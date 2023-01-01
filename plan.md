@@ -23,7 +23,6 @@ DS Manager:
 
 
 
-
 ver 0.1: Core functionality of dataset contribution:
 * Entry submittion page (web)
 * Server setup that accepts requests
