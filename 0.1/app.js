@@ -4,30 +4,19 @@ const app = express()
 const port = 3000
 
 
+app.use(express.urlencoded({extended: false}));
+app.use(express.json());
+
 /*
  
+ USE: PostgreSQL DB to store Users and Datasets + Metadata
+ 
  Handle:
- * Logins and Session tokens
+ * Logins and Session tokens. Maybe no pass login?
  * GET requests for datasets
  * Create Pull Requests
  * Accept Pull Requests and update DB
-
-
-Models:
-	User:
-		* username - str
-		* passward - hash
-		* email    - str
-		* karma?   - int32
-		* Notifications
-		* Messages
-		* Requests
-
-	Pull Request:
-		* Request id - hash
-		* new data   - JSON / CVS
-		* user       - str
-		* status		 - bool + NULL
+ 
 */
 
 app.get('/', (req, res) => {
@@ -39,9 +28,45 @@ app.get('/users/:username', (req, res) => {
 	res.send(`User ${username}`)
 })
 
-app.get('/datasets/:uuid', (req, res) => {
-	var uuid = req.params.uuid;
-	res.send(`GET Dataset with UUID ${uuid}`)
+app.get('/datasets/:dsid', (req, res) => {
+	var dsid = req.params.dsid;
+	res.send(`GET Dataset with UUID ${dsid}`)
+})
+
+
+/* Create new dataset
+
+ Expected JSON req data:
+ {
+		username: char[16]
+		schema: JSON
+		plan: int4
+		initial_data: JSON
+ }
+*/
+
+app.post('/new/dataset', (req, res) => {
+	res.send(req.body)
+})
+
+/* Create new User 
+
+ Expected JSON req data:
+ {
+		username: char[16]
+		passward: hash[256]
+		? email: char[16]
+		? RSS : hash[256]
+ }
+*/
+app.post('/new/user', (req, res) => {\
+	res.send(req.body)
+})
+
+app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
+	var ds = req.params.dsid;
+	var hash = req.params.hash;
+	res.send(`GET contribution ${hash} for dataset ${ds}.`)
 })
 
 
