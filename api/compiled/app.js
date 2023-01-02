@@ -81,7 +81,7 @@ app.get('/users/:username', function (req, res) { return __awaiter(_this, void 0
         switch (_a.label) {
             case 0:
                 username = req.params.username;
-                return [4 /*yield*/, queryDB('SELECT * from USERS')];
+                return [4 /*yield*/, queryDB("SELECT * FROM users WHERE username='".concat(username, "';"))];
             case 1:
                 get = _a.sent();
                 res.send("User ".concat(JSON.stringify(get['rows'])));
@@ -103,6 +103,8 @@ app.post('/create/dataset', function (req, res) {
     console.log("POST request");
     res.send("Recieved data : ".concat(JSON.stringify(req.body)));
     /* TODO
+     * Search DB database to make sure name is unique
+     * Search owner in User DB.
      * protect against injection attacks
      * parse schema into database creation command
      * check data format and schema + safety check?

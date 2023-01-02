@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
 // GET
 app.get('/users/:username', async(req: any, res: any) => {
 	var username: string = req.params.username;
-  var get: any = await queryDB('SELECT * from USERS')
+  var get: any = await queryDB(`SELECT * FROM users WHERE username='${username}';`)
 	res.send(`User ${JSON.stringify(get['rows'])}`) })
 
 app.get('/datasets/:dsid', (req, res) => {
@@ -53,8 +53,9 @@ app.post('/create/dataset', (req, res) => {
 	console.log("POST request")
 	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 
-
 	/* TODO
+	 * Search DB database to make sure name is unique
+	 * Search owner in User DB.
 	 * protect against injection attacks
 	 * parse schema into database creation command
 	 * check data format and schema + safety check?
