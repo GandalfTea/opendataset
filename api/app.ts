@@ -1,10 +1,9 @@
 
 const express = require('express')
 const app = express()
-const port = 3000
+const PORT: number = 3000;
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-
 
 const { Client } = require('pg')
 
@@ -19,8 +18,7 @@ const queryDB = async(query) => {
 					port: '5432'
 				})
 		await client.connect()
-		const res = await client.query(query)
-		console.log(res)
+		const res: any = await client.query(query)
 		await client.end()
 		return res;
 	} catch(error) {
@@ -28,29 +26,17 @@ const queryDB = async(query) => {
 	}
 }
 
-/*
- 
- USE: PostgreSQL DB to store Users and Datasets + Metadata
- 
- Handle:
- * Logins and Session tokens. Maybe no pass login?
- * GET requests for datasets
- * Create Pull Requests
- * Accept Pull Requests and update DB
- 
-*/
-
 app.get('/', (req, res) => {
 	res.send('Hello')	
 })
 
-app.get('/users/:username', async(req, res) => {
-	var username = req.params.username;
-  var get = await queryDB('SELECT * from USERS')
+app.get('/users/:username', async(req: any, res: any) => {
+	var username: string = req.params.username;
+  var get: any = await queryDB('SELECT * from USERS')
 	res.send(`User ${JSON.stringify(get['rows'])}`) })
 
 app.get('/datasets/:dsid', (req, res) => {
-	var dsid = req.params.dsid;
+	var dsid: number = req.params.dsid;
 	res.send(`GET Dataset with UUID ${dsid}`)
 })
 
@@ -99,7 +85,6 @@ app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
 	res.send(`GET contribution ${hash} for dataset ${ds}.`)
 })
 
-
-app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`)
+app.listen(PORT, () => {
+	console.log(`Example app listening on port ${PORT}`)
 })
