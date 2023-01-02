@@ -3,8 +3,10 @@ var assert = require('assert');
 const express = require('express')
 const app = express()
 const PORT: number = 3000;
+const DEBUG:boolean = true;
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+
 
 const { Client } = require('pg')
 
@@ -50,25 +52,42 @@ app.get('/datasets/:dsid', (req, res) => {
 })
 
 app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
-	var ds = req.params.dsid;
+	var ds = req.params.dsid['uuid'];
 	var hash = req.params.hash;
 	res.send(`GET contribution ${hash} for dataset ${ds}.`)
 })
 
 
 // CREATE
-app.post('/create/dataset', (req, res) => {
+app.post('/create/dataset', async (req, res) => {
 	console.log("POST request")
+	const name:string = req.body['name'];
+	let   owner:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
+	const owner:string = owner['rows'][0]['uuid'];
+	const schema:string = req.body['schema'];
+	switch(req.body['contributions']) {
+		case 'all':
+			const cont:number = 0;
+			break;
+		case 'res':
+			const cont:number = 1;
+			break;
+		case 'me' :
+			const cont:number = 2;
+			break;
+	};
+
+	if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
 	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 
 	/* TODO
-	 * Search DB database to make sure name is unique
-	 * Search owner in User DB.
-	 * protect against injection attacks
-	 * parse schema into database creation command
-	 * check data format and schema + safety check?
-	 * error catching and sending
-	 * respond with success */
+	 [ ] Search DB database to make sure name is unique
+	 [x] Search owner in User DB.
+	 [ ] protect against injection attacks
+	 [ ] parse schema into database creation command
+	 [ ] check data format and schema + safety check?
+	 [ ] error catching and sending
+	 [ ] respond with success */
 })
 
 app.post('/create/user', async (req, res) => {

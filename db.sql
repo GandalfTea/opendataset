@@ -40,6 +40,8 @@ COPY public.users (uuid, username, cakeday, email) FROM stdin;
 ef5ee1ff-bc8f-44cd-b4e5-4e32d64aaec1	GandalfTea	2001-07-09	contact@octavian.work
 9035e483-8c7b-4c16-a204-4bd2fd119163	dipsticksafety	1987-02-25	ventus@gmail.com
 d795becc-020b-45e0-98e4-e906969e8fcd	pioneer10	2005-01-19	pioneer10@gmail.com
+8c8e003f-a4b4-4544-a160-bc478c938bbb	GandalfTea	2023-01-02	octavian.concept@gmail.com
+6082e51e-67d5-41f6-b6e7-d59db8df0e96	spartacus991	2023-01-02	spartacus@spartacus.com
 \.
 
 

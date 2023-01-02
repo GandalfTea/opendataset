@@ -41,6 +41,7 @@ var assert = require('assert');
 var express = require('express');
 var app = express();
 var PORT = 3000;
+var DEBUG = true;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 var Client = require('pg').Client;
@@ -109,23 +110,42 @@ app.get('/datasets/:dsid', function (req, res) {
     res.send("GET Dataset with UUID ".concat(dsid));
 });
 app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
-    var ds = req.params.dsid;
+    var ds = req.params.dsid['uuid'];
     var hash = req.params.hash;
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 // CREATE
-app.post('/create/dataset', function (req, res) {
-    console.log("POST request");
-    res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-    /* TODO
-     * Search DB database to make sure name is unique
-     * Search owner in User DB.
-     * protect against injection attacks
-     * parse schema into database creation command
-     * check data format and schema + safety check?
-     * error catching and sending
-     * respond with success */
-});
+app.post('/create/dataset', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var name, owner, owner, schema, cont, cont, cont;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log("POST request");
+                name = req.body['name'];
+                return [4 /*yield*/, queryDB("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
+            case 1:
+                owner = _a.sent();
+                owner = owner['rows'][0]['uuid'];
+                schema = req.body['schema'];
+                switch (req.body['contributions']) {
+                    case 'all':
+                        cont = 0;
+                        break;
+                    case 'res':
+                        cont = 1;
+                        break;
+                    case 'me':
+                        cont = 2;
+                        break;
+                }
+                ;
+                if (DEBUG)
+                    console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
+                res.send("Recieved data : ".concat(JSON.stringify(req.body)));
+                return [2 /*return*/];
+        }
+    });
+}); });
 app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, email, uuid, now, cakeday, rq;
     return __generator(this, function (_a) {

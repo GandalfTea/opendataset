@@ -5,21 +5,21 @@
 	</head>	
 	<body>
 		<form action='http://127.0.0.1:3000/create/dataset' method='POST' id='dscreate' style='margin-left: 40vw; margin-top:25vh;'>
-			<label for='dsname'>Name:</label> <br>
-			<input type='text' id='dsname' name='dsname'> <br><br>
+			<label for='name'>Name:</label> <br>
+			<input type='text' id='name' name='name'> <br><br>
 
-			<label for='dsname'>Owner:</label> <br>
-			<input type='text' id='dsu' name='dsu'> <br><br>
+			<label for='owner'>Owner:</label> <br>
+			<input type='text' id='owner' name='owner'> <br><br>
 
-			<label for='dschema'>Schema:</label> <br>
-			<textarea for='dscreate' rows='4' cols='50' name='dschema'></textarea> <br><br>
+			<label for='schema'>Schema:</label> <br>
+			<textarea for='screate' rows='4' cols='50' name='schema'></textarea> <br><br>
 
 			<label>Who can contribute:</label> <br><br>
-			<input type='radio' id='anyone' name='contributions' value='True'>
+			<input type='radio' id='anyone' name='contributions' value='all'>
 			<label for='anyone'>Anyone can contribute</label> <br>
-			<input type='radio' id='restricted' name='contributions' value='True'>
+			<input type='radio' id='restricted' name='contributions' value='res'>
 			<label for='restricted'>Restricted users can contribute</label> <br>
-			<input type='radio' id='me' name='contributions' value='True'>
+			<input type='radio' id='me' name='contributions' value='me'>
 			<label for='me'>Only I can contribute</label> <br><br>
 
 			<input type='checkbox' id='default' name='default' value='True'>
