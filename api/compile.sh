@@ -1,3 +1,3 @@
-tsc app.ts --outDir ./compiled/
+tsc ./ts/app.ts --outDir ./compiled/
 node ./compiled/app.js
 

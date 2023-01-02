@@ -1,3 +1,5 @@
+import {v4 as uuidv4} from 'uuid';
+var assert = require('assert');
 const express = require('express')
 const app = express()
 const PORT: number = 3000;
@@ -31,6 +33,12 @@ app.get('/', (req, res) => {
 
 
 // GET
+
+app.get('/users', async(req, res) => {
+	var rq = await queryDB('SELECT * FROM users;');
+	res.send(JSON.stringify(rq['rows']));
+});
+
 app.get('/users/:username', async(req: any, res: any) => {
 	var username: string = req.params.username;
   var get: any = await queryDB(`SELECT * FROM users WHERE username='${username}';`)
@@ -63,8 +71,19 @@ app.post('/create/dataset', (req, res) => {
 	 * respond with success */
 })
 
-app.post('/create/user', (req, res) => {
-	res.send(req.body)
+app.post('/create/user', async (req, res) => {
+	const username:string = req.body['username'];
+	assert(username.length < 50 && username.length > 1);
+	const email:string = req.body['email'];
+	assert(email.length < 100 && email.length > 10);
+	// TODO: Actually check if email is correct lol
+	const uuid: string = uuidv4();
+	var now = new Date();
+	const cakeday: any = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate(); 
+	console.log(`\n Username: ${username}\n Email: ${email}\n UUID: ${uuid}\n Cakeday: ${cakeday}`)
+	const rq = await queryDB(`INSERT INTO users (uuid, username, cakeday, email) 
+													  VALUES('${uuid}', '${username}', '${cakeday}', '${email}');`)
+	res.send(JSON.stringify(rq))
 })
 
 app.listen(PORT, () => {
