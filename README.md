@@ -1,11 +1,12 @@
 
-Goal:
+Waypoints:    
+    
 1 week   : Allow multiple people to contribute to dataset creation      
 1 month  : Allow su to manage dataset contributions and manage pricing       
 1 year   : Allow users to crowdsource creative datasets that might not have commercial value.       
 10 years : Become the main democratic marketplace for datasets and crowdsource AI control through data.      
 
-
+&nbsp;     
 
 Needs:
 
@@ -21,6 +22,7 @@ DS Manager:
 * set automated contributions tests for sanity
 * set DS licence and usage rules
 
+&nbsp;     
 
 
 ver 0.1: Core functionality of dataset contribution:
@@ -43,13 +45,3 @@ ver 0.3: Search Update:
 
 ver 0.4: User upate:
 * user interactions: DMs, Forums, Comments
-
-
-Stack:
-* Frontend: React, socket.io
-* Backend: Django, SQLite
-
-
-
-
-
