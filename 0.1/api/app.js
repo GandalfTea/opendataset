@@ -66,9 +66,17 @@ app.get('/datasets/:dsid', (req, res) => {
  }
 */
 
-app.post('/new/dataset', (req, res) => {
+app.post('/create/dataset', (req, res) => {
 	console.log("POST request")
-	res.send(req.body)
+	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
+
+
+	/* TODO
+	 * protect against injection attacks
+	 * parse schema into database creation command
+	 * check data format and schema + safety check?
+	 * error catching and sending
+	 * respond with success */
 })
 
 /* Create new User 
@@ -81,7 +89,7 @@ app.post('/new/dataset', (req, res) => {
 		? RSS : hash[256]
  }
 */
-app.post('/new/user', (req, res) => {
+app.post('/create/user', (req, res) => {
 	res.send(req.body)
 })
 
