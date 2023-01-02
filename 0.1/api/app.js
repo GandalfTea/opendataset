@@ -2,10 +2,31 @@
 const express = require('express')
 const app = express()
 const port = 3000
-
-
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+
+
+const { Client } = require('pg')
+
+const queryDB = async(query) => {
+	try {
+					
+			const client = new Client({
+					user: 'su',
+					host: '127.0.0.1',
+					database: 'api',
+					password: 'lafiel',
+					port: '5432'
+				})
+		await client.connect()
+		const res = await client.query(query)
+		console.log(res)
+		await client.end()
+		return res;
+	} catch(error) {
+		return error
+	}
+}
 
 /*
  
@@ -23,10 +44,10 @@ app.get('/', (req, res) => {
 	res.send('Hello')	
 })
 
-app.get('/users/:username', (req, res) => {
+app.get('/users/:username', async(req, res) => {
 	var username = req.params.username;
-	res.send(`User ${username}`)
-})
+  var get = await queryDB('SELECT * from USERS')
+	res.send(`User ${JSON.stringify(get['rows'])}`) })
 
 app.get('/datasets/:dsid', (req, res) => {
 	var dsid = req.params.dsid;
@@ -46,6 +67,7 @@ app.get('/datasets/:dsid', (req, res) => {
 */
 
 app.post('/new/dataset', (req, res) => {
+	console.log("POST request")
 	res.send(req.body)
 })
 
@@ -59,7 +81,7 @@ app.post('/new/dataset', (req, res) => {
 		? RSS : hash[256]
  }
 */
-app.post('/new/user', (req, res) => {\
+app.post('/new/user', (req, res) => {
 	res.send(req.body)
 })
 
