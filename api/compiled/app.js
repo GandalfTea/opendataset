@@ -74,6 +74,7 @@ var queryDB = function (query) { return __awaiter(_this, void 0, void 0, functio
 app.get('/', function (req, res) {
     res.send('Hello');
 });
+// GET
 app.get('/users/:username', function (req, res) { return __awaiter(_this, void 0, void 0, function () {
     var username, get;
     return __generator(this, function (_a) {
@@ -92,16 +93,12 @@ app.get('/datasets/:dsid', function (req, res) {
     var dsid = req.params.dsid;
     res.send("GET Dataset with UUID ".concat(dsid));
 });
-/* Create new dataset
-
- Expected JSON req data:
- {
-        username: char[16]
-        schema: JSON
-        plan: int4
-        initial_data: JSON
- }
-*/
+app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
+    var ds = req.params.dsid;
+    var hash = req.params.hash;
+    res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
+});
+// CREATE
 app.post('/create/dataset', function (req, res) {
     console.log("POST request");
     res.send("Recieved data : ".concat(JSON.stringify(req.body)));
@@ -112,23 +109,8 @@ app.post('/create/dataset', function (req, res) {
      * error catching and sending
      * respond with success */
 });
-/* Create new User
-
- Expected JSON req data:
- {
-        username: char[16]
-        passward: hash[256]
-        ? email: char[16]
-        ? RSS : hash[256]
- }
-*/
 app.post('/create/user', function (req, res) {
     res.send(req.body);
-});
-app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
-    var ds = req.params.dsid;
-    var hash = req.params.hash;
-    res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 app.listen(PORT, function () {
     console.log("Example app listening on port ".concat(PORT));

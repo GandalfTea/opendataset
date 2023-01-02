@@ -7,26 +7,31 @@
 		<form action='http://127.0.0.1:3000/create/dataset' method='POST' id='dscreate' style='margin-left: 40vw; margin-top:25vh;'>
 			<label for='dsname'>Name:</label> <br>
 			<input type='text' id='dsname' name='dsname'> <br><br>
+
 			<label for='dsname'>Owner:</label> <br>
 			<input type='text' id='dsu' name='dsu'> <br><br>
+
 			<label for='dschema'>Schema:</label> <br>
 			<textarea for='dscreate' rows='4' cols='50' name='dschema'></textarea> <br><br>
 
 			<label>Who can contribute:</label> <br><br>
-			<input type='radio' id='anyone' name='contributions' value='anyone'>
+			<input type='radio' id='anyone' name='contributions' value='True'>
 			<label for='anyone'>Anyone can contribute</label> <br>
-			<input type='radio' id='restricted' name='contributions' value='restricted'>
+			<input type='radio' id='restricted' name='contributions' value='True'>
 			<label for='restricted'>Restricted users can contribute</label> <br>
-			<input type='radio' id='me' name='contributions' value='me'>
+			<input type='radio' id='me' name='contributions' value='True'>
 			<label for='me'>Only I can contribute</label> <br><br>
 
-			<input type='checkbox' id='default' name='default' value='default'>
+			<input type='checkbox' id='default' name='default' value='True'>
 			<label for='default'>Default contribution safety check (might impact performance)</label> <br>
-			<input type='checkbox' id='custom-test' name='custom-test' value='custom-test'>
+
+			<input type='checkbox' id='custom-test' name='custom-test' value='True'>
 			<label for='custom-test'>Implement custom tests</label> <br><br><br>
 
 			<label for='dsinit'>Data:</label> <br>
+
 			<input type='file' id='dsinit' name='filename'><br><br><br>
+
 			<input type='submit'>
 	</body>
 </html>

@@ -1,4 +1,3 @@
-
 const express = require('express')
 const app = express()
 const PORT: number = 3000;
@@ -30,6 +29,8 @@ app.get('/', (req, res) => {
 	res.send('Hello')	
 })
 
+
+// GET
 app.get('/users/:username', async(req: any, res: any) => {
 	var username: string = req.params.username;
   var get: any = await queryDB('SELECT * from USERS')
@@ -40,18 +41,14 @@ app.get('/datasets/:dsid', (req, res) => {
 	res.send(`GET Dataset with UUID ${dsid}`)
 })
 
+app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
+	var ds = req.params.dsid;
+	var hash = req.params.hash;
+	res.send(`GET contribution ${hash} for dataset ${ds}.`)
+})
 
-/* Create new dataset
 
- Expected JSON req data:
- {
-		username: char[16]
-		schema: JSON
-		plan: int4
-		initial_data: JSON
- }
-*/
-
+// CREATE
 app.post('/create/dataset', (req, res) => {
 	console.log("POST request")
 	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
@@ -65,24 +62,8 @@ app.post('/create/dataset', (req, res) => {
 	 * respond with success */
 })
 
-/* Create new User 
-
- Expected JSON req data:
- {
-		username: char[16]
-		passward: hash[256]
-		? email: char[16]
-		? RSS : hash[256]
- }
-*/
 app.post('/create/user', (req, res) => {
 	res.send(req.body)
-})
-
-app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
-	var ds = req.params.dsid;
-	var hash = req.params.hash;
-	res.send(`GET contribution ${hash} for dataset ${ds}.`)
 })
 
 app.listen(PORT, () => {
