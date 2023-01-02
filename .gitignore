@@ -1,4 +1,5 @@
 
+dump.sh
 node_modules
 *.swp
 package-lock.json

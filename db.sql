@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: su
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.users (
@@ -32,10 +32,8 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO su;
-
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: su
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.users (uuid, username, cakeday, email) FROM stdin;
@@ -46,7 +44,7 @@ d795becc-020b-45e0-98e4-e906969e8fcd	pioneer10	2005-01-19	pioneer10@gmail.com
 
 
 --
--- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: su
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
@@ -54,7 +52,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: su
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
