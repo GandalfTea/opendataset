@@ -43,16 +43,17 @@ var express = require('express');
 var app = express();
 var multer = require('multer');
 var PORT = 3000;
-var DEBUG = true;
+var DEBUG = false;
 // Setup 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 var cache = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, '../uploads');
+        cb(null, './cache');
     },
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now());
+        var dsname = file.originalname.split('.')[0];
+        cb(null, dsname + '-' + Date.now() + '.csv');
     }
 });
 var upload = multer({ storage: cache });
@@ -102,23 +103,20 @@ app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 // CREATE
-app.post('/create/dataset', upload.single('init'), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var NO_FILE_UPLOAD, file, name, owner_entry, owner, cont, schema;
+app.post('/create/dataset', upload.single('init'), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var file, NO_FILE_UPLOAD, name, owner_entry, owner, cont, schema;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("CREATE dataset REQUEST from ".concat(req.socket.remoteAddress));
-                console.log("CREATE dataset REQUEST from ".concat(req.connection.remoteAddress));
-                NO_FILE_UPLOAD = false;
+                process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
                 file = req.file;
-                if (!file)
-                    NO_FILE_UPLOAD = true;
+                NO_FILE_UPLOAD = (!file) ? true : false;
                 name = req.body['name'];
                 return [4 /*yield*/, (0, db_1["default"])("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
             case 1:
                 owner_entry = _a.sent();
                 if (owner_entry['rowCount'] <= 0)
-                    console.log("ERROR: User not found");
+                    process.stdout.write("REVOKED, user ".concat(req.body['owner'], " not found."));
                 if (owner_entry['rowCount'] <= 0) {
                     res.status = 404;
                     res.send("User not found: ".concat(req.body['owner']));
@@ -137,6 +135,7 @@ app.post('/create/dataset', upload.single('init'), function (req, res) { return 
                     }
                     if (DEBUG)
                         console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
+                    process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
                     res.status = 201;
                     res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 }
@@ -149,6 +148,7 @@ app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                console.log("CREATE user REQUEST from:  ".concat(req.socket.remoteAddress));
                 username = req.body['username'];
                 assert(username.length < 50 && username.length > 1);
                 email = req.body['email'];

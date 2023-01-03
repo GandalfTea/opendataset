@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 const multer = require('multer');
 const PORT: number = 3000;
-const DEBUG:boolean = true;
+const DEBUG:boolean = false;
 
 
 
@@ -15,10 +15,11 @@ app.use(express.json());
 
 var cache = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, '../uploads');
+		cb(null, './cache');
 	},
 	filename: (req, file, cb) => {
-		cb(null, file.fieldname + '-' + Date.now());
+		const dsname = file.originalname.split('.')[0];
+		cb(null, dsname + '-' + Date.now() + '.csv');
 	}
 })
 var upload = multer({ storage: cache });
@@ -62,17 +63,16 @@ app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
 
 
 // CREATE
-app.post('/create/dataset', upload.single('init'), async (req, res) => {
+app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 
-	console.log(`CREATE dataset REQUEST from:  ${req.socket.remoteAddress}`)
+	process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
 
-	const NO_FILE_UPLOAD: boolean = false;
 	const file: any = req.file
-	if(!file) NO_FILE_UPLOAD = true;	
+	const NO_FILE_UPLOAD: boolean = (!file) ? true : false; 
 
 	const name:string = req.body['name'];
 	let   owner_entry:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
-	if(owner_entry['rowCount'] <= 0) console.log("ERROR: User not found")
+	if(owner_entry['rowCount'] <= 0) process.stdout.write(`REVOKED, user ${req.body['owner']} not found.`) 
 	if(owner_entry['rowCount'] <= 0) {
 		res.status = 404;
 		res.send(`User not found: ${req.body['owner']}`);
@@ -93,6 +93,7 @@ app.post('/create/dataset', upload.single('init'), async (req, res) => {
 		}
 	
 		if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
+		process.stdout.write(`RESOLVED, dataset '${name}' created.`)
 		res.status = 201
 		res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 	}
