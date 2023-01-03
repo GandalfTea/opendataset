@@ -3,6 +3,8 @@
 Simple website for crowd-sourcing dataset creation for data that might not have comercial value.    
 Backend is Express.js and PostgreSQL while frontend is React.js and Socket.io.
       
+Backend also requires : `multer`, `pg` and `uuid`. 
+      
       
 &nbsp;
 
