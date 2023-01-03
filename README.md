@@ -6,23 +6,20 @@ Simple website for crowd-sourcing dataset creation for data that might not have 
       
 &nbsp;
 
-ver 0.1: Core functionality of dataset contribution:
-* Entry submission page
-* Server setup that accepts requests
-* Request page formulation, request code and formalising
+#### 0.1:
+* Manage user accounts
+* Dataset creation and contribution submission
 * SU accept or reject contributions
 * User download full dataset or random subset.
 
-ver 0.2:
-* Request tests
-* Sanity regular tests
+#### 0.2:
+* Contributions basic testing
+* Personalised contributions testing
 * CLI contributions
-* Rudimentary contributions scanning
 
-ver 0.3:
+#### 0.3:
 * Serialise and cache datasets properties to make them searchable
-* Search main page
-* Basic search functionality
+* Search page
 
-ver 0.4:
+#### 0.4:
 * user interactions: DMs, Forums, Comments
