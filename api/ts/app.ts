@@ -1,45 +1,42 @@
 import {v4 as uuidv4} from 'uuid';
+import queryDB from './db';
 var assert = require('assert');
-const express = require('express')
-const app = express()
+const express = require('express');
+const app = express();
+const multer = require('multer');
 const PORT: number = 3000;
 const DEBUG:boolean = true;
+
+
+
+// Setup 
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 
-
-const { Client } = require('pg')
-
-const queryDB = async(query) => {
-	try {
-					
-			const client = new Client({
-					user: 'su',
-					host: '127.0.0.1',
-					database: 'api',
-					password: 'lafiel',
-					port: '5432'
-				})
-		await client.connect()
-		const res: any = await client.query(query)
-		await client.end()
-		return res;
-	} catch(error) {
-		return error
+var cache = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, '../uploads');
+	},
+	filename: (req, file, cb) => {
+		cb(null, file.fieldname + '-' + Date.now());
 	}
-}
+})
+var upload = multer({ storage: cache });
+
+
 
 app.get('/', (req, res) => {
-	res.status = 200 
-	res.send('Hello')	
+	res.status = 200; 
+	res.send('Hello');	
 })
 
 
-// GET
 
+// GET
+// TODO: Prevent injection attacks (current is vulnerable)
 app.get('/users', async(req, res) => {
 	var rq = await queryDB('SELECT * FROM users;');
-	res.status = 302
+	res.status = 302;
 	res.send(JSON.stringify(rq['rows']));
 });
 
@@ -63,28 +60,42 @@ app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
 })
 
 
-// CREATE
-app.post('/create/dataset', async (req, res) => {
-	console.log("POST request")
-	const name:string = req.body['name'];
-	let   owner:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
-	const owner:string = owner['rows'][0]['uuid'];
-	const schema:string = req.body['schema'];
-	switch(req.body['contributions']) {
-		case 'all':
-			const cont:number = 0;
-			break;
-		case 'res':
-			const cont:number = 1;
-			break;
-		case 'me' :
-			const cont:number = 2;
-			break;
-	};
 
-	if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
-	res.status = 201
-	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
+// CREATE
+app.post('/create/dataset', upload.single('init'), async (req, res) => {
+
+	console.log(`CREATE dataset REQUEST from:  ${req.socket.remoteAddress}`)
+
+	const NO_FILE_UPLOAD: boolean = false;
+	const file: any = req.file
+	if(!file) NO_FILE_UPLOAD = true;	
+
+	const name:string = req.body['name'];
+	let   owner_entry:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
+	if(owner_entry['rowCount'] <= 0) console.log("ERROR: User not found")
+	if(owner_entry['rowCount'] <= 0) {
+		res.status = 404;
+		res.send(`User not found: ${req.body['owner']}`);
+	} else {
+		const owner:string = owner_entry['rows'][0]['uuid'];
+		const cont:number = parseInt(req.body['contributions']);
+
+		// Auto parse schema from .csv
+		const schema:string = req.body['schema'];
+
+		if(!NO_FILE_UPLOAD) {
+			/* TODO: Once the file is in local storage
+			  [ ] Automatic schema generation
+				[ ] Create new table in DB using schema
+				[ ] Migrate the data
+				[ ] ? Link table to a meta table of contributions
+				[ ] ? Register table in metatable of datasets */ 
+		}
+	
+		if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
+		res.status = 201
+		res.send(`Recieved data : ${JSON.stringify(req.body)}`)
+	}
 
 	/* TODO
 	 [ ] Search DB database to make sure name is unique
@@ -97,6 +108,9 @@ app.post('/create/dataset', async (req, res) => {
 })
 
 app.post('/create/user', async (req, res) => {
+
+	console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`)
+
 	const username:string = req.body['username'];
 	assert(username.length < 50 && username.length > 1);
 	const email:string = req.body['email'];
@@ -110,6 +124,15 @@ app.post('/create/user', async (req, res) => {
 													  VALUES('${uuid}', '${username}', '${cakeday}', '${email}');`)
 	res.status = 201
 	res.send(JSON.stringify(rq))
+
+	/* TODO
+	 [ ] Require passward
+	 [ ] Check if username already exists
+	 [ ] Regex check username
+	 [ ] Link to a UserMetadata table for notifications and msg
+	 [ ] Verify email
+	 [ ] ? Hold pointer to databases created
+	 [ ] ? Karma / Rep points */
 })
 
 
@@ -119,8 +142,11 @@ app.delete('/users/:user', async (req, res) => {
 	var query: any = await queryDB(`DELETE FROM users WHERE username='${username}';`);
 	res.status = 200 
 	res.send(query);
+
+	/* TODO
+	  [ ] ? Require some confirmation beforehand (to prevent accidental deletion) */
 })
 
 app.listen(PORT, () => {
-	console.log(`Example app listening on port ${PORT}`)
+	console.log(`Listening on port: ${PORT}`)
 })
