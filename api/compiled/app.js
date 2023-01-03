@@ -67,7 +67,7 @@ app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0,
     var rq;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, db_1["default"])('SELECT * FROM users;')];
+            case 0: return [4 /*yield*/, (0, db_1.queryDB)('SELECT * FROM users;')];
             case 1:
                 rq = _a.sent();
                 res.status = 302;
@@ -82,7 +82,7 @@ app.get('/users/:username', function (req, res) { return __awaiter(void 0, void 
         switch (_a.label) {
             case 0:
                 username = req.params.username;
-                return [4 /*yield*/, (0, db_1["default"])("SELECT * FROM users WHERE username='".concat(username, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(username, "';"))];
             case 1:
                 get = _a.sent();
                 res.status = 302;
@@ -112,7 +112,7 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 file = req.file;
                 NO_FILE_UPLOAD = (!file) ? true : false;
                 name = req.body['name'];
-                return [4 /*yield*/, (0, db_1["default"])("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
             case 1:
                 owner_entry = _a.sent();
                 if (owner_entry['rowCount'] <= 0)
@@ -157,7 +157,7 @@ app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, 
                 now = new Date();
                 cakeday = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
                 console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n UUID: ").concat(uuid, "\n Cakeday: ").concat(cakeday));
-                return [4 /*yield*/, (0, db_1["default"])("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t  VALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t  VALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
             case 1:
                 rq = _a.sent();
                 res.status = 201;
@@ -173,7 +173,7 @@ app["delete"]('/users/:user', function (req, res) { return __awaiter(void 0, voi
         switch (_a.label) {
             case 0:
                 username = req.params.user;
-                return [4 /*yield*/, (0, db_1["default"])("DELETE FROM users WHERE username='".concat(username, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username='".concat(username, "';"))];
             case 1:
                 query = _a.sent();
                 res.status = 200;

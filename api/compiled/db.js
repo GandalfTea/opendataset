@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.queryDB = void 0;
 var Client = require('pg').Client;
 var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
     var client, res, error_1;
@@ -67,4 +68,28 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
         }
     });
 }); };
-exports["default"] = queryDB;
+exports.queryDB = queryDB;
+// Parse recieved .cvs files and upload them to the database
+var spawn = require('child_process').spawn;
+function generate_schema(path) {
+    var python_process = spawn('python', ['./generate_schema_from_pandas.py', path]);
+    python_process.stdout.on('data', function (data) {
+        return data.toString();
+    });
+}
+exports.generate_schema = generate_schema;
+// generate_schema('../cache/demo-1672779676422.csv');
+function migrate_csv_to_db_new_table(path, table_name) {
+    return __awaiter(this, void 0, void 0, function () {
+        var py_schema, create_schema, cmd_schema;
+        return __generator(this, function (_a) {
+            py_schema = generate_schema(path);
+            create_schema = py_schema;
+            cmd_schema = py_schema;
+            queryDB(create_schema);
+            queryDB("COPY ".concat(cmd_schema, " FROM ").concat(path, " DELIMITER ',' CSV HEADER;"));
+            return [2 /*return*/];
+        });
+    });
+}
+exports.migrate_csv_to_db_new_table = migrate_csv_to_db_new_table;

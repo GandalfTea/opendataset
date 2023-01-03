@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import queryDB from './db';
+import { queryDB } from './db';
 var assert = require('assert');
 const express = require('express');
 const app = express();
