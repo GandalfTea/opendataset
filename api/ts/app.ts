@@ -30,6 +30,7 @@ const queryDB = async(query) => {
 }
 
 app.get('/', (req, res) => {
+	res.status = 200 
 	res.send('Hello')	
 })
 
@@ -38,22 +39,26 @@ app.get('/', (req, res) => {
 
 app.get('/users', async(req, res) => {
 	var rq = await queryDB('SELECT * FROM users;');
+	res.status = 302
 	res.send(JSON.stringify(rq['rows']));
 });
 
 app.get('/users/:username', async(req: any, res: any) => {
 	var username: string = req.params.username;
   var get: any = await queryDB(`SELECT * FROM users WHERE username='${username}';`)
+	res.status = 302
 	res.send(`User ${JSON.stringify(get['rows'])}`) })
 
 app.get('/datasets/:dsid', (req, res) => {
 	var dsid: number = req.params.dsid;
+	res.status = 302
 	res.send(`GET Dataset with UUID ${dsid}`)
 })
 
 app.get('/datasets/:dsid/contributions/:hash', (req, res) => {
 	var ds = req.params.dsid['uuid'];
 	var hash = req.params.hash;
+	res.status = 302
 	res.send(`GET contribution ${hash} for dataset ${ds}.`)
 })
 
@@ -78,6 +83,7 @@ app.post('/create/dataset', async (req, res) => {
 	};
 
 	if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
+	res.status = 201
 	res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 
 	/* TODO
@@ -102,7 +108,17 @@ app.post('/create/user', async (req, res) => {
 	console.log(`\n Username: ${username}\n Email: ${email}\n UUID: ${uuid}\n Cakeday: ${cakeday}`)
 	const rq = await queryDB(`INSERT INTO users (uuid, username, cakeday, email) 
 													  VALUES('${uuid}', '${username}', '${cakeday}', '${email}');`)
+	res.status = 201
 	res.send(JSON.stringify(rq))
+})
+
+
+// DELETE
+app.delete('/users/:user', async (req, res) => {
+	var username: string = req.params.user;
+	var query: any = await queryDB(`DELETE FROM users WHERE username='${username}';`);
+	res.status = 200 
+	res.send(query);
 })
 
 app.listen(PORT, () => {

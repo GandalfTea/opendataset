@@ -76,6 +76,7 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 app.get('/', function (req, res) {
+    res.status = 200;
     res.send('Hello');
 });
 // GET
@@ -86,6 +87,7 @@ app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0,
             case 0: return [4 /*yield*/, queryDB('SELECT * FROM users;')];
             case 1:
                 rq = _a.sent();
+                res.status = 302;
                 res.send(JSON.stringify(rq['rows']));
                 return [2 /*return*/];
         }
@@ -100,6 +102,7 @@ app.get('/users/:username', function (req, res) { return __awaiter(void 0, void 
                 return [4 /*yield*/, queryDB("SELECT * FROM users WHERE username='".concat(username, "';"))];
             case 1:
                 get = _a.sent();
+                res.status = 302;
                 res.send("User ".concat(JSON.stringify(get['rows'])));
                 return [2 /*return*/];
         }
@@ -107,11 +110,13 @@ app.get('/users/:username', function (req, res) { return __awaiter(void 0, void 
 }); });
 app.get('/datasets/:dsid', function (req, res) {
     var dsid = req.params.dsid;
+    res.status = 302;
     res.send("GET Dataset with UUID ".concat(dsid));
 });
 app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
     var ds = req.params.dsid['uuid'];
     var hash = req.params.hash;
+    res.status = 302;
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 // CREATE
@@ -141,6 +146,7 @@ app.post('/create/dataset', function (req, res) { return __awaiter(void 0, void 
                 ;
                 if (DEBUG)
                     console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
+                res.status = 201;
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 return [2 /*return*/];
         }
@@ -162,7 +168,24 @@ app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, 
                 return [4 /*yield*/, queryDB("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t  VALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
             case 1:
                 rq = _a.sent();
+                res.status = 201;
                 res.send(JSON.stringify(rq));
+                return [2 /*return*/];
+        }
+    });
+}); });
+// DELETE
+app["delete"]('/users/:user', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var username, query;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                username = req.params.user;
+                return [4 /*yield*/, queryDB("DELETE FROM users WHERE username='".concat(username, "';"))];
+            case 1:
+                query = _a.sent();
+                res.status = 200;
+                res.send(query);
                 return [2 /*return*/];
         }
     });
