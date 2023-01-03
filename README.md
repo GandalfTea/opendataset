@@ -1,16 +1,13 @@
 
 
-Waypoints:
+### About
+Simple website for crowd-sourcing dataset creation for data that might not have comercial value.
       
-**1 week**   : Allow multiple people to contribute to dataset creation      
-**1 month**  : Allow su to manage dataset contributions and manage pricing        
-**1 year**   : Allow users to crowdsource creative datasets that might not have commercial value.      
-**10 years** : Profit? 
       
 &nbsp;
 
 ver 0.1: Core functionality of dataset contribution:
-* Entry submittion page (web)
+* Entry submission page
 * Server setup that accepts requests
 * Request page formulation, request code and formalising
 * SU accept or reject contributions
