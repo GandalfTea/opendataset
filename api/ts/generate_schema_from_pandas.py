@@ -8,8 +8,10 @@ if __name__ == '__main__':
     for arg in sys.argv[1:]:
         if isinstance(arg, str):
             BASEDIR = os.path.dirname(os.path.realpath(__file__))
-            name = arg.split('-')[0]
-            path = os.path.join(BASEDIR, '..', 'cache', arg) if os.path.isfile(os.path.join(BASEDIR, '..', 'cache', arg)) else 0
+            relpath = os.path.join(BASEDIR, '..', 'cache', arg) 
+            if os.path.isfile(relpath): path = relpath
+            else:
+                name = arg
         else:
             pass
             

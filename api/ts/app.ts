@@ -72,7 +72,7 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 
 	const name:string = req.body['name'];
 	let   owner_entry:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
-	if(owner_entry['rowCount'] <= 0) process.stdout.write(`REVOKED, user ${req.body['owner']} not found.`) 
+	if(owner_entry['rowCount'] <= 0) process.stdout.write(`REJECTED, user ${req.body['owner']} not found.`) 
 	if(owner_entry['rowCount'] <= 0) {
 		res.status = 404;
 		res.send(`User not found: ${req.body['owner']}`);
@@ -84,18 +84,19 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 		const schema:string = req.body['schema'];
 
 		if(!NO_FILE_UPLOAD) {
-			const ret = await	migrate_csv_to_db_new_table(file.filename, 'api')
+			const ret = await	migrate_csv_to_db_new_table(file.filename, req.body['name'])
 
 			/* TODO: Once the file is in local storage
 			  [x] Automatic schema generation
-				[ ] Create new table in DB using schema
+				[x] Create new table in DB using schema
 				[ ] Migrate the data
 				[ ] ? Link table to a meta table of contributions
 				[ ] ? Register table in metatable of datasets */ 
 		}
 	
-		if(DEBUG) console.log(`\nCREATE dataset\n\tName: ${name}\n\tOwner: ${owner}\n\tContributions: ${cont}\n\tSchema: ${schema}`);
 		process.stdout.write(`RESOLVED, dataset '${name}' created.`)
+		if(DEBUG) console.log(`\n${name}\n\towner: ${owner}\n
+													 \tcontributions: ${cont}\n\tschema: ${schema}`);
 		res.status = 201
 		res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 	}

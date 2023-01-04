@@ -116,7 +116,7 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
             case 1:
                 owner_entry = _a.sent();
                 if (owner_entry['rowCount'] <= 0)
-                    process.stdout.write("REVOKED, user ".concat(req.body['owner'], " not found."));
+                    process.stdout.write("REJECTED, user ".concat(req.body['owner'], " not found."));
                 if (!(owner_entry['rowCount'] <= 0)) return [3 /*break*/, 2];
                 res.status = 404;
                 res.send("User not found: ".concat(req.body['owner']));
@@ -126,10 +126,10 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 cont = parseInt(req.body['contributions']);
                 schema = req.body['schema'];
                 if (!!NO_FILE_UPLOAD) return [3 /*break*/, 4];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, 'api')
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])
                     /* TODO: Once the file is in local storage
                       [x] Automatic schema generation
-                        [ ] Create new table in DB using schema
+                        [x] Create new table in DB using schema
                         [ ] Migrate the data
                         [ ] ? Link table to a meta table of contributions
                         [ ] ? Register table in metatable of datasets */
@@ -138,9 +138,9 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 ret = _a.sent();
                 _a.label = 4;
             case 4:
-                if (DEBUG)
-                    console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
                 process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
+                if (DEBUG)
+                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.status = 201;
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 _a.label = 5;
