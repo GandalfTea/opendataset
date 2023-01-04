@@ -104,13 +104,13 @@ app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
 });
 // CREATE
 app.post('/create/dataset', upload.single('init'), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var file, NO_FILE_UPLOAD, name, owner_entry, owner, cont, schema, ret;
+    var file, FILE_UPLOAD, name, owner_entry, owner, cont, schema, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
                 file = req.file;
-                NO_FILE_UPLOAD = (!file) ? true : false;
+                FILE_UPLOAD = (!file) ? false : true;
                 name = req.body['name'];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
             case 1:
@@ -118,30 +118,47 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 if (owner_entry['rowCount'] <= 0)
                     process.stdout.write("REJECTED, user ".concat(req.body['owner'], " not found."));
                 if (!(owner_entry['rowCount'] <= 0)) return [3 /*break*/, 2];
-                res.status = 404;
+                res.status(404);
                 res.send("User not found: ".concat(req.body['owner']));
                 return [3 /*break*/, 5];
             case 2:
                 owner = owner_entry['rows'][0]['uuid'];
                 cont = parseInt(req.body['contributions']);
                 schema = req.body['schema'];
-                if (!!NO_FILE_UPLOAD) return [3 /*break*/, 4];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])
-                    /* TODO: Once the file is in local storage
-                      [x] Automatic schema generation
-                        [x] Create new table in DB using schema
-                        [ ] Migrate the data
-                        [ ] ? Link table to a meta table of contributions
-                        [ ] ? Register table in metatable of datasets */
-                ];
+                if (!FILE_UPLOAD) return [3 /*break*/, 4];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])];
             case 3:
                 ret = _a.sent();
-                _a.label = 4;
+                switch (ret) {
+                    case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
+                        process.stdout.write(" Successful data migration ");
+                        res.status(201); // Creted
+                        process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
+                        if (DEBUG)
+                            console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                        res.send("Recieved data : ".concat(JSON.stringify(req.body)));
+                        break;
+                    case db_1.csv_mig_errors.ERROR_GENERATING_SCHEMA:
+                    case db_1.csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
+                        res.status(421); // Unprocessable Entity 
+                        res.send("Error parsing input on out end. Sorry");
+                        break;
+                    case db_1.csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
+                        res.status(400); // Bad request
+                        res.send("Your file contains illegal column names. Please make sure to\n\t\t\t\t\t\t\t\t\t  have your first row be in accordance with SQL naming conventions.");
+                        break;
+                    case db_1.csv_mig_errors.FAILURE_TO_GENERATE_TABLE:
+                    case db_1.csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
+                        res.status(500); // Internal server error
+                        res.send("Internal Server Error. Sorry.");
+                        break;
+                }
+                return [3 /*break*/, 5];
             case 4:
+                res.status(201); // Created
                 process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
                 if (DEBUG)
-                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
-                res.status = 201;
+                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 _a.label = 5;
             case 5: return [2 /*return*/];

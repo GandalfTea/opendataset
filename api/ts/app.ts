@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import { queryDB, generate_schema,  migrate_csv_to_db_new_table } from './db';
+import { queryDB, generate_schema, migrate_csv_to_db_new_table, csv_mig_errors } from './db';
 var assert = require('assert');
 const express = require('express');
 const app = express();
@@ -68,13 +68,13 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 	process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
 
 	const file: any = req.file
-	const NO_FILE_UPLOAD: boolean = (!file) ? true : false; 
+	const FILE_UPLOAD: boolean = (!file) ? false : true; 
 
 	const name:string = req.body['name'];
 	let   owner_entry:string = await queryDB(`SELECT * FROM users WHERE username='${req.body['owner']}';`);
 	if(owner_entry['rowCount'] <= 0) process.stdout.write(`REJECTED, user ${req.body['owner']} not found.`) 
 	if(owner_entry['rowCount'] <= 0) {
-		res.status = 404;
+		res.status(404);
 		res.send(`User not found: ${req.body['owner']}`);
 	} else {
 		const owner:string = owner_entry['rows'][0]['uuid'];
@@ -83,22 +83,52 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 		// Auto parse schema from .csv
 		const schema:string = req.body['schema'];
 
-		if(!NO_FILE_UPLOAD) {
+		if(FILE_UPLOAD) {
 			const ret = await	migrate_csv_to_db_new_table(file.filename, req.body['name'])
+			switch(ret) {
+
+				case csv_mig_errors.SUCCESSFUL_MIGRATION:
+					process.stdout.write(` Successful data migration `)
+					res.status(201); // Creted
+					process.stdout.write(`RESOLVED, dataset '${name}' created.`)
+					if(DEBUG) console.log(`\n${name}\n\towner: ${owner}\n
+																 \tcontributions: ${cont}\n\tschema: ${schema}\n\tfile: ${file.filename}`);
+					res.send(`Recieved data : ${JSON.stringify(req.body)}`)
+					break;
+
+				case csv_mig_errors.ERROR_GENERATING_SCHEMA:
+				case csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
+					res.status(421); // Unprocessable Entity 
+					res.send(`Error parsing input on out end. Sorry`)
+					break;
+
+				case csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
+					res.status(400); // Bad request
+					res.send(`Your file contains illegal column names. Please make sure to
+									  have your first row be in accordance with SQL naming conventions.`);
+					break;
+
+				case csv_mig_errors.FAILURE_TO_GENERATE_TABLE:
+				case csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
+					res.status(500); // Internal server error
+					res.send(`Internal Server Error. Sorry.`);
+					break;
+			}
 
 			/* TODO: Once the file is in local storage
 			  [x] Automatic schema generation
 				[x] Create new table in DB using schema
-				[ ] Migrate the data
+				[x] Migrate the data
 				[ ] ? Link table to a meta table of contributions
 				[ ] ? Register table in metatable of datasets */ 
+		} else {
+			res.status(201) // Created
+			process.stdout.write(`RESOLVED, dataset '${name}' created.`)
+			if(DEBUG) console.log(`\n${name}\n\towner: ${owner}\n
+														 \tcontributions: ${cont}\n\tschema: ${schema}`);
+			res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 		}
 	
-		process.stdout.write(`RESOLVED, dataset '${name}' created.`)
-		if(DEBUG) console.log(`\n${name}\n\towner: ${owner}\n
-													 \tcontributions: ${cont}\n\tschema: ${schema}`);
-		res.status = 201
-		res.send(`Recieved data : ${JSON.stringify(req.body)}`)
 	}
 
 	/* TODO
