@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.queryDB = void 0;
 var Client = require('pg').Client;
+var path = require('path');
 var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
     var client, res, error_1;
     return __generator(this, function (_a) {
@@ -100,17 +101,35 @@ function generate_schema(path) {
     });
 }
 exports.generate_schema = generate_schema;
-function migrate_csv_to_db_new_table(path, table_name) {
+function migrate_csv_to_db_new_table(relpath, table_name) {
     return __awaiter(this, void 0, void 0, function () {
-        var py_schema;
+        var py_schema, name, split_schema, fields, i, cmd_schema, i, ret;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, generate_schema(path)];
+                case 0: return [4 /*yield*/, generate_schema(relpath)];
                 case 1:
                     py_schema = _a.sent();
-                    //console.log(py_schema)
-                    //queryDB(create_schema);
-                    //queryDB(`COPY ${cmd_schema} FROM ${path} DELIMITER ',' CSV HEADER;`);
+                    name = relpath.split('-')[0];
+                    return [4 /*yield*/, queryDB(py_schema.toString())];
+                case 2:
+                    _a.sent();
+                    console.log(py_schema.toString());
+                    split_schema = py_schema.toString().split('(')[1].split(')')[0].split(',');
+                    fields = [];
+                    for (i = 0; i < split_schema.length; i++) {
+                        fields.push(split_schema[i].split('"')[1]);
+                    }
+                    cmd_schema = "".concat(name, "(");
+                    for (i = 0; i < fields.length; i++) {
+                        cmd_schema += (i == fields.length - 1) ? fields[i] : fields[i] + ", ";
+                    }
+                    cmd_schema += ")";
+                    relpath = './cache/' + relpath;
+                    console.log("COPY ".concat(cmd_schema, " FROM '").concat(path.resolve(relpath), "' WITH  (FORMAT csv)"));
+                    return [4 /*yield*/, queryDB("COPY ".concat(cmd_schema, " FROM '").concat(path.resolve(relpath), "' DELIMITER ',' CSV HEADER;"))];
+                case 3:
+                    ret = _a.sent();
+                    console.log(ret);
                     return [2 /*return*/, py_schema.toString()];
             }
         });

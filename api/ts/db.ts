@@ -1,5 +1,6 @@
 
 const { Client } = require('pg')
+const path = require('path');
 
 const queryDB = async(query) => {
 	try {
@@ -49,11 +50,29 @@ async function generate_schema(path: string) {
 	})
 }
 
-async function migrate_csv_to_db_new_table(path: string, table_name:string) {
-	const py_schema = await generate_schema(path);
-	//console.log(py_schema)
-	//queryDB(create_schema);
-	//queryDB(`COPY ${cmd_schema} FROM ${path} DELIMITER ',' CSV HEADER;`);
+async function migrate_csv_to_db_new_table(relpath: string, table_name:string) {
+	const py_schema = await generate_schema(relpath);
+
+	// TODO: propagate table_name all the way into python
+	const name = relpath.split('-')[0];
+	await queryDB(py_schema.toString());
+	console.log(py_schema.toString())
+	
+	var split_schema: string[] = py_schema.toString().split('(')[1].split(')')[0].split(',');
+	var fields: string[] = []; 
+	for( let i=0; i < split_schema.length; i++) {
+		fields.push(split_schema[i].split('"')[1]);
+	}
+	var cmd_schema = `${name}(`;
+	for( let i=0; i < fields.length; i++ ){
+		cmd_schema += (i == fields.length-1) ? fields[i] : fields[i]+", ";
+	}
+	cmd_schema += ")"
+	relpath = './cache/'+relpath
+	console.log(`COPY ${cmd_schema} FROM '${path.resolve(relpath)}' WITH  (FORMAT csv)`)
+
+	const ret = await queryDB(`COPY ${cmd_schema} FROM '${path.resolve(relpath)}' DELIMITER ',' CSV HEADER;`);
+	console.log(ret)
 	return py_schema.toString();
 }
 
