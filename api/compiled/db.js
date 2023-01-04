@@ -37,8 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.queryDB = void 0;
-var Client = require('pg').Client;
-var path = require('path');
+var Client = require("pg").Client;
+var path = require("path");
 var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
     var client, res, error_1;
     return __generator(this, function (_a) {
@@ -46,11 +46,11 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
             case 0:
                 _a.trys.push([0, 4, , 5]);
                 client = new Client({
-                    user: 'su',
-                    host: '127.0.0.1',
-                    database: 'api',
-                    password: 'lafiel',
-                    port: '5432'
+                    user: "su",
+                    host: "127.0.0.1",
+                    database: "api",
+                    password: "lafiel",
+                    port: "5432"
                 });
                 return [4 /*yield*/, client.connect()];
             case 1:
@@ -71,8 +71,8 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
 }); };
 exports.queryDB = queryDB;
 // Parse recieved .cvs files and upload them to the database
-var spawn = require('child_process').spawn;
-var execSync = require('child_process').execSync;
+var spawn = require("child_process").spawn;
+var execSync = require("child_process").execSync;
 /*
     The current schema automation takes the first row as the names of the columns
     The responsability for this will fall on the user. Future contributions after
@@ -86,19 +86,23 @@ function generate_schema(path, name) {
         var python_process;
         return __generator(this, function (_a) {
             try {
-                python_process = spawn('python', ['./ts/generate_schema_from_pandas.py', path, name]);
+                python_process = spawn("python", [
+                    "./ts/generate_schema_from_pandas.py",
+                    path,
+                    name,
+                ]);
             }
             catch (e) {
                 throw new Error(e);
             }
             return [2 /*return*/, new Promise(function (resolve, reject) {
-                    python_process.stderr.on('data', function (data) {
+                    python_process.stderr.on("data", function (data) {
                         process.stdout.write(data.toString());
                     });
-                    python_process.on('close', function (code) {
+                    python_process.on("close", function (code) {
                         console.log("Python child process finished : " + code);
                     });
-                    python_process.stdout.on('data', function (data) {
+                    python_process.stdout.on("data", function (data) {
                         resolve(data);
                     });
                 })];
@@ -116,7 +120,6 @@ var csv_mig_errors;
     csv_mig_errors[csv_mig_errors["FAILURE_TO_MIGRATE_CSV_INTO_TABLE"] = 5] = "FAILURE_TO_MIGRATE_CSV_INTO_TABLE";
 })(csv_mig_errors || (csv_mig_errors = {}));
 exports.csv_mig_errors = csv_mig_errors;
-;
 function migrate_csv_to_db_new_table(relpath, table_name, DEBUG) {
     if (DEBUG === void 0) { DEBUG = false; }
     return __awaiter(this, void 0, void 0, function () {
@@ -133,10 +136,14 @@ function migrate_csv_to_db_new_table(relpath, table_name, DEBUG) {
                     e_1 = _a.sent();
                     return [2 /*return*/, csv_mig_errors.ERROR_GENERATING_SCHEMA];
                 case 3:
-                    name = relpath.split('-')[0];
-                    relpath = './cache/' + relpath;
+                    name = relpath.split("-")[0];
+                    relpath = "./cache/" + relpath;
                     try {
-                        split_schema = py_schema.toString().split('(')[1].split(')')[0].split(',');
+                        split_schema = py_schema
+                            .toString()
+                            .split("(")[1]
+                            .split(")")[0]
+                            .split(",");
                         fields = [];
                         for (i = 0; i < split_schema.length; i++) {
                             if (/^[a-zA-Z_][a-zA-Z0-9#$@]+/.test(split_schema[i].split('"')[1])) {
@@ -148,7 +155,7 @@ function migrate_csv_to_db_new_table(relpath, table_name, DEBUG) {
                         }
                         cmd_schema = "".concat(name, "(");
                         for (i = 0; i < fields.length; i++) {
-                            cmd_schema += (i == fields.length - 1) ? fields[i] : fields[i] + ", ";
+                            cmd_schema += i == fields.length - 1 ? fields[i] : fields[i] + ", ";
                         }
                         cmd_schema += ")";
                     }

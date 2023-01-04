@@ -104,7 +104,7 @@ app.post("/create/dataset", upload.single("init"), async (req, res, next) => {
           );
           if (DEBUG)
             console.log(`\n${name}\n\towner: ${owner}\n
-																 \tcontributions: ${cont}\n\tschema: ${schema}\n\tfile: ${file.filename}`);
+												 \tcontributions: ${cont}\n\tschema: ${schema}\n\tfile: ${file.filename}`);
           res.status(201); // Created
           res.send(`Recieved data : ${JSON.stringify(req.body)}`);
           break;
@@ -172,8 +172,9 @@ app.post("/create/user", async (req, res) => {
   console.log(
     `\n Username: ${username}\n Email: ${email}\n UUID: ${uuid}\n Cakeday: ${cakeday}`
   );
-  const rq = await queryDB(`INSERT INTO users (uuid, username, cakeday, email) 
-														VALUES('${uuid}', '${username}', '${cakeday}', '${email}');`);
+  const rq = await queryDB(`INSERT INTO users (uuid, username, cakeday, email, password) 
+														VALUES('${uuid}', '${username}', '${cakeday}', '${email}', crypt('${req.body['password']}', gen_salt('bf')));`);
+	console.log(rq)
   res.status = 201;
   res.send(JSON.stringify(rq));
 

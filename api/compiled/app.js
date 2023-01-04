@@ -38,45 +38,45 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var uuid_1 = require("uuid");
 var db_1 = require("./db");
-var assert = require('assert');
-var express = require('express');
+var assert = require("assert");
+var express = require("express");
 var app = express();
-var multer = require('multer');
+var multer = require("multer");
 var PORT = 3000;
 var DEBUG = false;
-// Setup 
+// Setup
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 var cache = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './cache');
+        cb(null, "./cache");
     },
     filename: function (req, file, cb) {
-        var dsname = file.originalname.split('.')[0];
-        cb(null, dsname + '-' + Date.now() + '.csv');
+        var dsname = file.originalname.split(".")[0];
+        cb(null, dsname + "-" + Date.now() + ".csv");
     }
 });
 var upload = multer({ storage: cache });
-app.get('/', function (req, res) {
+app.get("/", function (req, res) {
     res.status = 200;
-    res.send('Hello');
+    res.send("Hello");
 });
 // GET
 // TODO: Prevent injection attacks (current is vulnerable)
-app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get("/users", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var rq;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, db_1.queryDB)('SELECT * FROM users;')];
+            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users;")];
             case 1:
                 rq = _a.sent();
                 res.status = 302;
-                res.send(JSON.stringify(rq['rows']));
+                res.send(JSON.stringify(rq["rows"]));
                 return [2 /*return*/];
         }
     });
 }); });
-app.get('/users/:username', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get("/users/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, get;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -86,67 +86,67 @@ app.get('/users/:username', function (req, res) { return __awaiter(void 0, void 
             case 1:
                 get = _a.sent();
                 res.status = 302;
-                res.send("User ".concat(JSON.stringify(get['rows'])));
+                res.send("User ".concat(JSON.stringify(get["rows"])));
                 return [2 /*return*/];
         }
     });
 }); });
-app.get('/datasets/:dsid', function (req, res) {
+app.get("/datasets/:dsid", function (req, res) {
     var dsid = req.params.dsid;
     res.status = 302;
     res.send("GET Dataset with UUID ".concat(dsid));
 });
-app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
-    var ds = req.params.dsid['uuid'];
+app.get("/datasets/:dsid/contributions/:hash", function (req, res) {
+    var ds = req.params.dsid["uuid"];
     var hash = req.params.hash;
     res.status = 302;
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 // CREATE
-app.post('/create/dataset', upload.single('init'), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var owner_entry, file, FILE_UPLOAD, owner, name_1, ret, cont, schema, ret_1;
+app.post("/create/dataset", upload.single("init"), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
+    var owner_entry, name_1, ret, owner, cont, schema, file, FILE_UPLOAD, ret_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body["owner"], "';"))];
             case 1:
                 owner_entry = _a.sent();
-                if (!(owner_entry['rowCount'] <= 0)) return [3 /*break*/, 2];
-                process.stdout.write("REJECTED, user ".concat(req.body['owner'], " not found."));
+                if (!(owner_entry["rowCount"] <= 0)) return [3 /*break*/, 2];
+                process.stdout.write("REJECTED, user ".concat(req.body["owner"], " not found."));
                 res.status(404);
-                res.send("User not found: ".concat(req.body['owner']));
+                res.send("User not found: ".concat(req.body["owner"]));
                 return [3 /*break*/, 6];
             case 2:
-                file = req.file;
-                FILE_UPLOAD = (!file) ? false : true;
-                owner = owner_entry['rows'][0]['uuid'];
-                name_1 = req.body['name'];
+                name_1 = req.body["name"];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='".concat(name_1, "');"))];
             case 3:
                 ret = _a.sent();
-                if (ret['rows'][0]['exists'] != 'true') {
+                if (ret["rows"][0]["exists"] != "true") {
                     res.status(409); // Conflict
                     res.send("A dataset with the name ".concat(name_1, " already exists."));
                 }
-                cont = parseInt(req.body['contributions']);
-                schema = req.body['schema'];
+                owner = owner_entry["rows"][0]["uuid"];
+                cont = parseInt(req.body["contributions"]);
+                schema = req.body["schema"];
+                file = req.file;
+                FILE_UPLOAD = !file ? false : true;
                 if (!FILE_UPLOAD) return [3 /*break*/, 5];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
             case 4:
                 ret_1 = _a.sent();
                 switch (ret_1) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
                         process.stdout.write(" Successful data migration, dataset '".concat(name_1, "' created."));
                         if (DEBUG)
-                            console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                            console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
                         res.status(201); // Created
                         res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                         break;
                     case db_1.csv_mig_errors.ERROR_GENERATING_SCHEMA:
                     case db_1.csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
                         process.stdout.write("ERROR, Schema or Commands generation failure");
-                        res.status(421); // Unprocessable Entity 
+                        res.status(421); // Unprocessable Entity
                         res.send("Error parsing input on out end. Sorry");
                         break;
                     case db_1.csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
@@ -173,23 +173,24 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
         }
     });
 }); });
-app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post("/create/user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, email, uuid, now, cakeday, rq;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 console.log("CREATE user REQUEST from:  ".concat(req.socket.remoteAddress));
-                username = req.body['username'];
+                username = req.body["username"];
                 assert(username.length < 50 && username.length > 1);
-                email = req.body['email'];
+                email = req.body["email"];
                 assert(email.length < 100 && email.length > 10);
                 uuid = (0, uuid_1.v4)();
                 now = new Date();
-                cakeday = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
+                cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
                 console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n UUID: ").concat(uuid, "\n Cakeday: ").concat(cakeday));
-                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "', crypt('").concat(req.body['password'], "', gen_salt('bf')));"))];
             case 1:
                 rq = _a.sent();
+                console.log(rq);
                 res.status = 201;
                 res.send(JSON.stringify(rq));
                 return [2 /*return*/];
@@ -197,7 +198,7 @@ app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, 
     });
 }); });
 // DELETE
-app["delete"]('/users/:user', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app["delete"]("/users/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, query;
     return __generator(this, function (_a) {
         switch (_a.label) {

@@ -16,6 +16,20 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -26,9 +40,10 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.users (
     uuid uuid NOT NULL,
-    username character varying(50) NOT NULL,
-    cakeday date,
-    email character varying(100)
+    username text NOT NULL,
+    email text NOT NULL,
+    cakeday date NOT NULL,
+    password text NOT NULL
 );
 
 
@@ -36,12 +51,8 @@ CREATE TABLE public.users (
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.users (uuid, username, cakeday, email) FROM stdin;
-ef5ee1ff-bc8f-44cd-b4e5-4e32d64aaec1	GandalfTea	2001-07-09	contact@octavian.work
-9035e483-8c7b-4c16-a204-4bd2fd119163	dipsticksafety	1987-02-25	ventus@gmail.com
-d795becc-020b-45e0-98e4-e906969e8fcd	pioneer10	2005-01-19	pioneer10@gmail.com
-8c8e003f-a4b4-4544-a160-bc478c938bbb	GandalfTea	2023-01-02	octavian.concept@gmail.com
-6082e51e-67d5-41f6-b6e7-d59db8df0e96	spartacus991	2023-01-02	spartacus@spartacus.com
+COPY public.users (uuid, username, email, cakeday, password) FROM stdin;
+c4368913-163b-4c1b-87e1-c0589bb16911	GandalfTea	contact@octavian.work	2023-01-04	$2a$06$1XcvglP07B8yBybn1if9pufihVWnElinBOH10z7UlkjzPzyufKtwG
 \.
 
 
