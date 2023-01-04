@@ -71,24 +71,40 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
 exports.queryDB = queryDB;
 // Parse recieved .cvs files and upload them to the database
 var spawn = require('child_process').spawn;
+var execSync = require('child_process').execSync;
 function generate_schema(path) {
-    var python_process = spawn('python', ['./generate_schema_from_pandas.py', path]);
-    python_process.stdout.on('data', function (data) {
-        return data.toString();
+    return __awaiter(this, void 0, void 0, function () {
+        var python_process;
+        return __generator(this, function (_a) {
+            python_process = spawn('python', ['./ts/generate_schema_from_pandas.py', path]);
+            return [2 /*return*/, new Promise(function (resolve, reject) {
+                    python_process.stderr.on('data', function (data) {
+                        process.stdout.write(data.toString());
+                    });
+                    python_process.on('close', function (code) {
+                        console.log("Python child process finished : " + code);
+                    });
+                    python_process.stdout.on('data', function (data) {
+                        resolve(data);
+                    });
+                })];
+        });
     });
 }
 exports.generate_schema = generate_schema;
-// generate_schema('../cache/demo-1672779676422.csv');
 function migrate_csv_to_db_new_table(path, table_name) {
     return __awaiter(this, void 0, void 0, function () {
-        var py_schema, create_schema, cmd_schema;
+        var py_schema;
         return __generator(this, function (_a) {
-            py_schema = generate_schema(path);
-            create_schema = py_schema;
-            cmd_schema = py_schema;
-            queryDB(create_schema);
-            queryDB("COPY ".concat(cmd_schema, " FROM ").concat(path, " DELIMITER ',' CSV HEADER;"));
-            return [2 /*return*/];
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, generate_schema(path)];
+                case 1:
+                    py_schema = _a.sent();
+                    //console.log(py_schema)
+                    //queryDB(create_schema);
+                    //queryDB(`COPY ${cmd_schema} FROM ${path} DELIMITER ',' CSV HEADER;`);
+                    return [2 /*return*/, py_schema.toString()];
+            }
         });
     });
 }

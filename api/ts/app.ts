@@ -1,5 +1,5 @@
 import {v4 as uuidv4} from 'uuid';
-import { queryDB } from './db';
+import { queryDB, generate_schema,  migrate_csv_to_db_new_table } from './db';
 var assert = require('assert');
 const express = require('express');
 const app = express();
@@ -84,6 +84,8 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 		const schema:string = req.body['schema'];
 
 		if(!NO_FILE_UPLOAD) {
+			const ret = await	migrate_csv_to_db_new_table(file.filename, 'api')
+
 			/* TODO: Once the file is in local storage
 			  [ ] Automatic schema generation
 				[ ] Create new table in DB using schema

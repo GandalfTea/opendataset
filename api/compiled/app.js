@@ -104,7 +104,7 @@ app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
 });
 // CREATE
 app.post('/create/dataset', upload.single('init'), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var file, NO_FILE_UPLOAD, name, owner_entry, owner, cont, schema;
+    var file, NO_FILE_UPLOAD, name, owner_entry, owner, cont, schema, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -117,29 +117,34 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 owner_entry = _a.sent();
                 if (owner_entry['rowCount'] <= 0)
                     process.stdout.write("REVOKED, user ".concat(req.body['owner'], " not found."));
-                if (owner_entry['rowCount'] <= 0) {
-                    res.status = 404;
-                    res.send("User not found: ".concat(req.body['owner']));
-                }
-                else {
-                    owner = owner_entry['rows'][0]['uuid'];
-                    cont = parseInt(req.body['contributions']);
-                    schema = req.body['schema'];
-                    if (!NO_FILE_UPLOAD) {
-                        /* TODO: Once the file is in local storage
-                          [ ] Automatic schema generation
-                            [ ] Create new table in DB using schema
-                            [ ] Migrate the data
-                            [ ] ? Link table to a meta table of contributions
-                            [ ] ? Register table in metatable of datasets */
-                    }
-                    if (DEBUG)
-                        console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
-                    process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
-                    res.status = 201;
-                    res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-                }
-                return [2 /*return*/];
+                if (!(owner_entry['rowCount'] <= 0)) return [3 /*break*/, 2];
+                res.status = 404;
+                res.send("User not found: ".concat(req.body['owner']));
+                return [3 /*break*/, 5];
+            case 2:
+                owner = owner_entry['rows'][0]['uuid'];
+                cont = parseInt(req.body['contributions']);
+                schema = req.body['schema'];
+                if (!!NO_FILE_UPLOAD) return [3 /*break*/, 4];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, 'api')
+                    /* TODO: Once the file is in local storage
+                      [ ] Automatic schema generation
+                        [ ] Create new table in DB using schema
+                        [ ] Migrate the data
+                        [ ] ? Link table to a meta table of contributions
+                        [ ] ? Register table in metatable of datasets */
+                ];
+            case 3:
+                ret = _a.sent();
+                _a.label = 4;
+            case 4:
+                if (DEBUG)
+                    console.log("\nCREATE dataset\n\tName: ".concat(name, "\n\tOwner: ").concat(owner, "\n\tContributions: ").concat(cont, "\n\tSchema: ").concat(schema));
+                process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
+                res.status = 201;
+                res.send("Recieved data : ".concat(JSON.stringify(req.body)));
+                _a.label = 5;
+            case 5: return [2 /*return*/];
         }
     });
 }); });
