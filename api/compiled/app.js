@@ -104,64 +104,72 @@ app.get('/datasets/:dsid/contributions/:hash', function (req, res) {
 });
 // CREATE
 app.post('/create/dataset', upload.single('init'), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var file, FILE_UPLOAD, name, owner_entry, owner, cont, schema, ret;
+    var owner_entry, file, FILE_UPLOAD, owner, name_1, ret, cont, schema, ret_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
-                file = req.file;
-                FILE_UPLOAD = (!file) ? false : true;
-                name = req.body['name'];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['owner'], "';"))];
             case 1:
                 owner_entry = _a.sent();
-                if (owner_entry['rowCount'] <= 0)
-                    process.stdout.write("REJECTED, user ".concat(req.body['owner'], " not found."));
                 if (!(owner_entry['rowCount'] <= 0)) return [3 /*break*/, 2];
+                process.stdout.write("REJECTED, user ".concat(req.body['owner'], " not found."));
                 res.status(404);
                 res.send("User not found: ".concat(req.body['owner']));
-                return [3 /*break*/, 5];
+                return [3 /*break*/, 6];
             case 2:
+                file = req.file;
+                FILE_UPLOAD = (!file) ? false : true;
                 owner = owner_entry['rows'][0]['uuid'];
-                cont = parseInt(req.body['contributions']);
-                schema = req.body['schema'];
-                if (!FILE_UPLOAD) return [3 /*break*/, 4];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])];
+                name_1 = req.body['name'];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='".concat(name_1, "');"))];
             case 3:
                 ret = _a.sent();
-                switch (ret) {
+                if (ret['rows'][0]['exists'] != 'true') {
+                    res.status(409); // Conflict
+                    res.send("A dataset with the name ".concat(name_1, " already exists."));
+                }
+                cont = parseInt(req.body['contributions']);
+                schema = req.body['schema'];
+                if (!FILE_UPLOAD) return [3 /*break*/, 5];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body['name'])];
+            case 4:
+                ret_1 = _a.sent();
+                switch (ret_1) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
-                        process.stdout.write(" Successful data migration ");
-                        res.status(201); // Creted
-                        process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
+                        process.stdout.write(" Successful data migration, dataset '".concat(name_1, "' created."));
                         if (DEBUG)
-                            console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                            console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                        res.status(201); // Created
                         res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                         break;
                     case db_1.csv_mig_errors.ERROR_GENERATING_SCHEMA:
                     case db_1.csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
+                        process.stdout.write("ERROR, Schema or Commands generation failure");
                         res.status(421); // Unprocessable Entity 
                         res.send("Error parsing input on out end. Sorry");
                         break;
                     case db_1.csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
+                        process.stdout.write("ERROR, Illegal column names");
                         res.status(400); // Bad request
-                        res.send("Your file contains illegal column names. Please make sure to\n\t\t\t\t\t\t\t\t\t  have your first row be in accordance with SQL naming conventions.");
+                        res.send("Your file contains illegal column names. Please make sure to\n\t\t\t\t\t\t\t\t\t\thave your first row be in accordance with SQL naming conventions.");
                         break;
                     case db_1.csv_mig_errors.FAILURE_TO_GENERATE_TABLE:
                     case db_1.csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
+                        process.stdout.write("ERROR, Database error");
                         res.status(500); // Internal server error
                         res.send("Internal Server Error. Sorry.");
                         break;
                 }
-                return [3 /*break*/, 5];
-            case 4:
+                return [3 /*break*/, 6];
+            case 5:
                 res.status(201); // Created
-                process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
+                process.stdout.write("RESOLVED, dataset '".concat(name_1, "' created."));
                 if (DEBUG)
-                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
+                    console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-                _a.label = 5;
-            case 5: return [2 /*return*/];
+                _a.label = 6;
+            case 6: return [2 /*return*/];
         }
     });
 }); });
@@ -179,7 +187,7 @@ app.post('/create/user', function (req, res) { return __awaiter(void 0, void 0, 
                 now = new Date();
                 cakeday = now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate();
                 console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n UUID: ").concat(uuid, "\n Cakeday: ").concat(cakeday));
-                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t  VALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "');"))];
             case 1:
                 rq = _a.sent();
                 res.status = 201;

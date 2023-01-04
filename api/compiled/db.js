@@ -165,7 +165,10 @@ function migrate_csv_to_db_new_table(relpath, table_name, DEBUG) {
                     ret = _a.sent();
                     if (false /* check if ret is good*/)
                         return [2 /*return*/, csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE];
-                    console.log(ret);
+                    if (DEBUG) {
+                        console.log("COPY ".concat(cmd_schema, " FROM '").concat(path.resolve(relpath), "' WITH  (FORMAT csv)\n\n"));
+                        console.log(ret);
+                    }
                     return [2 /*return*/, csv_mig_errors.SUCCESSFUL_MIGRATION];
             }
         });

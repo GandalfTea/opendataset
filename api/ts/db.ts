@@ -71,7 +71,6 @@ async function migrate_csv_to_db_new_table(relpath: string, table_name:string, D
 	relpath = './cache/'+relpath
 
 	try{
-
 		var split_schema: string[] = py_schema.toString().split('(')[1].split(')')[0].split(',');
 		var fields: string[] = []; 
 	
@@ -89,15 +88,17 @@ async function migrate_csv_to_db_new_table(relpath: string, table_name:string, D
 		cmd_schema += ")"
 	} catch(e) { return csv_mig_errors.ERROR_GENERATING_DB_COMMANDS; }
 
-	//console.log(`COPY ${cmd_schema} FROM '${path.resolve(relpath)}' WITH  (FORMAT csv)\n\n`)
-
 	var ret:string = await queryDB(py_schema.toString());
 	if (false /* check if ret is good*/) return csv_mig_errors.FAILURE_TO_GENERATE_TABLE;
 
 	ret = await queryDB(`COPY ${cmd_schema} FROM '${path.resolve(relpath)}' DELIMITER ',' CSV HEADER;`);
 	if (false /* check if ret is good*/) return csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE;
 
-	console.log(ret)
+	if(DEBUG) {
+		console.log(`COPY ${cmd_schema} FROM '${path.resolve(relpath)}' WITH  (FORMAT csv)\n\n`)
+		console.log(ret)
+	}
+
 	return csv_mig_errors.SUCCESSFUL_MIGRATION;
 }
 
