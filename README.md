@@ -1,7 +1,8 @@
 
 
 Simple website for crowd-sourcing dataset creation for data that might not have comercial value.    
-Backend is Express.js and PostgreSQL while frontend is React.js and Socket.io.
+Backend is Express.js and PostgreSQL while frontend is React.js and Socket.io.     
+It allows the user to upload .csv files, automatically generates a schema using `pandas` in a python script and uploads the data into the database. 
       
 Backend also requires : `multer`, `pg` and `uuid`. 
       

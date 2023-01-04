@@ -126,16 +126,10 @@ app.post('/create/dataset', upload.single('init'), function (req, res, next) { r
                 cont = parseInt(req.body['contributions']);
                 schema = req.body['schema'];
                 if (!!NO_FILE_UPLOAD) return [3 /*break*/, 4];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, 'api')
-                    /* TODO: Once the file is in local storage
-                      [ ] Automatic schema generation
-                        [ ] Create new table in DB using schema
-                        [ ] Migrate the data
-                        [ ] ? Link table to a meta table of contributions
-                        [ ] ? Register table in metatable of datasets */
-                ];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, 'api')];
             case 3:
                 ret = _a.sent();
+                console.log(ret);
                 _a.label = 4;
             case 4:
                 if (DEBUG)

@@ -87,7 +87,7 @@ app.post('/create/dataset', upload.single('init'), async (req, res, next) => {
 			const ret = await	migrate_csv_to_db_new_table(file.filename, 'api')
 
 			/* TODO: Once the file is in local storage
-			  [ ] Automatic schema generation
+			  [x] Automatic schema generation
 				[ ] Create new table in DB using schema
 				[ ] Migrate the data
 				[ ] ? Link table to a meta table of contributions
