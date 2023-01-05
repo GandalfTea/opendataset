@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.router = void 0;
-var db_1 = require("./db");
+var db_1 = require("../db");
 var express = require("express");
 var router = express.Router();
 exports.router = router;

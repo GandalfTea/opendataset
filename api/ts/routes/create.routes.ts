@@ -17,7 +17,7 @@ var cache = multer.diskStorage({
 });
 var upload = multer({ storage: cache });
 
-import { queryDB, migrate_csv_to_db_new_table, csv_mig_errors } from "./db";
+import { queryDB, migrate_csv_to_db_new_table, csv_mig_errors } from "../db";
 
 // CREATE
 router.post("/dataset", upload.single("init"), async (req, res, next) => {

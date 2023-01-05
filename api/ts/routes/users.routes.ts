@@ -1,4 +1,4 @@
-import { queryDB } from "./db";
+import { queryDB } from "../db";
 
 const express = require("express");
 const router = express.Router();

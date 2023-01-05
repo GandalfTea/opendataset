@@ -37,51 +37,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.router = void 0;
-var db_1 = require("./db");
+var db_1 = require("../db");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
-// TODO: Prevent injection attacks (current is vulnerable)
-router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var rq;
+router.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users;")];
+            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['username'], "' AND password=crypt('").concat(req.body['password'], "', password);"))];
             case 1:
-                rq = _a.sent();
-                res.status = 302;
-                res.send(JSON.stringify(rq["rows"]));
-                return [2 /*return*/];
-        }
-    });
-}); });
-router.get("/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, get;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                username = req.params.username;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(username, "';"))];
-            case 1:
-                get = _a.sent();
-                res.status = 302;
-                res.send("User ".concat(JSON.stringify(get["rows"])));
-                return [2 /*return*/];
-        }
-    });
-}); });
-// DELETE
-router["delete"]("/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, query;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                username = req.params.user;
-                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username='".concat(username, "';"))];
-            case 1:
-                query = _a.sent();
-                res.status = 200;
-                res.send(query);
+                ret = _a.sent();
+                if (parseInt(ret['rowCount']) > 0) {
+                    console.log(ret);
+                    res.status(200);
+                    res.send("Successful Login");
+                }
+                else {
+                    console.log(ret);
+                    res.status(400);
+                    res.send("Wrong Password");
+                }
                 return [2 /*return*/];
         }
     });

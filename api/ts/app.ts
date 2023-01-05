@@ -21,12 +21,14 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-import { router as create_routes } from "./create.routes";
-import { router as users_routes } from "./users.routes";
-import { router as datasets_routes } from "./datasets.routes";
+import { router as create_routes } from "./routes/create.routes";
+import { router as users_routes } from "./routes/users.routes";
+import { router as datasets_routes } from "./routes/datasets.routes";
+import { router as login_routes } from "./routes/login.routes"
 app.use("/create", create_routes);
 app.use("/users", users_routes);
 app.use("/datasets", datasets_routes);
+app.use("/login", login_routes);
 
 // GET
 app.listen(PORT, () => {
