@@ -69,15 +69,17 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 process.stdout.write("REJECTED, user ".concat(req.body["owner"], " not found."));
                 res.status(404);
                 res.send("User not found: ".concat(req.body["owner"]));
-                return [3 /*break*/, 6];
+                return [2 /*return*/];
             case 2:
                 name_1 = req.body["name"];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='".concat(name_1, "');"))];
             case 3:
                 ret = _a.sent();
                 if (ret["rows"][0]["exists"] != "true") {
+                    process.stdout.write("REJECTED, dataset ".concat(name_1, " already exists."));
                     res.status(409); // Conflict
                     res.send("A dataset with the name ".concat(name_1, " already exists."));
+                    return [2 /*return*/];
                 }
                 owner = owner_entry["rows"][0]["uuid"];
                 cont = parseInt(req.body["contributions"]);
@@ -113,13 +115,14 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                         res.status(500); // Internal server error
                         res.send("Internal Server Error. Sorry.");
                         break;
+                    // TODO: ADD default
                 }
                 return [3 /*break*/, 6];
             case 5:
-                res.status(201); // Created
                 process.stdout.write("RESOLVED, dataset '".concat(name_1, "' created."));
                 if (DEBUG)
                     console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
+                res.status(201); // Created
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 _a.label = 6;
             case 6: return [2 /*return*/];

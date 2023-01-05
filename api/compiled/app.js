@@ -21,7 +21,6 @@ app.use("/create", create_routes_1.router);
 app.use("/users", users_routes_1.router);
 app.use("/datasets", datasets_routes_1.router);
 app.use("/login", login_routes_1.router);
-// GET
 app.listen(PORT, function () {
     console.log("Listening on port: ".concat(PORT));
 });

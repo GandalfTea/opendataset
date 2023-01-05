@@ -13,23 +13,48 @@ def test_user():
 
     # CREATE
     print(" > test_user_create:", end='')
-    payload = {'username':'demo-user', 'email':'demo-email@example.com'}
+    payload = {'username':'demo-user', 'email':'demo-email@example.com', 'password':'demopassword'}
     st = time.monotonic()
     r = rq.post(f"http://127.0.0.1:{PORT}/create/user",
                 headers={"Content-Type":"application/json"},
                 data=json.dumps(payload))
-    assert(r.status_code == 200)
     ed = time.monotonic()
+    assert(r.status_code == 200)
     et = ed-st
-    print(f"       {et:7f} seconds.")
+    print(f"                        {et:7f} seconds.")
     if VERBOSE:
         print("Response: ") 
         pprint.pprint(json.loads(r.content.decode()))
         print('')
 
+    # LOGIN
+    print(" > test_user_login_wrong_credentials:", end='')
+    correct_payload = {'username': 'demo-user', 'password': 'demopassword'}
+    wrong_payload   = {'username': 'demo-user', 'password': 'wrongpassword'}
+
+    st = time.monotonic()
+    r = rq.post(f"http://127.0.0.1:{PORT}/login",
+            headers={'content-type': 'application/json'},
+            data=json.dumps(wrong_payload))
+    ed = time.monotonic()
+    assert r.status_code == 400, 'wrong password worked.'
+    et = ed-st
+    print(f"       {et:7f} seconds.")
+
+    print(" > test_user_login_correct_credentials:", end='')
+    st = time.monotonic()
+    r = rq.post(f"http://127.0.0.1:{PORT}/login",
+            headers={'content-type': 'application/json'},
+            data=json.dumps(correct_payload))
+    ed = time.monotonic()
+    assert r.status_code == 200, 'Correct password failed.'
+    et = ed-st
+    print(f"     {et:7f} seconds.")
+
     # EDIT  . . .
-    print(f" > test_user_edit_username SKIPPED")
-    print(f" > test_user_edit_email    SKIPPED")
+    print(f" > test_user_edit_username           \t    SKIPPED")
+    print(f" > test_user_edit_email              \t    SKIPPED")
+    print(f" > test_user_edit_password           \t    SKIPPED")
 
     # DELETE
     print(" > test_user_delete:", end='')
@@ -38,7 +63,7 @@ def test_user():
     assert(r.status_code == 200)
     ed = time.monotonic()
     et = ed-st
-    print(f"       {et:7f} seconds.")
+    print(f"                        {et:7f} seconds.")
     if VERBOSE: 
         print("Response: ") 
         pprint.pprint(json.loads(r.content.decode()))
@@ -46,40 +71,59 @@ def test_user():
 
 
 # CREATE, EDIT and DELETE Dataset
-def test_dataset():
 
-    # Create
-    print("\n > test_database_creation", end='')
-    payload = {
-        "name":"demo-dataset",
-        "owner": "pioneer10",
-        "schema": "Name --> STRING(50)\nName--> STRING(50)",
-        "contributions": "res",
-        "initial_data": "NULL"
-    };
 
+def test_dataset_creation(test_name, payload, expected_status_code):
+    print(f"\n > {test_name}", end='')
     st = time.monotonic()
     r =  rq.post(f"http://127.0.0.1:{PORT}/create/dataset",
                  headers={"Content-Type":"application/json"},
                  data=json.dumps(payload))
-    assert(r.status_code == 200)
+    assert(r.status_code == expected_status_code)
     ed = time.monotonic()
     et = ed-st
     print(f"              {et:7f} seconds.")
     if VERBOSE: pprint.pprint(r.content.decode())
 
-    # EDIT ...
+
+def test_dataset():
+
+    correct_payload = { "name":"demo-dataset", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1" };
+    user_not_existant_payload = { "name":"demo-dataset", "owner": "not_existant_user", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1"};
+    dataset_already_exists_payload = { "name":"users", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1"};
+    #schema_generation_failure_payload = { "name":"users", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1"};
+    #command_generation_failure_payload = { "name":"users", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1"};
+    #illegal_column_names_payload = { "name":"demo-dataset", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "2"};
+    #database_error_payload = { "name":"demo-dataset", "owner": "GandalfTea", "schema": "Name --> STRING(50)\nName--> STRING(50)", "contributions": "1"};
+
+    test_dataset_creation("test_dataset_creation_correct_payload", correct_payload, 201)
+    test_dataset_creation("test_dataset_creation_owner_not_existant", user_not_existant_payload, 404)
+    test_dataset_creation("test_dataset_creation_ds_already_exists", dataset_already_exists_payload, 409)
+
+    # Require Demo Data
+    #test_dataset_creation("test_dataset_creation_schama_generation_failure", schema_generation_failure_payload, 421)
+    #test_dataset_creation("test_dataset_creation_command_generation_failure", command_generation_failure_payload, 421)
+    #test_dataset_creation("test_dataset_creation_illegal_column_names", illegal_column_names_payload, 400)
+    #test_dataset_creation("test_dataset_creation_database_error", database_error_payload, 500)
+
+    print(" > test_dataset_creation_schama_generation_failure    SKIPPED")
+    print(" > test_dataset_creation_command_generation_failure   SKIPPED")
+    print(" > test_dataset_creation_illegal_column_names         SKIPPED")
+    print(" > test_dataset_creation_database_error               SKIPPED")
+
+
+    # EDIT 
     print(" > test_database_edit_name             SKIPPED")
     print(" > test_database_edit_contributions    SKIPPED")
     print(" > test_database_edit_schema           SKIPPED")
     print(" > test_database_edit_tests            SKIPPED")
     print(" > test_database_edit_owner            SKIPPED")
 
-    # CONTRIBUTE ...
+    # CONTRIBUTE 
     print(" > test_database_contribution          SKIPPED")
     print(" > test_database_su_contrib_accept     SKIPPED")
 
-    # DELETE ...
+    # DELETE 
     print(" > test_database_deletion              SKIPPED")
 
 if __name__ == '__main__':

@@ -31,6 +31,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     process.stdout.write(`REJECTED, user ${req.body["owner"]} not found.`);
     res.status(404);
     res.send(`User not found: ${req.body["owner"]}`);
+		return;
   } else {
     // Check if dataset name already exists
     const name: string = req.body["name"];
@@ -38,8 +39,10 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
       `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='${name}');`
     );
     if (ret["rows"][0]["exists"] != "true") {
+    	process.stdout.write(`REJECTED, dataset ${name} already exists.`);
       res.status(409); // Conflict
       res.send(`A dataset with the name ${name} already exists.`);
+			return;
     }
 
     const owner: string = owner_entry["rows"][0]["uuid"];
@@ -86,6 +89,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
           res.status(500); // Internal server error
           res.send(`Internal Server Error. Sorry.`);
           break;
+				// TODO: ADD default
       }
 
       /* TODO: Once the file is in local storage
@@ -95,11 +99,11 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 				[ ] ? Link table to a meta table of contributions
 				[ ] ? Register table in metatable of datasets */
     } else {
-      res.status(201); // Created
       process.stdout.write(`RESOLVED, dataset '${name}' created.`);
       if (DEBUG)
         console.log(`\n${name}\n\towner: ${owner}\n
 														 \tcontributions: ${cont}\n\tschema: ${schema}`);
+      res.status(201); // Created
       res.send(`Recieved data : ${JSON.stringify(req.body)}`);
     }
   }
