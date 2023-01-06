@@ -17,7 +17,7 @@ var cache = multer.diskStorage({
 });
 var upload = multer({ storage: cache });
 
-import { queryDB, migrate_csv_to_db_new_table, csv_mig_errors } from "../db";
+import { queryDB, create_ds_metadata, migrate_csv_to_db_new_table, csv_mig_errors } from "../db";
 
 // CREATE
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
@@ -45,12 +45,16 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 			return;
     }
 
-    const owner: string = owner_entry["rows"][0]["uuid"];
+    const owner: string = owner_entry["rows"][0]["id"];
     const cont: number = parseInt(req.body["contributions"]); // TODO: Maybe test if [0-2]
     const schema: string = req.body["schema"]; // TODO: REDUNDANT
 
     const file: any = req.file;
     const FILE_UPLOAD: boolean = !file ? false : true;
+
+
+		// ADD TABLE METADATA TO ds_metadata in DB
+		await create_ds_metadata(req.body['name'], cont, owner)
 
     if (FILE_UPLOAD) {
       const ret = await migrate_csv_to_db_new_table(

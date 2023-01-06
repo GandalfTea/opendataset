@@ -19,6 +19,14 @@ const queryDB = async (query) => {
   }
 };
 
+// Add table metadata to ds_metadata
+
+// Note: Score is defaulted to 0;
+async function create_ds_metadata(ds_name:string, ds_cont:number, ds_owner:number) {
+	let ret = await queryDB(`INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('${ds_name}', ${ds_cont}, ${ds_owner});`)
+	console.log(ret);
+}
+
 // Parse recieved .cvs files and upload them to the database
 
 const spawn = require("child_process").spawn;
@@ -130,6 +138,7 @@ async function migrate_csv_to_db_new_table(
 
 export {
   queryDB,
+	create_ds_metadata,
   generate_schema,
   migrate_csv_to_db_new_table,
   csv_mig_errors,

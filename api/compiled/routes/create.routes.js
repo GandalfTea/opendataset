@@ -81,14 +81,19 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                     res.send("A dataset with the name ".concat(name_1, " already exists."));
                     return [2 /*return*/];
                 }
-                owner = owner_entry["rows"][0]["uuid"];
+                owner = owner_entry["rows"][0]["id"];
                 cont = parseInt(req.body["contributions"]);
                 schema = req.body["schema"];
                 file = req.file;
                 FILE_UPLOAD = !file ? false : true;
-                if (!FILE_UPLOAD) return [3 /*break*/, 5];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
+                // ADD TABLE METADATA TO ds_metadata in DB
+                return [4 /*yield*/, (0, db_1.create_ds_metadata)(name_1, cont, owner)];
             case 4:
+                // ADD TABLE METADATA TO ds_metadata in DB
+                _a.sent();
+                if (!FILE_UPLOAD) return [3 /*break*/, 6];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
+            case 5:
                 ret_1 = _a.sent();
                 switch (ret_1) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
@@ -117,15 +122,15 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                         break;
                     // TODO: ADD default
                 }
-                return [3 /*break*/, 6];
-            case 5:
+                return [3 /*break*/, 7];
+            case 6:
                 process.stdout.write("RESOLVED, dataset '".concat(name_1, "' created."));
                 if (DEBUG)
                     console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.status(201); // Created
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-                _a.label = 6;
-            case 6: return [2 /*return*/];
+                _a.label = 7;
+            case 7: return [2 /*return*/];
         }
     });
 }); });

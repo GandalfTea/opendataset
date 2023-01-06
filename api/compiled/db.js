@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.queryDB = void 0;
+exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.create_ds_metadata = exports.queryDB = void 0;
 var Client = require("pg").Client;
 var path = require("path");
 var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
@@ -70,6 +70,23 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 exports.queryDB = queryDB;
+// Add table metadata to ds_metadata
+// Note: Score is defaulted to 0;
+function create_ds_metadata(ds_name, ds_cont, ds_owner) {
+    return __awaiter(this, void 0, void 0, function () {
+        var ret;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, queryDB("INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('".concat(ds_name, "', ").concat(ds_cont, ", ").concat(ds_owner, ");"))];
+                case 1:
+                    ret = _a.sent();
+                    console.log(ret);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.create_ds_metadata = create_ds_metadata;
 // Parse recieved .cvs files and upload them to the database
 var spawn = require("child_process").spawn;
 var execSync = require("child_process").execSync;
