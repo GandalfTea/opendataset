@@ -38,7 +38,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     let ret = await queryDB(
       `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='${name}');`
     );
-    if (ret["rows"][0]["exists"] != "true") {
+    if (ret["rows"][0]["exists"] == true) {
     	process.stdout.write(`REJECTED, dataset ${name} already exists.`);
       res.status(409); // Conflict
       res.send(`A dataset with the name ${name} already exists.`);

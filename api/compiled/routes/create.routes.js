@@ -75,7 +75,7 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='".concat(name_1, "');"))];
             case 3:
                 ret = _a.sent();
-                if (ret["rows"][0]["exists"] != "true") {
+                if (ret["rows"][0]["exists"] == true) {
                     process.stdout.write("REJECTED, dataset ".concat(name_1, " already exists."));
                     res.status(409); // Conflict
                     res.send("A dataset with the name ".concat(name_1, " already exists."));
