@@ -10,8 +10,8 @@ router.get("/", async (req, res) => {
   res.send(JSON.stringify(rq["rows"]));
 });
 
-router.get("/:username", async (req: any, res: any) => {
-  var username: string = req.params.username;
+router.get("/:user", async (req: any, res: any) => {
+  var username: string = req.params.user;
   var get: any = await queryDB(
     `SELECT * FROM users WHERE username='${username}';`
   );

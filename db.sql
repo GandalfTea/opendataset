@@ -45,6 +45,20 @@ CREATE TABLE public.contributors (
 
 
 --
+-- Name: ds_frontend; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ds_frontend (
+    num_contributors integer DEFAULT 0,
+    description text,
+    num_entries integer DEFAULT 0,
+    licence smallint NOT NULL,
+    CONSTRAINT ds_frontend_licence_check CHECK (((licence >= 0) AND (licence <= 5))),
+    CONSTRAINT ds_frontend_num_entries_check CHECK ((num_entries >= 0))
+);
+
+
+--
 -- Name: ds_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -54,7 +68,6 @@ CREATE TABLE public.ds_metadata (
     score integer DEFAULT 0,
     contribution smallint NOT NULL,
     owner integer NOT NULL,
-    num_contributors integer DEFAULT 0,
     CONSTRAINT ds_metadata_contribution_check CHECK (((contribution >= 0) AND (contribution <= 2)))
 );
 
@@ -135,11 +148,18 @@ COPY public.contributors (user_id, ds_id) FROM stdin;
 
 
 --
+-- Data for Name: ds_frontend; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.ds_frontend (num_contributors, description, num_entries, licence) FROM stdin;
+\.
+
+
+--
 -- Data for Name: ds_metadata; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.ds_metadata (ds_id, ds_name, score, contribution, owner, num_contributors) FROM stdin;
-1	hello	0	0	1	0
+COPY public.ds_metadata (ds_id, ds_name, score, contribution, owner) FROM stdin;
 \.
 
 
