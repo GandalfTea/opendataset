@@ -1,5 +1,7 @@
 
 const path = require('path');
+const webpack = require('webpack');
+
 
 module.exports = {
 
@@ -26,17 +28,22 @@ module.exports = {
 	},
 
 	resolve: {
-		extensions: ['.ts', '.tsx', '.js', '.jsx', '.json']
+		extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
+		alias: {
+			"@hooks" : path.resolve(__dirname, "./src/hooks"),
+			"@assets" : path.resolve(__dirname, "./src/assets")
+		}
 	},
+	
+	plugins: [
+		new webpack.DefinePlugin({
+			'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL)
+		})	
+	],
 	
 	stats: {
 		colors: true,
 		reasons: true,
 		chunks: false
 	},
-
-	devServer: {
-		static: path.resolve(__dirname, './static'),
-	},
-
 };

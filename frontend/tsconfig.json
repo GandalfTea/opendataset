@@ -10,7 +10,16 @@
 		"lib": [
 			"dom",
 			"ES2021.String"
-		]
+		],
+		"baseUrl": ".",
+		"paths": {
+			"@assets/*": [
+				"./src/assets/*"
+			],
+			"@hooks/*": [
+				"./src/hooks/*"
+			]
+		}
 	},
 	"include": ["./src/**/*"]
 }

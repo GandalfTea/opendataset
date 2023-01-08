@@ -4,6 +4,7 @@ import { queryDB } from "../db";
 const express = require("express");
 const upvote_router = express.Router();
 
+// www.api.demo.com/upvote?ds=demo-dataset
 upvote_router.post('/', async (req, res) => {	
 	const ds = req.query.ds;
 	// post to db db_metadata
