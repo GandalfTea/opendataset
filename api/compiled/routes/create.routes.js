@@ -42,7 +42,6 @@ var router = express.Router();
 exports.router = router;
 var DEBUG = false;
 var assert = require("assert");
-var uuid_1 = require("uuid");
 var multer = require("multer");
 var cache = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -87,9 +86,11 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 file = req.file;
                 FILE_UPLOAD = !file ? false : true;
                 // ADD TABLE METADATA TO ds_metadata in DB
-                return [4 /*yield*/, (0, db_1.create_ds_metadata)(name_1, cont, owner)];
+                // TODO: Get owner id
+                return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body['name'], cont, 0)];
             case 4:
                 // ADD TABLE METADATA TO ds_metadata in DB
+                // TODO: Get owner id
                 _a.sent();
                 if (!FILE_UPLOAD) return [3 /*break*/, 6];
                 return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
@@ -135,7 +136,7 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
     });
 }); });
 router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, email, uuid, now, cakeday, rq;
+    var username, email, now, cakeday, rq;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -144,11 +145,10 @@ router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void
                 assert(username.length < 50 && username.length > 1);
                 email = req.body["email"];
                 assert(email.length < 100 && email.length > 10);
-                uuid = (0, uuid_1.v4)();
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-                console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n UUID: ").concat(uuid, "\n Cakeday: ").concat(cakeday));
-                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (uuid, username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(uuid, "', '").concat(username, "', '").concat(cakeday, "', '").concat(email, "', crypt('").concat(req.body["password"], "', gen_salt('bf')));"))];
+                console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n Cakeday: ").concat(cakeday));
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(username, "', '").concat(cakeday, "', '").concat(email, "', crypt('").concat(req.body["password"], "', gen_salt('bf')));"))];
             case 1:
                 rq = _a.sent();
                 console.log(rq);

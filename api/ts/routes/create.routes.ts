@@ -54,7 +54,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 
 
 		// ADD TABLE METADATA TO ds_metadata in DB
-		await create_ds_metadata(req.body['name'], cont, owner)
+		// TODO: Get owner id
+		await create_ds_metadata(req.body['name'], cont, 0)
 
     if (FILE_UPLOAD) {
       const ret = await migrate_csv_to_db_new_table(
@@ -130,16 +131,15 @@ router.post("/user", async (req, res) => {
   const email: string = req.body["email"];
   assert(email.length < 100 && email.length > 10);
   // TODO: Actually check if email is correct lol
-  const uuid: string = uuidv4();
   var now = new Date();
   const cakeday: any =
     now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
   console.log(
-    `\n Username: ${username}\n Email: ${email}\n UUID: ${uuid}\n Cakeday: ${cakeday}`
+    `\n Username: ${username}\n Email: ${email}\n Cakeday: ${cakeday}`
   );
   const rq =
-    await queryDB(`INSERT INTO users (uuid, username, cakeday, email, password) 
-														VALUES('${uuid}', '${username}', '${cakeday}', '${email}', crypt('${req.body["password"]}', gen_salt('bf')));`);
+    await queryDB(`INSERT INTO users (username, cakeday, email, password) 
+														VALUES('${username}', '${cakeday}', '${email}', crypt('${req.body["password"]}', gen_salt('bf')));`);
   console.log(rq);
   res.status = 201;
   res.send(JSON.stringify(rq));

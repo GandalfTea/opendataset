@@ -1,0 +1,14 @@
+
+{
+	"compilerOptions": {
+		"outDir": "./public/",
+		"allowJs": true,
+		"target": "es5",
+		"jsx": "react",
+		"lib": [
+			"dom",
+			"ES2021.String"
+		]
+	},
+	"include": ["./src/**/*"]
+}

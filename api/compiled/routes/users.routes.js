@@ -55,12 +55,12 @@ router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, f
         }
     });
 }); });
-router.get("/:username", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+router.get("/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, get;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                username = req.params.username;
+                username = req.params.user;
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(username, "';"))];
             case 1:
                 get = _a.sent();
