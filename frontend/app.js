@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 
 app.get("/dataset/:name", (req, res) => {
 	//res.sendFile(path.join(__dirname, "public", "dataset", "dataset.html"));	
-	res.render('dataset', {title:'Dataset', message:'Welcome to the dataset page'});
+	res.render('dataset', {name: req.params.name, message:'Welcome to the dataset page'});
 });
 
 

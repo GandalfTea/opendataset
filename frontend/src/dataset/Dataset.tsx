@@ -1,5 +1,14 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom/client';
 
-/* TODO (much wow):
-  [ ] GET ds_frontend data for specific dataset
-	[ ] Render page
- */
+class Dataset extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		return <h1>{this.props.msg}</h1>;
+	}
+}
+
+const root = ReactDOM.createRoot(document.getElementById('app'));
+root.render(<Dataset msg={window.ds_name}/>);

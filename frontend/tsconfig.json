@@ -1,5 +1,7 @@
 
 {
+	"allowSyntheticDefaultImports": true,
+	"esModuleInterop": true,
 	"compilerOptions": {
 		"outDir": "./public/",
 		"allowJs": true,
