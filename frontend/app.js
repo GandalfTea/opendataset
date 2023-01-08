@@ -1,7 +1,13 @@
+const path = require("path");
 const express = require("express");
+
 const app = express();
+
 const PORT = 3001;
 const DEBUG = false;
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'public', 'views')); 
 
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: false }));
@@ -13,7 +19,8 @@ app.get("/", (req, res) => {
 });
 
 app.get("/dataset/:name", (req, res) => {
-	
+	//res.sendFile(path.join(__dirname, "public", "dataset", "dataset.html"));	
+	res.render('dataset', {title:'Dataset', message:'Welcome to the dataset page'});
 });
 
 

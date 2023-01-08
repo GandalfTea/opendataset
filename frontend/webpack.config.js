@@ -5,11 +5,11 @@ module.exports = {
 
 	mode: 'development',
 
-	entry: {  '/dataset/dataset': path.resolve(__dirname, './src/dataset/Dataset.tsx')},
+	entry: {  dataset: path.resolve(__dirname, './src/dataset/Dataset.tsx')},
 
 	output: {
 		filename: '[name].min.js',
-		path: path.resolve(__dirname, './public/'),
+		path: path.resolve(__dirname, './public/js'),
 	},
 
 	module: {
