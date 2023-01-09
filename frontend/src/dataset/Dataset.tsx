@@ -45,12 +45,78 @@ function DatasetCard(props) {
 	)	
 }
 
+
+function ContentCard(props) {
+	const [tab, setTab] = useState(0);
+
+	var tabhtml;
+	switch(tab){
+		case 0: // README
+			tabhtml = <div className=''> { /* MARKDOWN */} </div>
+			break;
+		case 1: // DATA SNIPPET
+			tabhtml = 
+				<div className=''>
+					<div> { /* Format */} </div>
+					<div> { /* First 30 entries */} </div>
+				</div>
+			break;
+		case 2: // CODE EXAMPLES
+			tabhtml = <div className=''> { /* Examples */} </div>
+			break;
+		case 3: // Live discussions
+		case 4:	// Issues
+			break;
+	}
+
+	return(
+		<div>
+			{/* Buttons */}
+			{ tabhtml }
+		</div>
+	);
+}
+
+function SideBar(props) {
+	// Switch of type of licence
+	var licence: any;
+	switch(parseInt(props.licence)){
+		case 0: // MIT
+			licence =
+				<div>
+					<h5>MIT Licence</h5> 
+					<div><img src={'@assets/tick.svg'} /><p>Commercial Use</p></div> 
+					<div><img src={'@assets/tick.svg'} /><p>Private Use</p></div> 
+					<div><img src={'@assets/tick.svg'} /><p>Modification</p></div> 
+					<div><img src={'@assets/tick.svg'} /><p>Distribution</p></div> 
+					<div><img src={'@assets/x.svg'} /><p>Liability</p></div> 
+					<div><img src={'@assets/x.svg'} /><p>Warranty</p></div> 
+				</div>
+	}
+
+	return(
+		<div className='side-bar'>
+			<h4>About</h4>
+			<p>{props.about}
+			<p>{props.num_entries} . {props.file_type} . {props.file_size} </p>
+			<p>{licence}</p>
+		</div>
+	)
+}
+
 class Dataset extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 	render() {
-		return <DatasetCard title={this.props.name} />;
+		return (
+			<div>
+				<div>
+					<DatasetCard title={this.props.name} />
+				</div>
+				<SideBar about='description' num_entries='50000' file_type='CSV' file_size='69Kb' licence='0' />
+			</div>
+		);
 	}
 }
 
