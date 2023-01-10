@@ -28,6 +28,23 @@ router.get('/:dsid/details', async (req, res) => {
 	res.send(JSON.stringify(ret))
 })
 
+// UPDATE FRONTEND
+
+router.patch('/:dsid/frontend/description', async (req, res) => {
+	console.log('HERE')
+	var dsid: number | string = req.params.dsid;
+	if( dsid instanceof String || typeof dsid === 'string') {
+		var ret = await queryDB(`SELECT ds_id FROM ds_metadata WHERE ds_name='${dsid}';`)
+		dsid = ret['rows'][0]['ds_id'];
+	}
+	var new_des = req.body['description'];
+	console.log(Object.keys(req.body))
+	var ret = await queryDB(`UPDATE ds_frontend SET description='${new_des}' WHERE ds_id=${dsid};`)
+	console.log(ret);
+	res.status(200)
+	res.send("Hello");
+})
+
 // EDIT
 
 // DELETE

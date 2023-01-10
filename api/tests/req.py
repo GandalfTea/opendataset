@@ -21,6 +21,10 @@ def test(test_name, req_type, req_url, expected_status_code, payload={}):
             r = rq.get(f"{API_BASE_URL}{req_url}")
         elif req_type=='DELETE':
             r = rq.delete(f"{API_BASE_URL}{req_url}")
+        elif req_type=='PATCH':
+            r = rq.patch(f"{API_BASE_URL}{req_url}",
+                    headers={"Content-Type":"application/json"},
+                    data=json.dumps(payload))
         else:
             raise ValueError("URL Request Type not valid.")
         assert r.status_code == expected_status_code
@@ -94,6 +98,7 @@ def test_dataset():
     test("test_dataset_frontend", 'GET', f"/dataset/{correct_payload['name']}/details", 200)
 
     # EDIT 
+    test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/frontend/description", 200, {"description": "a new description"})
     print(" > test_database_edit_name                             SKIPPED")
     print(" > test_database_edit_contributions                    SKIPPED")
     print(" > test_database_edit_schema                           SKIPPED")
@@ -103,6 +108,7 @@ def test_dataset():
     # CONTRIBUTE 
     print(" > test_database_contribution                          SKIPPED")
     print(" > test_database_su_contrib_accept                     SKIPPED")
+
 
     # DELETE 
     #test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)

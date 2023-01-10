@@ -74,6 +74,33 @@ router.get('/:dsid/details', function (req, res) { return __awaiter(void 0, void
         }
     });
 }); });
+// UPDATE FRONTEND
+router.patch('/:dsid/frontend/description', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var dsid, ret, new_des, ret;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log('HERE');
+                dsid = req.params.dsid;
+                if (!(dsid instanceof String || typeof dsid === 'string')) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+            case 1:
+                ret = _a.sent();
+                dsid = ret['rows'][0]['ds_id'];
+                _a.label = 2;
+            case 2:
+                new_des = req.body['description'];
+                console.log(Object.keys(req.body));
+                return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET description='".concat(new_des, "' WHERE ds_id=").concat(dsid, ";"))];
+            case 3:
+                ret = _a.sent();
+                console.log(ret);
+                res.status(200);
+                res.send("Hello");
+                return [2 /*return*/];
+        }
+    });
+}); });
 // EDIT
 // DELETE
 router["delete"]('/:dsid', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
