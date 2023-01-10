@@ -19,7 +19,7 @@ function DatasetCard(props) {
 			<div> { props.address } <strong> { props.title } </strong> </div>
 			<div className='card'>
 				<h2> { props.name } </h2>
-				<h5> { props.description } </h5>
+				<h4> { props.description } {props.description} {props.description} </h4>
 				<div className='voting'> 
 					<VoteButton vote='upvote' ds_name={props.name} />
 					<p>{ /*score*/ } </p>
@@ -117,9 +117,9 @@ class Dataset extends React.Component {
 			<div className='page'>
 				<div className='main-content'>
 					{console.log(this.state)}
-					<DatasetCard address='demo-user/' name={this.props.name} description={this.state.description} cli='' />
+					<DatasetCard address='demo-user/' name={this.props.name} description={this.state.desc} cli='' />
 				</div>
-				<SideBar about='description' num_entries={this.state.num_entries} file_type='CSV' file_size='69Kb' licence={this.state.licence} />
+				<SideBar about={this.state.desc} num_entries={this.state.num_entries} file_type='CSV' file_size='69Kb' licence={this.state.licence} />
 			</div>
 		);
 	}

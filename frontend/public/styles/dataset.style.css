@@ -10,12 +10,12 @@ body {
 }
 
 h1,
-h2,
-h3,
-h4 {
+h2 {
 	font-family: "Roboto Mono";
 }
 
+h3,
+h4,
 h5,
 h6,
 p {
@@ -34,7 +34,6 @@ p {
 	display: flex;
 	flex-direction: column;
 	width: 55vw;
-	height: 24vh;
 	background-color: #2f2f2f;
 	border-radius: 25px;
 	color: white;
@@ -48,24 +47,27 @@ p {
 	flex-direction: row;
 }
 
-.card .bottom-menu {
-	display: flex;
-	flex-direction: row;
-}
-
 .card h2 {
 	margin-top: 5%;
 	margin-left: 8%;
 	font-size: 30px;
 }
 
-.card h5 {
+.card h4 {
 	height: 30%;
+	min-height: 80px;
+	line-height: 28px;
+	font-size: 18px;
+	padding: 2% 5% 0% 0%;
+	text-align: justify;
 	margin-left: 8%;
 }
 
 .card .bottom-menu {
-	margin-top: 2%;
+	display: flex;
+	flex-direction: row;
+	margin-bottom: 4%;
+	margin-top: 3%;
 	margin-left: 8%;
 	width: 100%;
 } 

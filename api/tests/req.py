@@ -98,7 +98,8 @@ def test_dataset():
     test("test_dataset_frontend", 'GET', f"/dataset/{correct_payload['name']}/details", 200)
 
     # EDIT 
-    test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/frontend/description", 200, {"description": "a new description"})
+    updated_description = {"description": "This is a demo description to fill the white space and get a better idea of how an actual description would look like."}
+    test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/frontend/description", 200, updated_description)
     print(" > test_database_edit_name                             SKIPPED")
     print(" > test_database_edit_contributions                    SKIPPED")
     print(" > test_database_edit_schema                           SKIPPED")
