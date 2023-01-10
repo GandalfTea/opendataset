@@ -19,17 +19,17 @@ function DatasetCard(props) {
 			<div> { props.address } <strong> { props.title } </strong> </div>
 			<div className='card'>
 				<h2> { props.name } </h2>
-				<h3> { props.description } </h3>
+				<h5> { props.description } </h5>
 				<div className='voting'> 
 					<VoteButton vote='upvote' ds_name={props.name} />
 					<p>{ /*score*/ } </p>
 					<VoteButton vote='downvote' ds_name={props.name} />
 				</div>
-				<div>
+				<div className='bottom-menu'>
 					<p> { props.cli } </p>
 					<button onClick={ () => navigator.clipboard.writeText(cli) }></button>
-					<button type='button'> <p>Contribute</p> </button>
-					<button type='button'> <p>Get</p> </button>
+					<button type='button' className='button-empty-white'> <p>Contribute</p> </button>
+					<button type='button' className='button-full-white'> <p>Get</p> </button>
 				</div>
 			</div>
 		</div>
@@ -75,7 +75,7 @@ function SideBar(props) {
 		case 0: // MIT
 			licence =
 				<div>
-					<h4>MIT Licence</h4> 
+					<h3>MIT Licence</h3> 
 					<div><img src={'@assets/tick.svg'} /><p>Commercial Use</p></div> 
 					<div><img src={'@assets/tick.svg'} /><p>Private Use</p></div> 
 					<div><img src={'@assets/tick.svg'} /><p>Modification</p></div> 
@@ -87,10 +87,10 @@ function SideBar(props) {
 
 	return(
 		<div className='side-bar'>
-			<h4>About</h4>
+			<h3>About</h3>
 			<p>{props.about}</p>
 			<p>{props.num_entries} . {props.file_type} . {props.file_size} </p>
-			<p>{licence}</p>
+			{licence}
 		</div>
 	)
 }
@@ -114,8 +114,8 @@ class Dataset extends React.Component {
 
 	render() {
 		return (
-			<div>
-				<div>
+			<div className='page'>
+				<div className='main-content'>
 					{console.log(this.state)}
 					<DatasetCard address='demo-user/' name={this.props.name} description={this.state.description} cli='' />
 				</div>

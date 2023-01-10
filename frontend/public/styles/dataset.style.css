@@ -1,0 +1,144 @@
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #F6F6F6;
+}
+
+h1,
+h2,
+h3,
+h4 {
+	font-family: "Roboto Mono";
+}
+
+h5,
+h6,
+p {
+	font-family: 'Lato'
+}
+
+.page {
+	width: 80vw;
+	margin: auto;
+	display: flex;
+	flex-direction: row;
+}
+
+.main-content .card{
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 55vw;
+	height: 24vh;
+	background-color: #2f2f2f;
+	border-radius: 25px;
+	color: white;
+}
+
+.card .voting {
+	position: absolute;
+	right: 5%;
+	top: 5%;
+	display: flex;
+	flex-direction: row;
+}
+
+.card .bottom-menu {
+	display: flex;
+	flex-direction: row;
+}
+
+.card h2 {
+	margin-top: 5%;
+	margin-left: 8%;
+	font-size: 30px;
+}
+
+.card h5 {
+	height: 30%;
+	margin-left: 8%;
+}
+
+.card .bottom-menu {
+	margin-top: 2%;
+	margin-left: 8%;
+	width: 100%;
+} 
+
+.bottom-menu p {
+	height: 40px;
+	width: 35%;
+	background-color: #171717;
+	border-radius: 30px;
+} 
+
+.bottom-menu .button-empty-white {
+	margin-left: 24%;
+}
+
+.bottom-menu .button-full-white {
+	margin-left: 2%;
+}
+
+/* GENERAL BUTTONS */
+
+.button-full-white,
+.button-empty-white {
+	height: 40px;
+	width: 140px;
+	border-radius: 40px;
+}
+
+.button-empty-white {
+	background-color: transparent;
+	border: 2px solid white;
+	color: white;
+}
+
+.button-empty-white p{
+	font-size: 16px;
+	font-weight: bold;
+	width: auto;
+	height: auto;
+	background-color: transparent;
+	margin: auto;
+}
+
+.button-full-white {
+	background-color: white;
+	border: none;
+}
+
+.button-full-white p {
+	font-size: 16px;
+	font-weight: bold;
+	height: auto;
+	margin: auto;
+	color: #171717;
+	margin: auto;
+	background-color: white;
+}
+
+.side-bar {
+	margin-left: 10vw;
+}
+
+.side-bar * {
+	margin-bottom: 1px;
+}
+
+.side-bar h3 {
+	margin-top: 30px;
+	margin-bottom: 20px;
+} 
+
+.side-bar div div{
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}

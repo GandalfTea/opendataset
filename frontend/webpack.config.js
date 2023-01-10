@@ -31,7 +31,7 @@ module.exports = {
 		extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
 		alias: {
 			"@hooks" : path.resolve(__dirname, "./src/hooks"),
-			"@assets" : path.resolve(__dirname, "./src/assets")
+			"@assets" : path.resolve(__dirname, "./src/assets"),
 		}
 	},
 	
