@@ -6,12 +6,18 @@ Like a very shitty GitHub, for now.
 
 #### Dependencies:      
 Backend: `typescript`, `express`, PostgreSQL, `multer`, `pg`, `uuid`    
-Frontend: `react`, `socket.io`    
+Frontend: `react`, `socket.io`, `pug`      
 Python: `pandas`  
 
 &nbsp;
 
 #### Run locally:
+
+`api` and `frontend` are different webservers that both run on express and node
+
+&nbsp;
+##### API Server:
+
 Import `db.sql` into a PostgreSQL database.     
 Update `node-postgres` client information in `./api/ts/db.ts` with your login credentials.     
 Make sure your Postgres user has the `pg_read_server_files` role.   
@@ -33,6 +39,11 @@ Use the demo forms in `./frontend` or make requests using cURL
 In order to upload files to a HTML form, it needs `enctype="multipart/form-data"`.
       
 &nbsp;
+
+##### Frontend server:
+```bash
+REACT_APP_API_BASE_DIR= { your api url }:PORT node app.js
+```
 
 #### TODO:
 #### 0.1:
