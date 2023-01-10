@@ -24,6 +24,7 @@ router.get('/:dsid/details', async (req, res) => {
 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id='${dsid}'`);
 	console.log(ret);
 	res.status(200)
+	res.set('Access-Control-Allow-Origin', '*')
 	res.send(JSON.stringify(ret))
 })
 

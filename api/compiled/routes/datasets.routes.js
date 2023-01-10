@@ -68,6 +68,7 @@ router.get('/:dsid/details', function (req, res) { return __awaiter(void 0, void
                 ret = _a.sent();
                 console.log(ret);
                 res.status(200);
+                res.set('Access-Control-Allow-Origin', '*');
                 res.send(JSON.stringify(ret));
                 return [2 /*return*/];
         }

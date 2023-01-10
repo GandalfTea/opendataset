@@ -96,22 +96,30 @@ function SideBar(props) {
 }
 
 class Dataset extends React.Component {
+
 	constructor(props) {
 		super(props);
+		this.state = {desc:'', num_entries:0, num_cont:0, licence: 0}
 	}
 
 	async componentWillMount() {
-		const details = await fetch(`http://localhost:3000/dataset/${this.props.name}/details`);
-		console.log(details)
+		var details;
+		await fetch(`http://localhost:3000/dataset/${this.props.name}/details`)
+							 .then( response=>response.json())
+							 .then( (data) => details=data);
+		details = details['rows'][0];
+		this.setState({ desc: details['description'], num_entries: details['num_entries'],
+		                num_cont: details['num_contributors'], licence: details['licence']});
 	}
 
 	render() {
 		return (
 			<div>
 				<div>
-					<DatasetCard address='demo-user/' name={this.props.name} description='A demo description for demo-dataset' cli='' />
+					{console.log(this.state)}
+					<DatasetCard address='demo-user/' name={this.props.name} description={this.state.description} cli='' />
 				</div>
-				<SideBar about='description' num_entries='50000' file_type='CSV' file_size='69Kb' licence='0' />
+				<SideBar about='description' num_entries={this.state.num_entries} file_type='CSV' file_size='69Kb' licence={this.state.licence} />
 			</div>
 		);
 	}
