@@ -54,17 +54,21 @@ router.get("/:dsid/contributions/:hash", function (req, res) {
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 router.get('/:dsid/details', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, ret;
+    var dsid, ret, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id='".concat(dsid, "'"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
             case 1:
+                ret = _a.sent();
+                dsid = ret['rows'][0]['ds_id'];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id='".concat(dsid, "'"))];
+            case 2:
                 ret = _a.sent();
                 console.log(ret);
                 res.status(200);
-                res.send("Hello");
+                res.send(JSON.stringify(ret));
                 return [2 /*return*/];
         }
     });
@@ -72,22 +76,29 @@ router.get('/:dsid/details', function (req, res) { return __awaiter(void 0, void
 // EDIT
 // DELETE
 router["delete"]('/:dsid', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, ret, ret, ret;
+    var dsid, dsname, ret, ret, ret, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
                 if (!(dsid instanceof String || typeof dsid === 'string')) return [3 /*break*/, 2];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id, ds_name FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+                dsname = dsid;
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
             case 1:
                 ret = _a.sent();
                 dsid = ret['rows'][0]['ds_id'];
-                _a.label = 2;
-            case 2: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id='".concat(dsid, "';"))];
+                return [3 /*break*/, 4];
+            case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_name FROM ds_metadata WHERE ds_id='".concat(dsid, "';"))
+                //var dsname = ret['rows'][0]['ds_name'];
+            ];
             case 3:
                 ret = _a.sent();
+                _a.label = 4;
+            case 4: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id='".concat(dsid, "';"))];
+            case 5:
+                ret = _a.sent();
                 return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_frontend WHERE ds_id='".concat(dsid, "';"))];
-            case 4:
+            case 6:
                 ret = _a.sent();
                 console.log("\n\n\n", ret);
                 res.status(204);

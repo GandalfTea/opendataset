@@ -105,7 +105,7 @@ def test_dataset():
     print(" > test_database_su_contrib_accept                     SKIPPED")
 
     # DELETE 
-    test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
+    #test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
 
 
 

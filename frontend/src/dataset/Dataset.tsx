@@ -14,28 +14,19 @@ function VoteButton(props) {
 }
 
 function DatasetCard(props) {
-	useEffect( () => {
-		var dick = true;
-		// Request data from ds_frontend
-	});
-
-	var address = 'dicks'
-	var description = 'desc'
-	var cli = 'https://pornhub.com'
-
 	return(
 		<div className='address'>
-			<div> { address } <strong> { props.title } </strong> </div>
+			<div> { props.address } <strong> { props.title } </strong> </div>
 			<div className='card'>
 				<h2> { props.name } </h2>
-				<h3> { description } </h3>
+				<h3> { props.description } </h3>
 				<div className='voting'> 
 					<VoteButton vote='upvote' ds_name={props.name} />
 					<p>{ /*score*/ } </p>
 					<VoteButton vote='downvote' ds_name={props.name} />
 				</div>
 				<div>
-					<p> { cli } </p>
+					<p> { props.cli } </p>
 					<button onClick={ () => navigator.clipboard.writeText(cli) }></button>
 					<button type='button'> <p>Contribute</p> </button>
 					<button type='button'> <p>Get</p> </button>
@@ -84,7 +75,7 @@ function SideBar(props) {
 		case 0: // MIT
 			licence =
 				<div>
-					<h5>MIT Licence</h5> 
+					<h4>MIT Licence</h4> 
 					<div><img src={'@assets/tick.svg'} /><p>Commercial Use</p></div> 
 					<div><img src={'@assets/tick.svg'} /><p>Private Use</p></div> 
 					<div><img src={'@assets/tick.svg'} /><p>Modification</p></div> 
@@ -97,7 +88,7 @@ function SideBar(props) {
 	return(
 		<div className='side-bar'>
 			<h4>About</h4>
-			<p>{props.about}
+			<p>{props.about}</p>
 			<p>{props.num_entries} . {props.file_type} . {props.file_size} </p>
 			<p>{licence}</p>
 		</div>
@@ -108,11 +99,17 @@ class Dataset extends React.Component {
 	constructor(props) {
 		super(props);
 	}
+
+	async componentWillMount() {
+		const details = await fetch(`http://localhost:3000/dataset/${this.props.name}/details`);
+		console.log(details)
+	}
+
 	render() {
 		return (
 			<div>
 				<div>
-					<DatasetCard title={this.props.name} />
+					<DatasetCard address='demo-user/' name={this.props.name} description='A demo description for demo-dataset' cli='' />
 				</div>
 				<SideBar about='description' num_entries='50000' file_type='CSV' file_size='69Kb' licence='0' />
 			</div>

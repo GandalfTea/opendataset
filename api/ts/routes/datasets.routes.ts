@@ -19,10 +19,12 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
 
 router.get('/:dsid/details', async (req, res) => {
 	var dsid: number | string = req.params.dsid;
+	var ret = await queryDB(`SELECT ds_id FROM ds_metadata WHERE ds_name='${dsid}';`)
+	dsid = ret['rows'][0]['ds_id'];
 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id='${dsid}'`);
 	console.log(ret);
 	res.status(200)
-	res.send("Hello")
+	res.send(JSON.stringify(ret))
 })
 
 // EDIT
@@ -31,13 +33,13 @@ router.get('/:dsid/details', async (req, res) => {
 router.delete('/:dsid', async (req, res) => {
 	var dsid: number | string = req.params.dsid
 	if( dsid instanceof String || typeof dsid === 'string') {
-		// get  id
-		var ret = await queryDB(`SELECT ds_id, ds_name FROM ds_metadata WHERE ds_name='${dsid}';`)
+		var dsname = dsid;
+		var ret = await queryDB(`SELECT ds_id FROM ds_metadata WHERE ds_name='${dsid}';`)
 		dsid = ret['rows'][0]['ds_id'];
-		//dsname = ret['rows'][0]['ds_name'];
+	} else {
+		var ret = await queryDB(`SELECT ds_name FROM ds_metadata WHERE ds_id='${dsid}';`)
+		//var dsname = ret['rows'][0]['ds_name'];
 	}
-	// Delete DS table first!
-	
 	//var ret = await queryDB(`DROP TABLE ${dsname};`)
 	var ret = await queryDB(`DELETE FROM ds_metadata WHERE ds_id='${dsid}';`)
 	var ret = await queryDB(`DELETE FROM ds_frontend WHERE ds_id='${dsid}';`)
