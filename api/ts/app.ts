@@ -28,7 +28,7 @@ import { router as datasets_routes } from "./routes/datasets.routes";
 import { router as login_routes } from "./routes/login.routes";
 app.use("/create", create_routes);
 app.use("/users", users_routes);
-app.use("/datasets", datasets_routes);
+app.use("/dataset", datasets_routes);
 app.use("/login", login_routes);
 
 

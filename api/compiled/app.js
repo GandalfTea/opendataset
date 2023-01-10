@@ -19,7 +19,7 @@ var datasets_routes_1 = require("./routes/datasets.routes");
 var login_routes_1 = require("./routes/login.routes");
 app.use("/create", create_routes_1.router);
 app.use("/users", users_routes_1.router);
-app.use("/datasets", datasets_routes_1.router);
+app.use("/dataset", datasets_routes_1.router);
 app.use("/login", login_routes_1.router);
 app.listen(PORT, function () {
     console.log("Listening on port: ".concat(PORT));

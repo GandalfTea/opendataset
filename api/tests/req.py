@@ -91,6 +91,7 @@ def test_dataset():
     print(" > test_dataset_creation_illegal_column_names          SKIPPED")
     print(" > test_dataset_creation_database_error                SKIPPED")
 
+    test("test_dataset_frontend", 'GET', f"/dataset/{correct_payload['name']}/details", 200)
 
     # EDIT 
     print(" > test_database_edit_name                             SKIPPED")
@@ -104,13 +105,10 @@ def test_dataset():
     print(" > test_database_su_contrib_accept                     SKIPPED")
 
     # DELETE 
-    print(" > test_database_deletion                              SKIPPED")
+    test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
 
 
-def test_dataset_frontend():
-    ds_id = 'demo-dataset'
-    test("test_dataset_frontend", 'GET', f"/dataset/{ds_id}/details", 200)
-    
+
 
 if __name__ == '__main__':
     for arg in sys.argv[1:]:
@@ -124,5 +122,3 @@ if __name__ == '__main__':
     test_user()
     print('\n')
     test_dataset()
-    print('\n')
-    test_dataset_frontend()
