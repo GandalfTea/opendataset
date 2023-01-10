@@ -22,9 +22,32 @@ const queryDB = async (query) => {
 // Add table metadata to ds_metadata
 
 // Note: Score is defaulted to 0;
-async function create_ds_metadata(ds_name:string, ds_cont:number, ds_owner:number) {
-	let ret = await queryDB(`INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('${ds_name}', ${ds_cont}, ${ds_owner});`)
-	console.log(ret);
+async function create_ds_metadata(
+  ds_name: string,
+  ds_cont: number,
+  ds_owner: number
+) {
+  let ret = await queryDB(
+    `INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('${ds_name}', ${ds_cont}, ${ds_owner});`
+  );
+  console.log(ret);
+}
+
+async function create_ds_frontend(
+  ds_name: string,
+  ds_description: string = "",
+  ds_num_cont: number = 0,
+  ds_num_entries: number = 0,
+  ds_licence: number = 0
+) {
+  var ret = await queryDB(
+    `SELECT ds_id FROM ds_metadata WHERE ds_name='${ds_name}';`
+  );
+  const dsid = ret["rows"][0]["ds_id"];
+  var ret = await queryDB(
+    `INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES(${ds_num_cont}, '${ds_description}', ${ds_num_entries}, ${ds_licence}, ${dsid});`
+  );
+	console.log(ret)
 }
 
 // Parse recieved .cvs files and upload them to the database
@@ -138,7 +161,8 @@ async function migrate_csv_to_db_new_table(
 
 export {
   queryDB,
-	create_ds_metadata,
+  create_ds_metadata,
+  create_ds_frontend,
   generate_schema,
   migrate_csv_to_db_new_table,
   csv_mig_errors,

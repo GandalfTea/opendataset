@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.create_ds_metadata = exports.queryDB = void 0;
+exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.create_ds_frontend = exports.create_ds_metadata = exports.queryDB = void 0;
 var Client = require("pg").Client;
 var path = require("path");
 var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
@@ -87,6 +87,29 @@ function create_ds_metadata(ds_name, ds_cont, ds_owner) {
     });
 }
 exports.create_ds_metadata = create_ds_metadata;
+function create_ds_frontend(ds_name, ds_description, ds_num_cont, ds_num_entries, ds_licence) {
+    if (ds_description === void 0) { ds_description = ""; }
+    if (ds_num_cont === void 0) { ds_num_cont = 0; }
+    if (ds_num_entries === void 0) { ds_num_entries = 0; }
+    if (ds_licence === void 0) { ds_licence = 0; }
+    return __awaiter(this, void 0, void 0, function () {
+        var ret, dsid, ret;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, queryDB("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(ds_name, "';"))];
+                case 1:
+                    ret = _a.sent();
+                    dsid = ret["rows"][0]["ds_id"];
+                    return [4 /*yield*/, queryDB("INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES(".concat(ds_num_cont, ", '").concat(ds_description, "', ").concat(ds_num_entries, ", ").concat(ds_licence, ", ").concat(dsid, ");"))];
+                case 2:
+                    ret = _a.sent();
+                    console.log(ret);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.create_ds_frontend = create_ds_frontend;
 // Parse recieved .cvs files and upload them to the database
 var spawn = require("child_process").spawn;
 var execSync = require("child_process").execSync;

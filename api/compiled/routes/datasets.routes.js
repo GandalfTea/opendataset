@@ -78,7 +78,7 @@ router["delete"]('/:dsid', function (req, res) { return __awaiter(void 0, void 0
             case 0:
                 dsid = req.params.dsid;
                 if (!(dsid instanceof String || typeof dsid === 'string')) return [3 /*break*/, 2];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id, ds_name FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
             case 1:
                 ret = _a.sent();
                 dsid = ret['rows'][0]['ds_id'];

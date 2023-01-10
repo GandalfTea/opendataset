@@ -92,9 +92,12 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 // ADD TABLE METADATA TO ds_metadata in DB
                 // TODO: Get owner id
                 _a.sent();
-                if (!FILE_UPLOAD) return [3 /*break*/, 6];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
+                return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body['name'])];
             case 5:
+                _a.sent();
+                if (!FILE_UPLOAD) return [3 /*break*/, 7];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
+            case 6:
                 ret_1 = _a.sent();
                 switch (ret_1) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
@@ -123,15 +126,15 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                         break;
                     // TODO: ADD default
                 }
-                return [3 /*break*/, 7];
-            case 6:
+                return [3 /*break*/, 8];
+            case 7:
                 process.stdout.write("RESOLVED, dataset '".concat(name_1, "' created."));
                 if (DEBUG)
                     console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.status(201); // Created
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-                _a.label = 7;
-            case 7: return [2 /*return*/];
+                _a.label = 8;
+            case 8: return [2 /*return*/];
         }
     });
 }); });
