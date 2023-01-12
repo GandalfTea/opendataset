@@ -57,7 +57,8 @@ async function create_ds_frontend(
   );
   const dsid = ret["rows"][0]["ds_id"];
   var ret = await queryDB(
-    `INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES(${ds_num_cont}, '${ds_description}', ${ds_num_entries}, ${ds_licence}, ${dsid});`
+    `INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES($1, $2, $3, $4, $5);`,
+		[ds_num_cont, ds_description, ds_num_entries, ds_licence, dsid]
   );
   console.log(ret);
 }

@@ -6,7 +6,8 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   // Recieve username and password;
   var ret = await queryDB(
-    `SELECT * FROM users WHERE username='${req.body["username"]}' AND password=crypt('${req.body["password"]}', password);`
+    `SELECT * FROM users WHERE username=$1 AND password=crypt($2, password);`,
+		[req.body['username'], req.body['password']]
   );
   if (parseInt(ret["rowCount"]) > 0) {
     console.log(ret);

@@ -42,26 +42,13 @@ var express = require("express");
 var router = express.Router();
 exports.router = router;
 // TODO: Prevent injection attacks (current is vulnerable)
-router.get("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var rq;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users;")];
-            case 1:
-                rq = _a.sent();
-                res.status = 302;
-                res.send(JSON.stringify(rq["rows"]));
-                return [2 /*return*/];
-        }
-    });
-}); });
 router.get("/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, get;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 username = req.params.user;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(username, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1;", [username])];
             case 1:
                 get = _a.sent();
                 res.status = 302;
@@ -77,7 +64,7 @@ router["delete"]("/:user", function (req, res) { return __awaiter(void 0, void 0
         switch (_a.label) {
             case 0:
                 username = req.params.user;
-                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username='".concat(username, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username=$1;", [username])];
             case 1:
                 query = _a.sent();
                 res.status = 200;

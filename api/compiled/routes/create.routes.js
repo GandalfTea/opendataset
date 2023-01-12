@@ -54,7 +54,6 @@ var cache = multer.diskStorage({
 });
 var upload = multer({ storage: cache });
 var db_1 = require("../db");
-// CREATE
 router.post("/dataset", upload.single("init"), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var owner_entry, name_1, ret, owner, cont, schema, file, FILE_UPLOAD, ret_1;
     return __generator(this, function (_a) {
@@ -87,12 +86,12 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 FILE_UPLOAD = !file ? false : true;
                 // ADD TABLE METADATA TO ds_metadata in DB
                 // TODO: Get owner id
-                return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body['name'], cont, 0)];
+                return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body["name"], cont, 0)];
             case 4:
                 // ADD TABLE METADATA TO ds_metadata in DB
                 // TODO: Get owner id
                 _a.sent();
-                return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body['name'])];
+                return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body["name"])];
             case 5:
                 _a.sent();
                 if (!FILE_UPLOAD) return [3 /*break*/, 7];

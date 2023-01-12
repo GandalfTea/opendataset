@@ -4,16 +4,11 @@ const express = require("express");
 const router = express.Router();
 
 // TODO: Prevent injection attacks (current is vulnerable)
-router.get("/", async (req, res) => {
-  var rq = await queryDB("SELECT * FROM users;");
-  res.status = 302;
-  res.send(JSON.stringify(rq["rows"]));
-});
-
 router.get("/:user", async (req: any, res: any) => {
   var username: string = req.params.user;
   var get: any = await queryDB(
-    `SELECT * FROM users WHERE username='${username}';`
+    `SELECT * FROM users WHERE username=$1;`,
+		[username]
   );
   res.status = 302;
   res.send(`User ${JSON.stringify(get["rows"])}`);
@@ -23,7 +18,8 @@ router.get("/:user", async (req: any, res: any) => {
 router.delete("/:user", async (req, res) => {
   var username: string = req.params.user;
   var query: any = await queryDB(
-    `DELETE FROM users WHERE username='${username}';`
+    `DELETE FROM users WHERE username=$1;`,
+		[username]
   );
   res.status = 200;
   res.send(query);

@@ -41,14 +41,14 @@ var db_1 = require("../db");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
-router.post('/', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+router.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body['username'], "' AND password=crypt('").concat(req.body['password'], "', password);"))];
+            case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1 AND password=crypt($2, password);", [req.body['username'], req.body['password']])];
             case 1:
                 ret = _a.sent();
-                if (parseInt(ret['rowCount']) > 0) {
+                if (parseInt(ret["rowCount"]) > 0) {
                     console.log(ret);
                     res.status(200);
                     res.send("Successful Login");

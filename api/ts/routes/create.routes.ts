@@ -28,7 +28,8 @@ import {
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
   process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
   let owner_entry: string = await queryDB(
-    `SELECT * FROM users WHERE username='${req.body["owner"]}';`
+    `SELECT * FROM users WHERE username=$1;`,
+		[req.body["owner"]]
   );
 
   // Check if owner account exists
@@ -41,7 +42,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     // Check if dataset name already exists
     const name: string = req.body["name"];
     let ret = await queryDB(
-      `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='${name}');`
+      `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name=$1);`,
+			[name]
     );
     if (ret["rows"][0]["exists"] == true) {
       process.stdout.write(`REJECTED, dataset ${name} already exists.`);
@@ -144,7 +146,8 @@ router.post("/user", async (req, res) => {
   );
   const rq =
     await queryDB(`INSERT INTO users (username, cakeday, email, password) 
-														VALUES('${username}', '${cakeday}', '${email}', crypt('${req.body["password"]}', gen_salt('bf')));`);
+														VALUES($1, $2, $3, $4, gen_salt('bf')));`,
+					        [username, cakeday, email, req.body['password']]);
   console.log(rq);
   res.status = 201;
   res.send(JSON.stringify(rq));

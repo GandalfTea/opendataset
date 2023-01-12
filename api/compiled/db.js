@@ -39,7 +39,9 @@ exports.__esModule = true;
 exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.create_ds_frontend = exports.create_ds_metadata = exports.queryDB = void 0;
 var Client = require("pg").Client;
 var path = require("path");
-var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, function () {
+var utils_1 = require("./utils");
+// TODO: Maybe not close connection to db on every query?
+var queryDB = function (query, params) { return __awaiter(void 0, void 0, void 0, function () {
     var client, res, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -55,7 +57,7 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
                 return [4 /*yield*/, client.connect()];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, client.query(query)];
+                return [4 /*yield*/, client.query(query, params)];
             case 2:
                 res = _a.sent();
                 return [4 /*yield*/, client.end()];
@@ -70,6 +72,12 @@ var queryDB = function (query) { return __awaiter(void 0, void 0, void 0, functi
     });
 }); };
 exports.queryDB = queryDB;
+var prepareDB = function (sname, query) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        queryDB("PREPARE ".concat(sname, " "));
+        return [2 /*return*/];
+    });
+}); };
 // Add table metadata to ds_metadata
 // Note: Score is defaulted to 0;
 function create_ds_metadata(ds_name, ds_cont, ds_owner) {
@@ -77,7 +85,11 @@ function create_ds_metadata(ds_name, ds_cont, ds_owner) {
         var ret;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, queryDB("INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('".concat(ds_name, "', ").concat(ds_cont, ", ").concat(ds_owner, ");"))];
+                case 0:
+                    if (!(0, utils_1.validate)(ds_name, utils_1.dtype.DS_NAME) || !(0, utils_1.validate)(ds_cont, utils_1.dtype.INT) || !(0, utils_1.validate)(ds_owner, utils_1.dtype.INT)) {
+                        throw Error("Input values could not be validated.");
+                    }
+                    return [4 /*yield*/, queryDB("INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ( $1, $2, $3);", [ds_name, ds_cont.toString(), ds_owner.toString()])];
                 case 1:
                     ret = _a.sent();
                     console.log(ret);
