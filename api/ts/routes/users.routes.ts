@@ -24,7 +24,7 @@ router.delete("/:user", async (req, res) => {
   var username: string = req.params.user;
   var query: any = await queryDB(
     `DELETE FROM users WHERE username='${username}';`
-  )
+  );
   res.status = 200;
   res.send(query);
 

@@ -3,7 +3,6 @@ const router = express.Router();
 
 const DEBUG: boolean = false;
 var assert = require("assert");
-import { v4 as uuidv4 } from "uuid";
 
 const multer = require("multer");
 var cache = multer.diskStorage({
@@ -17,9 +16,15 @@ var cache = multer.diskStorage({
 });
 var upload = multer({ storage: cache });
 
-import { queryDB, create_ds_metadata, create_ds_frontend, migrate_csv_to_db_new_table, csv_mig_errors } from "../db";
+import {
+  queryDB,
+  create_ds_metadata,
+  create_ds_frontend,
+  migrate_csv_to_db_new_table,
+  csv_mig_errors,
+} from "../db";
 
-// CREATE
+
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
   process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
   let owner_entry: string = await queryDB(
@@ -31,7 +36,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     process.stdout.write(`REJECTED, user ${req.body["owner"]} not found.`);
     res.status(404);
     res.send(`User not found: ${req.body["owner"]}`);
-		return;
+    return;
   } else {
     // Check if dataset name already exists
     const name: string = req.body["name"];
@@ -39,10 +44,10 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
       `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='${name}');`
     );
     if (ret["rows"][0]["exists"] == true) {
-    	process.stdout.write(`REJECTED, dataset ${name} already exists.`);
+      process.stdout.write(`REJECTED, dataset ${name} already exists.`);
       res.status(409); // Conflict
       res.send(`A dataset with the name ${name} already exists.`);
-			return;
+      return;
     }
 
     const owner: string = owner_entry["rows"][0]["id"];
@@ -52,11 +57,10 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     const file: any = req.file;
     const FILE_UPLOAD: boolean = !file ? false : true;
 
-
-		// ADD TABLE METADATA TO ds_metadata in DB
-		// TODO: Get owner id
-		await create_ds_metadata(req.body['name'], cont, 0)
-		await create_ds_frontend(req.body['name']);
+    // ADD TABLE METADATA TO ds_metadata in DB
+    // TODO: Get owner id
+    await create_ds_metadata(req.body["name"], cont, 0);
+    await create_ds_frontend(req.body["name"]);
 
     if (FILE_UPLOAD) {
       const ret = await migrate_csv_to_db_new_table(
@@ -95,7 +99,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
           res.status(500); // Internal server error
           res.send(`Internal Server Error. Sorry.`);
           break;
-				// TODO: ADD default
+        // TODO: ADD default
       }
 
       /* TODO: Once the file is in local storage

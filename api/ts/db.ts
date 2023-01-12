@@ -1,7 +1,10 @@
 const { Client } = require("pg");
 const path = require("path");
 
-const queryDB = async (query) => {
+import { dtype, validate } from './utils';
+
+// TODO: Maybe not close connection to db on every query?
+const queryDB = async (query:string, params) => {
   try {
     const client = new Client({
       user: "su",
@@ -11,13 +14,18 @@ const queryDB = async (query) => {
       port: "5432",
     });
     await client.connect();
-    const res: any = await client.query(query);
+    const res: any = await client.query(query, params);
     await client.end();
     return res;
   } catch (error) {
     return error;
   }
 };
+
+const prepareDB = async(sname: string, query: string) => {
+	queryDB(`PREPARE ${sname} `)
+}
+
 
 // Add table metadata to ds_metadata
 
@@ -27,8 +35,12 @@ async function create_ds_metadata(
   ds_cont: number,
   ds_owner: number
 ) {
+	if( !validate(ds_name, dtype.DS_NAME) || !validate(ds_cont, dtype.INT) || !validate(ds_owner, dtype.INT)) {
+		throw Error("Input values could not be validated.")
+	}
   let ret = await queryDB(
-    `INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ('${ds_name}', ${ds_cont}, ${ds_owner});`
+    `INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ( $1, $2, $3);`,
+		[ds_name, ds_cont.toString(), ds_owner.toString()]
   );
   console.log(ret);
 }
@@ -47,7 +59,7 @@ async function create_ds_frontend(
   var ret = await queryDB(
     `INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES(${ds_num_cont}, '${ds_description}', ${ds_num_entries}, ${ds_licence}, ${dsid});`
   );
-	console.log(ret)
+  console.log(ret);
 }
 
 // Parse recieved .cvs files and upload them to the database
