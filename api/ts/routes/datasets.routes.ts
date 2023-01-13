@@ -31,6 +31,16 @@ router.get("/:dsid/details", async (req, res) => {
   res.send(JSON.stringify(ret));
 });
 
+router.get('/:dsid/demo', async (req, res) => {
+	var dsid: number | string = req.params.dsid;
+  var ret = await queryDB(
+    `SELECT ds_id FROM ds_metadata WHERE ds_name=$1;`,
+		[dsid]
+  );
+  dsid = ret["rows"][0]["ds_id"];
+  var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
+})
+
 // UPDATE FRONTEND
 
 router.patch("/:dsid/frontend/description", async (req, res) => {

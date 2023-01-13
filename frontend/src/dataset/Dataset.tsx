@@ -61,7 +61,7 @@ function DatasetCard(props) {
 }
 
 function ContentCard(props) {
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(1);
 
   var tabhtml;
   switch (tab) {
