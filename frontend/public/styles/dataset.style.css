@@ -26,11 +26,18 @@ p {
 .page {
 	width: 70vw;
 	margin: auto;
+}
+
+.page .content {
 	display: flex;
 	flex-direction: row;
 }
 
-.main-content .card{
+.content {
+	width: 100%;
+}
+
+.card{
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -166,8 +173,9 @@ p {
 }
 
 .side-bar {
-	margin-left: 5vw;
-	margin-top: 10vh; 
+	position: absolute;
+	right: 10vw;
+	width: 200px;
 }
 
 .side-bar * {

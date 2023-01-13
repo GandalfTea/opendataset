@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
 import useVote from "@hooks/useVote";
+import Header from "@commons/Header";
 
 function Vote(props) {
 	const [vote, setVote] = useState(0);
@@ -162,22 +163,24 @@ class Dataset extends React.Component {
   render() {
     return (
       <div className="page">
-        <div className="main-content">
-          <DatasetCard
-            address="demo-user/"
-            name={this.props.name}
-            description={this.state.desc}
-            cli="127.0.0.1:3000/dataset/43/data"
-						score="69"
-          />
-        </div>
-        <SideBar
-          about={this.state.desc}
-          num_entries={this.state.num_entries}
-          file_type="CSV"
-          file_size="69Kb"
-          licence={this.state.licence}
+				<Header />
+        <DatasetCard
+          address="demo-user/"
+          name={this.props.name}
+          description={this.state.desc}
+          cli="127.0.0.1:3000/dataset/43/data"
+					score="69"
         />
+				<div className="content">
+        	<SideBar
+          	about={this.state.desc}
+          	num_entries={this.state.num_entries}
+          	file_type="CSV"
+          	file_size="69Kb"
+          	licence={this.state.licence}
+        	/>
+					<ContentCard />
+				</div>
       </div>
     );
   }
