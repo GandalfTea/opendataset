@@ -43,8 +43,10 @@ function DatasetCard(props) {
         <h4> {props.description} {props.description} {props.description} </h4>
 				<Vote ds_name='demo-dataset' score={69} />
         <div className="bottom-menu">
-          <p> {props.cli} </p>
-          <button onClick={() => navigator.clipboard.writeText(cli)}></button>
+					<div> 
+						<p> {props.cli} </p> 
+          	<button onClick={() => navigator.clipboard.writeText(cli)}><img src="../assets/clipboard.svg" alt='copy to clipboard' /></button>
+					</div>
           <button type="button" className="button-empty-white">
             <p>Contribute</p>
           </button>
@@ -98,27 +100,27 @@ function SideBar(props) {
         <div>
           <h3>MIT Licence</h3>
           <div>
-            <img src={"@assets/tick.svg"} />
+            <img src={"../assets/tick.svg"} />
             <p>Commercial Use</p>
           </div>
           <div>
-            <img src={"@assets/tick.svg"} />
+            <img src={"../assets/tick.svg"} />
             <p>Private Use</p>
           </div>
           <div>
-            <img src={"@assets/tick.svg"} />
+            <img src={"../assets/tick.svg"} />
             <p>Modification</p>
           </div>
           <div>
-            <img src={"@assets/tick.svg"} />
+            <img src={"../assets/tick.svg"} />
             <p>Distribution</p>
           </div>
           <div>
-            <img src={"@assets/x.svg"} />
+            <img src={"../assets/x.svg"} />
             <p>Liability</p>
           </div>
           <div>
-            <img src={"@assets/x.svg"} />
+            <img src={"../assets/x.svg"} />
             <p>Warranty</p>
           </div>
         </div>
@@ -165,7 +167,7 @@ class Dataset extends React.Component {
             address="demo-user/"
             name={this.props.name}
             description={this.state.desc}
-            cli="api.example.com/42069"
+            cli="127.0.0.1:3000/dataset/43/data"
 						score="69"
           />
         </div>

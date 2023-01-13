@@ -59,11 +59,11 @@ router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
             case 1:
                 ret = _a.sent();
                 dsid = ret["rows"][0]["ds_id"];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id='".concat(dsid, "'"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
             case 2:
                 ret = _a.sent();
                 console.log(ret);
@@ -83,7 +83,7 @@ router.patch("/:dsid/frontend/description", function (req, res) { return __await
                 console.log("HERE");
                 dsid = req.params.dsid;
                 if (!(dsid instanceof String || typeof dsid === "string")) return [3 /*break*/, 2];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
             case 1:
                 ret = _a.sent();
                 dsid = ret["rows"][0]["ds_id"];
@@ -91,7 +91,7 @@ router.patch("/:dsid/frontend/description", function (req, res) { return __await
             case 2:
                 new_des = req.body["description"];
                 console.log(Object.keys(req.body));
-                return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET description='".concat(new_des, "' WHERE ds_id=").concat(dsid, ";"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET description=$1 WHERE ds_id=$2;", [new_des, dsid])];
             case 3:
                 ret = _a.sent();
                 console.log(ret);
@@ -111,19 +111,19 @@ router["delete"]("/:dsid", function (req, res) { return __awaiter(void 0, void 0
                 dsid = req.params.dsid;
                 if (!(dsid instanceof String || typeof dsid === "string")) return [3 /*break*/, 2];
                 dsname = dsid;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name='".concat(dsid, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
             case 1:
                 ret = _a.sent();
                 dsid = ret["rows"][0]["ds_id"];
                 return [3 /*break*/, 4];
-            case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_name FROM ds_metadata WHERE ds_id='".concat(dsid, "';"))];
+            case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_name FROM ds_metadata WHERE ds_id=$1;", [dsid])];
             case 3:
                 ret = _a.sent();
                 _a.label = 4;
-            case 4: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id='".concat(dsid, "';"))];
+            case 4: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id=$1;", [dsid])];
             case 5:
                 ret = _a.sent();
-                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_frontend WHERE ds_id='".concat(dsid, "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_frontend WHERE ds_id=$1;", [dsid])];
             case 6:
                 ret = _a.sent();
                 console.log("\n\n\n", ret);

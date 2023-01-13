@@ -60,7 +60,7 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
         switch (_a.label) {
             case 0:
                 process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username='".concat(req.body["owner"], "';"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1;", [req.body["owner"]])];
             case 1:
                 owner_entry = _a.sent();
                 if (!(owner_entry["rowCount"] <= 0)) return [3 /*break*/, 2];
@@ -70,7 +70,7 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 return [2 /*return*/];
             case 2:
                 name_1 = req.body["name"];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name='".concat(name_1, "');"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name=$1);", [name_1])];
             case 3:
                 ret = _a.sent();
                 if (ret["rows"][0]["exists"] == true) {
@@ -150,7 +150,7 @@ router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
                 console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n Cakeday: ").concat(cakeday));
-                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES('".concat(username, "', '").concat(cakeday, "', '").concat(email, "', crypt('").concat(req.body["password"], "', gen_salt('bf')));"))];
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, $4, gen_salt('bf')));", [username, cakeday, email, req.body['password']])];
             case 1:
                 rq = _a.sent();
                 console.log(rq);
