@@ -60,36 +60,56 @@ function DatasetCard(props) {
   );
 }
 
-function ContentCard(props) {
-  const [tab, setTab] = useState(1);
+class ContentCard extends React.Component {
+	constructor(props) {
+		super(props);
+		this.sample_data = null;
+		this.description = null;
+		this.issues = null;
+		this.tabhtml = null;
 
-  var tabhtml;
-  switch (tab) {
-    case 0: // README
-      tabhtml = <div className=""> {/* MARKDOWN */} </div>;
-      break;
-    case 1: // DATA SNIPPET
-      tabhtml = (
-        <div className="">
-          <div> {/* Format */} </div>
-          <div> {/* First 30 entries */} </div>
-        </div>
-      );
-      break;
-    case 2: // CODE EXAMPLES
-      tabhtml = <div className=""> {/* Examples */} </div>;
-      break;
-    case 3: // Live discussions
-    case 4: // Issues
-      break;
-  }
+		this.state = { tab: 1, loading: true };
+	}
 
-  return (
-    <div>
-      {/* Buttons */}
-      {tabhtml}
-    </div>
-  );
+	async componentWillMount() {
+		(async () => {
+			const sdata = await fetch(`http://localhost:3000/dataset/${this.props.ds_name}/sample`);
+			this.sample_data = await sdata.json();
+			this.sample_data = this.sample_data['rows'];
+		})().then( () => this.setState({loading: false}));
+	}
+
+	componentWillUpdate() {
+		switch(this.state.tab) {
+			case 0:
+				break;
+			case 1:
+				var data;
+				try {
+					data = JSON.stringify(this.sample_data[0]['row_to_json'], undefined, 2);
+				} catch(e) {
+					console.error(e);
+				}
+				this.tabhtml = (
+								<div className="sample">
+									<div className="snippet"> <pre>{data}</pre></div>
+									<div className="table"> {/* First 30 entries */} </div>
+								</div>
+							);
+				break;
+			default:
+				break;
+		}
+	}
+
+	render() {
+		return(
+    	<div className="content">
+    	  {/* Buttons */}
+    	  { (this.state.loading) ? <p>Loading...</p> : this.tabhtml}
+    	</div>
+		);
+	}
 }
 
 function SideBar(props) {
@@ -179,7 +199,7 @@ class Dataset extends React.Component {
           	file_size="69Kb"
           	licence={this.state.licence}
         	/>
-					<ContentCard />
+					<ContentCard ds_name={this.props.name}/>
 				</div>
       </div>
     );

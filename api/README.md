@@ -5,7 +5,7 @@ Datasets
 
 ```
 GET  /dataset/:dsid                         Returns the whole dataset
-GET  /dataset/:dsid/demo                    Returns a random subset of 50 entries
+GET  /dataset/:dsid/sample                  Returns a random subset of 50 entries
 GET  /dataset/:dsid/details                 Returns the dataset metadata
 GET  /dataset/:dsid/details?q=:field        Return specific contributions
 GET  /dataset/:dsid/contributions           Return history of contributions

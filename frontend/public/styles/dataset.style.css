@@ -192,3 +192,25 @@ p {
 	flex-direction: row;
 	margin-top: 10px;
 }
+
+
+/* CONTENT BAR */
+
+.sample,
+.content {
+	width: 50vw;
+}
+
+.sample .snippet{
+	width: 100%;
+	height: auto;
+	padding: 50px 50px 50px 50px;
+	background-color: white;
+	border-radius: 25px;
+	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
+	            0 2px  2px rgb(0 0 0 / 11%), 
+							0 4px  4px rgb(0 0 0 / 11%), 
+							0 6px  8px rgb(0 0 0 / 11%),
+							0 8px 16px rgb(0 0 0 / 11%);
+	margin-top: 2vh;
+}

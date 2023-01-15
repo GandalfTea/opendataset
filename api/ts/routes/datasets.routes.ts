@@ -10,6 +10,16 @@ router.get("/:dsid", (req, res) => {
   res.send(`GET Dataset with UUID ${dsid}`);
 });
 
+router.get("/:dsid/sample", async (req, res) => {
+  var dsid: number | string = req.params.dsid;
+	// TODO:  Verify dsid is a ream dataset name
+	let ret = await queryDB(`SELECT row_to_json(${dsid}) FROM ${dsid} LIMIT 50;`);
+	console.log(ret);
+	res.status(200);
+  res.set("Access-Control-Allow-Origin", "*");
+	res.send(ret);
+})
+
 router.get("/:dsid/contributions/:hash", (req, res) => {
   var ds = req.params.dsid["uuid"];
   var hash = req.params.hash;

@@ -47,6 +47,23 @@ router.get("/:dsid", function (req, res) {
     res.status = 302;
     res.send("GET Dataset with UUID ".concat(dsid));
 });
+router.get("/:dsid/sample", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var dsid, ret;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                dsid = req.params.dsid;
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT row_to_json(".concat(dsid, ") FROM ").concat(dsid, " LIMIT 50;"))];
+            case 1:
+                ret = _a.sent();
+                console.log(ret);
+                res.status(200);
+                res.set("Access-Control-Allow-Origin", "*");
+                res.send(ret);
+                return [2 /*return*/];
+        }
+    });
+}); });
 router.get("/:dsid/contributions/:hash", function (req, res) {
     var ds = req.params.dsid["uuid"];
     var hash = req.params.hash;
@@ -70,6 +87,23 @@ router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void
                 res.status(200);
                 res.set("Access-Control-Allow-Origin", "*");
                 res.send(JSON.stringify(ret));
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get('/:dsid/demo', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var dsid, ret, ret;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                dsid = req.params.dsid;
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
+            case 1:
+                ret = _a.sent();
+                dsid = ret["rows"][0]["ds_id"];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
+            case 2:
+                ret = _a.sent();
                 return [2 /*return*/];
         }
     });
