@@ -90,10 +90,29 @@ class ContentCard extends React.Component {
 				} catch(e) {
 					console.error(e);
 				}
+				var tableheaders = [];
+				var tabent = [];
+				tableheaders = Object.keys(this.sample_data[0]['row_to_json']);
+				tableheaders = tableheaders.map( (i) => <th>{i}</th>);
+				tableheaders = <tr>{tableheaders}</tr>;
+
+				for(let i of this.sample_data) {
+					let ent = [];
+					let keys = Object.keys(i['row_to_json']);
+					for(let f of keys) {
+						ent.push(<td>{i['row_to_json'][f]}</td>)
+					}
+					tabent.push(<tr>{ent}</tr>)
+				}
 				this.tabhtml = (
 								<div className="sample">
 									<div className="snippet"> <pre>{data}</pre></div>
-									<div className="table"> {/* First 30 entries */} </div>
+									<div className="table"> 
+										<table>
+											{tableheaders}
+											{tabent}
+										</table>
+									</div>
 								</div>
 							);
 				break;
@@ -105,8 +124,17 @@ class ContentCard extends React.Component {
 	render() {
 		return(
     	<div className="content">
-    	  {/* Buttons */}
-    	  { (this.state.loading) ? <p>Loading...</p> : this.tabhtml}
+				<div className="buttons">
+					<button id={ (this.state.tab === 0) ? "button-clicked" : ""}
+					        onClick={ () => this.setState({tab: 0})} >readme</button>
+					<button id={ (this.state.tab === 1) ? "button-clicked" : ""}
+					        onClick={ () => this.setState({tab: 1})}>sample</button>
+					<button id={ (this.state.tab === 2) ? "button-clicked" : ""}
+					        onClick={ () => this.setState({tab: 2})}>issues</button>
+					<button id={ (this.state.tab === 3) ? "button-clicked" : ""}
+					        onClick={ () => this.setState({tab: 3})}>forums</button>
+				</div>
+    	  { (this.state.loading) ? <p>Loading...</p> : this.tabhtml }
     	</div>
 		);
 	}

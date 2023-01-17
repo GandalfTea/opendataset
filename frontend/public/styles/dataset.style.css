@@ -30,7 +30,7 @@ p {
 
 .page .content {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 }
 
 .content {
@@ -201,10 +201,53 @@ p {
 	width: 50vw;
 }
 
+.content .buttons {
+	display: flex;
+	flex-direction: row;
+}
+
+.buttons {
+	margin-left: 50px;
+}
+
+.buttons button {
+	cursor: pointer;
+	outline: none;
+	border: none;
+	background-color: transparent;
+	margin: 50px 50px 50px 50px;
+	font-weight: 600;
+}
+
+#button-clicked {
+	background-color: #2f2f2f;
+	padding: 10px 30px 10px 30px;
+	margin: 40px 20px 40px 20px;
+	color: white;
+	border-radius: 40px;
+}
+
 .sample .snippet{
 	width: 100%;
 	height: auto;
-	padding: 50px 50px 50px 50px;
+	padding: 50px 50px 50px 100px;
+	background-color: white;
+	border-radius: 25px;
+	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
+	            0 2px  2px rgb(0 0 0 / 11%), 
+							0 4px  4px rgb(0 0 0 / 11%), 
+							0 6px  8px rgb(0 0 0 / 11%),
+							0 8px 16px rgb(0 0 0 / 11%);
+
+}
+
+.content .table {
+	width: 100%;
+	height: auto;
+	max-height: 700px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 50px 50px 50px 10px;
 	background-color: white;
 	border-radius: 25px;
 	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
@@ -214,3 +257,11 @@ p {
 							0 8px 16px rgb(0 0 0 / 11%);
 	margin-top: 2vh;
 }
+
+.table table {
+	font-size: 12px;
+	font-family: "Roboto Mono";
+	font-weight: 300;
+	border-spacing: 30px 8px;
+}
+
