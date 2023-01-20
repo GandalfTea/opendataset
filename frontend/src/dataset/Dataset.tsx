@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
 import useVote from "@hooks/useVote";
 import Header from "@commons/Header";
+import MarkdownRender from "@commons/Markdown";
 
 function Vote(props) {
 	const [vote, setVote] = useState(0);
@@ -61,11 +62,12 @@ class ContentCard extends React.Component {
 	constructor(props) {
 		super(props);
 		this.sample_data = null;
-		this.description = null;
+		this.readme = null;
 		this.issues = null;
 		this.tabhtml = null;
 
 		this.state = { tab: 1, loading: true };
+		this.renderTab = this.renderTab.bind(this);
 	}
 
 	async componentWillMount() {
@@ -73,13 +75,24 @@ class ContentCard extends React.Component {
 			const sdata = await fetch(`http://localhost:3000/dataset/${this.props.ds_name}/sample`);
 			this.sample_data = await sdata.json();
 			this.sample_data = this.sample_data['rows'];
+
+			const ddata = await fetch(`http://localhost:3000/dataset/${this.props.ds_name}/details?field=readme`);
+			const jdata = await ddata.json();
+			this.readme = jdata['rows'][0]['readme']
 		})().then( () => this.setState({loading: false}));
 	}
 
-	componentWillUpdate() {
+	renderTab() {
 		switch(this.state.tab) {
+			// README
 			case 0:
+				return (
+					<div className="readme">
+						<MarkdownRender children={this.readme}></MarkdownRender>
+					</div>
+				);
 				break;
+			// SAMPLE
 			case 1:
 				var data;
 				try {
@@ -101,7 +114,7 @@ class ContentCard extends React.Component {
 					}
 					tabent.push(<tr>{ent}</tr>)
 				}
-				this.tabhtml = (
+				return (
 								<div className="sample">
 									<div className="snippet"> <pre>{data}</pre></div>
 									<div className="table"> 
@@ -131,7 +144,7 @@ class ContentCard extends React.Component {
 					<button id={ (this.state.tab === 3) ? "button-clicked" : ""}
 					        onClick={ () => this.setState({tab: 3})}>forums</button>
 				</div>
-    	  { (this.state.loading) ? <p>Loading...</p> : this.tabhtml }
+    	  { (this.state.loading) ? <p>Loading...</p> : this.renderTab() }
     	</div>
 		);
 	}
