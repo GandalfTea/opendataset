@@ -37,11 +37,9 @@ function Vote(props) {
 
 function DatasetCard(props) {
   return (
-    <div className="address">
-      {props.address} <strong> {props.title} </strong>
       <div className="card">
         <h2> {props.name} </h2>
-        <h4> {props.description} {props.description} {props.description} </h4>
+        <h4> {props.description} </h4>
 				<Vote ds_name='demo-dataset' score={69} />
         <div className="bottom-menu">
 					<div> 
@@ -56,7 +54,6 @@ function DatasetCard(props) {
           </button>
         </div>
       </div>
-    </div>
   );
 }
 
@@ -164,7 +161,7 @@ function SideBar(props) {
             <img src={"../assets/tick.svg"} />
             <p>Distribution</p>
           </div>
-          <div>
+          <div className="x">
             <img src={"../assets/x.svg"} />
             <p>Liability</p>
           </div>
@@ -179,10 +176,17 @@ function SideBar(props) {
   return (
     <div className="side-bar">
       <h3>About</h3>
-      <p>{props.about}</p>
       <p>
-        {props.num_entries} . {props.file_type} . {props.file_size}{" "}
+        {props.num_entries} entries . {props.file_type} . <strong>{props.file_size}</strong>
       </p>
+			<p>{props.num_contrib} contributors</p>
+			<div>
+				<h3>Owner</h3>
+				<div className="owner">
+					<div className="owner-pfp"></div>
+					<p>owner_name</p>
+				</div>
+			</div>
       {licence}
     </div>
   );
@@ -216,15 +220,16 @@ class Dataset extends React.Component {
           address="demo-user/"
           name={this.props.name}
           description={this.state.desc}
-          cli="127.0.0.1:3000/dataset/43/data"
+          cli="127.0.0.1:3000/dataset/43"
 					score="69"
         />
 				<div className="content">
         	<SideBar
           	about={this.state.desc}
           	num_entries={this.state.num_entries}
+						num_contrib="560"
           	file_type="CSV"
-          	file_size="69Kb"
+          	file_size="456 kB"
           	licence={this.state.licence}
         	/>
 					<ContentCard ds_name={this.props.name}/>
