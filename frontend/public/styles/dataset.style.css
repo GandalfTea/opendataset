@@ -263,6 +263,7 @@ p {
 	background-color: transparent;
 	margin: 50px 50px 50px 50px;
 	font-weight: 600;
+	font-size: 14px;
 }
 
 #button-clicked {

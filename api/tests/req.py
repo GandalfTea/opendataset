@@ -7,6 +7,7 @@ import time
 
 PORT = 3000
 VERBOSE = False
+NO_DELETE = False
 
 def test(test_name, req_type, req_url, expected_status_code, payload={}):
     print(f" > {test_name}", end='')
@@ -98,10 +99,18 @@ def test_dataset():
     test("test_dataset_frontend", 'GET', f"/dataset/{correct_payload['name']}/details", 200)
 
     # EDIT 
-    updated_description = {"description": "This is a demo description to fill the white space and get a better idea of how an actual description would look like."}
-    test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/frontend/description", 200, updated_description)
+    updated_description = {"data": "A demo description for a demo world."}
+    update_readme       = {"data": "A demo README."}
+    update_licence      = {"data": 2}
+    update_num_contrib  = {"data": 42069}
+    update_num_entries  = {"data": 4200000}
+
+    test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=description", 200, updated_description)
+    test('test_database_update_readme', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=readme", 200, update_readme)
+    test('test_database_update_licence', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=licence", 200, update_licence)
+    test('test_database_update_contributors_number', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=num_contributors", 200, update_num_contrib)
+    test('test_database_update_num_entries', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=num_entries", 200, update_num_entries)
     print(" > test_database_edit_name                             SKIPPED")
-    print(" > test_database_edit_contributions                    SKIPPED")
     print(" > test_database_edit_schema                           SKIPPED")
     print(" > test_database_edit_tests                            SKIPPED")
     print(" > test_database_edit_owner                            SKIPPED")
@@ -112,7 +121,8 @@ def test_dataset():
 
 
     # DELETE 
-    #test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
+    if NO_DELETE: print(" > test_database_deletion                              SKIPPED")
+    else: test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
 
 
 
@@ -123,6 +133,8 @@ if __name__ == '__main__':
             PORT = arg.split('=')[1]
         elif '--verbose' in arg or '-V' in arg:
             VERBOSE=True
+        elif '--no-delete' in arg:
+            NO_DELETE=True
 
     print(f"\nTesting on port: {PORT}", end='')
     print(' with verbose print\b') if VERBOSE else print('\n')

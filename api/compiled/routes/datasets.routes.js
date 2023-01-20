@@ -71,17 +71,28 @@ router.get("/:dsid/contributions/:hash", function (req, res) {
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
 router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, ret, ret;
+    var dsid, query, ret, ret, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
+                query = req.query.q;
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
             case 1:
                 ret = _a.sent();
                 dsid = ret["rows"][0]["ds_id"];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
+                if (!(query != null)) return [3 /*break*/, 3];
+                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) return [3 /*break*/, 3];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ".concat(query, " FROM ds_frontend WHERE ds_id=$1"), [dsid])];
             case 2:
+                ret = _a.sent();
+                console.log(ret);
+                res.status(200);
+                res.set("Access-Control-Allow-Origin", "*");
+                res.send(JSON.stringify(ret));
+                return [2 /*return*/];
+            case 3: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
+            case 4:
                 ret = _a.sent();
                 console.log(ret);
                 res.status(200);
@@ -109,29 +120,35 @@ router.get('/:dsid/demo', function (req, res) { return __awaiter(void 0, void 0,
     });
 }); });
 // UPDATE FRONTEND
-router.patch("/:dsid/frontend/description", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, ret, new_des, ret;
+router.patch("/:dsid/details", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var query, dsid, ret, new_des, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("HERE");
+                query = req.query.field;
                 dsid = req.params.dsid;
-                if (!(dsid instanceof String || typeof dsid === "string")) return [3 /*break*/, 2];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
+                if (!(query != null && dsid != null)) return [3 /*break*/, 4];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1", [dsid])];
             case 1:
                 ret = _a.sent();
-                dsid = ret["rows"][0]["ds_id"];
-                _a.label = 2;
+                try {
+                    dsid = ret['rows'][0]['ds_id'];
+                }
+                catch (e) {
+                    console.log(e);
+                }
+                new_des = req.body['data'];
+                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) return [3 /*break*/, 3];
+                return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET ".concat(query, "=$1 WHERE ds_id=$2"), [new_des, dsid])];
             case 2:
-                new_des = req.body["description"];
-                console.log(Object.keys(req.body));
-                return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET description=$1 WHERE ds_id=$2;", [new_des, dsid])];
-            case 3:
                 ret = _a.sent();
+                _a.label = 3;
+            case 3:
                 console.log(ret);
                 res.status(200);
-                res.send("Hello");
-                return [2 /*return*/];
+                res.send("Done.");
+                _a.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }); });
