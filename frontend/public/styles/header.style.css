@@ -30,6 +30,7 @@
 	width: 30vw;
 	height: 35px;
 	border-radius: 40px;
+	padding: 5px 50px 5px 20px;
 	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
 	            0 2px  2px rgb(0 0 0 / 11%), 
 							0 4px  4px rgb(0 0 0 / 11%), 
@@ -37,9 +38,17 @@
 							0 8px 16px rgb(0 0 0 / 11%);
 }
 
+.search img {
+	height: 20px;
+	position: absolute; 
+	top: 7px;
+	right: 20px;
+	
+}
+
 .header .profile {
-	height: 50px;
-	width: 50px;
+	height: 35px;
+	width: 35px;
 	border-radius: 50px;
 	background-color: #2f2f2f;
 	position: absolute;

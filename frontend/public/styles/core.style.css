@@ -1,0 +1,99 @@
+
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background-color: #F6F6F6;
+}
+
+h1,
+h2 {
+	font-family: "Roboto Mono";
+}
+
+h3,
+h4,
+h5,
+h6,
+p {
+	font-family: 'Lato';
+	font-weight: 300;
+}
+
+.page {
+	width: 60vw;
+	margin: auto;
+}
+
+.card{
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	height: auto;
+	min-height: 50px;
+	background-color: white;
+	border-radius: 25px;
+	margin-top: 20px;
+	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
+	            0 2px  2px rgb(0 0 0 / 11%), 
+							0 4px  4px rgb(0 0 0 / 11%), 
+							0 6px  8px rgb(0 0 0 / 11%),
+							0 8px 16px rgb(0 0 0 / 11%);
+}
+
+.black {
+	background-color: #2f2f2f;
+	color: white;
+}
+
+/* GENERAL BUTTONS */
+
+.button-full-white,
+.button-empty-white {
+	height: 35px;
+	width: 140px;
+	border-radius: 40px;
+	cursor: pointer;
+}
+
+.button-empty-white {
+	background-color: transparent;
+	border: 2px solid white;
+	color: white;
+}
+
+.button-empty-white p{
+	font-size: 16px;
+	font-weight: bold;
+	width: auto;
+	height: auto;
+	background-color: transparent;
+	margin: auto;
+}
+
+.button-empty-white:hover {
+	background-color: white;
+	color: black;
+	transition: 0.3s all ease-in-out;
+}
+
+.button-full-white {
+	background-color: white;
+	border: none;
+}
+
+.button-full-white p {
+	font-size: 16px;
+	font-weight: bold;
+	height: auto;
+	margin: auto;
+	color: #171717;
+	margin: auto;
+	background-color: transparent;
+}
+

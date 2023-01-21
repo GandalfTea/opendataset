@@ -99,7 +99,7 @@ def test_dataset():
     test("test_dataset_frontend", 'GET', f"/dataset/{correct_payload['name']}/details", 200)
 
     # EDIT 
-    updated_description = {"data": "A demo description for a demo world."}
+    updated_description = {"data": "A demo description for a demo world. $$ e^^{i\\pi}=-1"}
     update_readme       = {"data": "A demo README."}
     update_licence      = {"data": 2}
     update_num_contrib  = {"data": 42069}

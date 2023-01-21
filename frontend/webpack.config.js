@@ -7,7 +7,8 @@ module.exports = {
 
 	mode: 'development',
 
-	entry: {  dataset: path.resolve(__dirname, './src/dataset/Dataset.tsx')},
+	entry: {  dataset:    path.resolve(__dirname, './src/dataset/Dataset.tsx'),
+	          contribute: path.resolve(__dirname, './src/commons/Contribute.tsx')},
 
 	output: {
 		filename: '[name].min.js',

@@ -23,6 +23,10 @@ app.get("/dataset/:name", (req, res) => {
 	res.render('dataset', {name: req.params.name, message:'Welcome to the dataset page'});
 });
 
+app.get("/contribute", (req, res) => {
+	res.render('contribute');
+})
+
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });

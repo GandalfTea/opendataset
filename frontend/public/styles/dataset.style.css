@@ -37,19 +37,8 @@ p {
 	width: 100%;
 }
 
-.card{
-	position: relative;
-	display: flex;
-	flex-direction: column;
+.ds_card{
 	width: 50vw;
-	background-color: #2f2f2f;
-	border-radius: 25px;
-	color: white;
-	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
-	            0 2px  2px rgb(0 0 0 / 11%), 
-							0 4px  4px rgb(0 0 0 / 11%), 
-							0 6px  8px rgb(0 0 0 / 11%),
-							0 8px 16px rgb(0 0 0 / 11%);
 }
 
 .card h2 {
@@ -100,6 +89,7 @@ p {
 .card .score_button img {
 	width: 17px;
 	height: 17px;
+	margin-top: 1px;
 }
 
 .bottom-menu div {
@@ -137,52 +127,6 @@ p {
 
 .bottom-menu .button-full-white {
 	margin-left: 2%;
-}
-
-/* GENERAL BUTTONS */
-
-.button-full-white,
-.button-empty-white {
-	height: 35px;
-	width: 140px;
-	border-radius: 40px;
-	cursor: pointer;
-}
-
-.button-empty-white {
-	background-color: transparent;
-	border: 2px solid white;
-	color: white;
-}
-
-.button-empty-white p{
-	font-size: 16px;
-	font-weight: bold;
-	width: auto;
-	height: auto;
-	background-color: transparent;
-	margin: auto;
-}
-
-.button-empty-white:hover {
-	background-color: white;
-	color: black;
-	transition: 0.3s all ease-in-out;
-}
-
-.button-full-white {
-	background-color: white;
-	border: none;
-}
-
-.button-full-white p {
-	font-size: 16px;
-	font-weight: bold;
-	height: auto;
-	margin: auto;
-	color: #171717;
-	margin: auto;
-	background-color: transparent;
 }
 
 .side-bar {
@@ -227,6 +171,7 @@ p {
 .owner p {
 	margin-top: 15px;
 	margin-left: 10px;
+	text-decoration: underline;
 }
 
 .side-bar .x {

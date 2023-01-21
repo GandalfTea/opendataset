@@ -38,7 +38,7 @@ function Vote(props) {
 
 function DatasetCard(props) {
   return (
-      <div className="card">
+      <div className="ds_card card">
         <h2> {props.name} </h2>
         <h4> {props.description} </h4>
 				<Vote ds_name='demo-dataset' score={69} />
@@ -66,7 +66,7 @@ class ContentCard extends React.Component {
 		this.issues = null;
 		this.tabhtml = null;
 
-		this.state = { tab: 1, loading: true };
+		this.state = { tab: 0, loading: true };
 		this.renderTab = this.renderTab.bind(this);
 	}
 
@@ -88,6 +88,7 @@ class ContentCard extends React.Component {
 			case 0:
 				return (
 					<div className="readme">
+					  {console.log(this.readme)}
 						<MarkdownRender children={this.readme}></MarkdownRender>
 					</div>
 				);
@@ -126,6 +127,14 @@ class ContentCard extends React.Component {
 								</div>
 							);
 				break;
+			// ISSUES
+			case 2:
+				break;
+
+			// DISCUSSIONS (nostr)
+			case 3:
+				break;
+
 			default:
 				break;
 		}
