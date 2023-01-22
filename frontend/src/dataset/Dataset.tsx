@@ -38,7 +38,7 @@ function Vote(props) {
 
 function DatasetCard(props) {
   return (
-      <div className="ds_card card">
+      <div className="black card">
         <h2> {props.name} </h2>
         <h4> {props.description} </h4>
 				<Vote ds_name='demo-dataset' score={69} />

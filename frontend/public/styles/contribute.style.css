@@ -12,6 +12,10 @@
 	box-shadow: inset 3px 5px 16px -6px rgba(0,0,0,0.59);
 }
 
+.circle > input {
+	display: none;
+}
+
 .circle div {
 	height: 70px;
 	width: 70px;
@@ -20,6 +24,7 @@
 	margin: auto;
 	margin-top: 40px;
 	transition: all 0.2s ease;
+	cursor: pointer;
 	box-shadow: 0 1px  1px rgb(0 0 0 / 11%), 
 	            0 2px  2px rgb(0 0 0 / 11%), 
 							0 4px  4px rgb(0 0 0 / 11%), 
@@ -27,14 +32,14 @@
 							0 8px 16px rgb(0 0 0 / 11%);
 }
 
-.circle:hover > div  {
+.circle:hover > label div  {
 	height: 100px;
 	width: 100px;
 	margin-top: 25px;
 	transition: all 0.2s ease;
 }
 
-.circle:hover > div img {
+.circle:hover > label div img {
 	margin: 40px 40px;
 	transition: all 0.2s ease;
 }

@@ -26,9 +26,12 @@ function DropCSV(props) {
 			     onDrop={/*do something*/}
 					 onDragOver={ /* do something */}>
 				<div className="circle">
-					<div>
-						<img src="../assets/upload.svg" alt='Upload file symbol' />
-					</div>
+					<label for="file">
+						<div>
+							<img src="../assets/upload.svg" alt='Upload file symbol' />
+						</div>
+					</label>
+						<input type="file" id="file" accept="application/json, application/csv" />
 				</div>
 			</div>
 		);
