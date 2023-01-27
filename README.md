@@ -5,8 +5,11 @@ Like a very shitty GitHub, for now.
 &nbsp;
 
 #### Dependencies:      
-Backend: `typescript`, `express`, PostgreSQL, `multer`, `pg`, `uuid`    
-Frontend: `react`, `socket.io`, `pug`      
+Backend: `typescript`, `express`, PostgreSQL, `multer`, `pg`       
+Frontend:      
+* `react`, `socket.io`, `pug`,      
+* `react-markdown`, `react-mathjax`, `remark-math`          
+
 Python: `pandas`  
 
 &nbsp;
@@ -45,21 +48,11 @@ In order to upload files to a HTML form, it needs `enctype="multipart/form-data"
 REACT_APP_API_BASE_DIR= { your api url }:PORT node app.js
 ```
 
+&nbsp;
+
 #### TODO:
 #### 0.1:
-* Manage user accounts
-* Dataset creation and contribution submission
-* SU accept or reject contributions
-* User download full dataset or random subset.
-
-#### 0.2:
-* Contributions basic testing
-* Personalised contributions testing
-* CLI contributions
-
-#### 0.3:
-* Serialise and cache datasets properties to make them searchable
-* Search page
-
-#### 0.4:
-* user interactions: DMs, Forums, Comments
+* [ ] Manage user accounts
+* [ ] Dataset creation and contribution submission
+* [ ] SU accept or reject contributions
+* [ ] User download full dataset or random subset.
