@@ -63,6 +63,7 @@ router["delete"]("/:user", function (req, res) { return __awaiter(void 0, void 0
         switch (_a.label) {
             case 0:
                 username = req.params.user;
+                console.log(username);
                 return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username=$1;", [username])];
             case 1:
                 query = _a.sent();

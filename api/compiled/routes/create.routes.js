@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.router = void 0;
+var utils_1 = require("../utils");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
@@ -138,19 +139,17 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
     });
 }); });
 router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, email, now, cakeday, rq;
+    var now, cakeday, rq;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 console.log("CREATE user REQUEST from:  ".concat(req.socket.remoteAddress));
-                username = req.body["username"];
-                assert(username.length < 50 && username.length > 1);
-                email = req.body["email"];
-                assert(email.length < 100 && email.length > 10);
+                assert(req.body['username'].length < 50 && req.body['username'].length > 1);
+                assert(req.body['email'].length < 100 && req.body['email'].length > 10);
+                assert((0, utils_1.validate)(req.body['email'], utils_1.dtype.EMAIL));
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-                console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n Cakeday: ").concat(cakeday, "\n Password: ").concat(req.body['password']));
-                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, $4, gen_salt('bf')));", [username, cakeday, email, req.body['password']])];
+                return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, crypt($4, gen_salt('bf')))", [req.body['username'], cakeday, req.body['email'], req.body['password']])];
             case 1:
                 rq = _a.sent();
                 console.log(rq);

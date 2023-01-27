@@ -1,3 +1,4 @@
+import { dtype, validate} from '../utils'
 const express = require("express");
 const router = express.Router();
 
@@ -133,22 +134,17 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 router.post("/user", async (req, res) => {
   console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`);
 
-  const username: string = req.body["username"];
-  assert(username.length < 50 && username.length > 1);
-  const email: string = req.body["email"];
-  assert(email.length < 100 && email.length > 10);
-  // TODO: Actually check if email is correct lol
+  assert(req.body['username'].length < 50 && req.body['username'].length > 1);
+  assert(req.body['email'].length < 100 && req.body['email'].length > 10);
+	assert(validate(req.body['email'], dtype.EMAIL));
   var now = new Date();
-  const cakeday: any =
-    now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-  console.log(
-    `\n Username: ${username}\n Email: ${email}\n Cakeday: ${cakeday}\n Password: ${req.body['password']}`
-  );
+  const cakeday: any = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
   const rq =
     await queryDB(`INSERT INTO users (username, cakeday, email, password) 
-														VALUES($1, $2, $3, $4, gen_salt('bf')));`,
-					        [username, cakeday, email, req.body['password']]);
+														VALUES($1, $2, $3, crypt($4, gen_salt('bf')))`,
+					        [req.body['username'], cakeday, req.body['email'], req.body['password']]);
   console.log(rq);
+
   res.status = 201;
   res.send(JSON.stringify(rq));
 

@@ -57,7 +57,6 @@ def test_user():
     # LOGIN
     correct_payload = {'username': 'demo-user', 'password': 'demopassword'}
     wrong_payload   = {'username': 'demo-user', 'password': 'wrongpassword'}
-
     test("test_user_login_wrong_credentials", "POST", "/login", 400, wrong_payload)
     test("test_user_login_correct_credentials", "POST", "/login", 200, correct_payload)
 
@@ -67,7 +66,7 @@ def test_user():
     print(f" > test_user_edit_password                             SKIPPED")
 
     # DELETE
-    test('test_user_delete', 'DELETE', f"/users/{payload['username']}", 200)
+    test('test_user_delete', 'DELETE', f"/user/{payload['username']}", 200)
 
 
 # CREATE, EDIT and DELETE Dataset

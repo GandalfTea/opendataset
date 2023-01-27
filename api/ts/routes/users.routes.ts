@@ -16,6 +16,7 @@ router.get("/:user", async (req: any, res: any) => {
 // DELETE
 router.delete("/:user", async (req, res) => {
   var username: string = req.params.user;
+	console.log(username)
   var query: any = await queryDB(
     `DELETE FROM users WHERE username=$1;`,
 		[username]
