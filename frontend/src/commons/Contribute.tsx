@@ -6,7 +6,9 @@ import Header from "@commons/Header";
 import MarkdownRender from "@commons/Markdown";
 
 function Guidelines(props) {
-	return <div className="black card"><MarkdownRender children={props.guidelines}></MarkdownRender></div>
+	// Markdown doesn't want to work
+	//return <div className="black card"><MarkdownRender children={props.gd}></MarkdownRender></div>
+	return <div className="guidelines black card"><p>{props.gd}</p></div>
 }
 
 function DropCSV(props) {
@@ -31,7 +33,7 @@ function DropCSV(props) {
 							<img src="../assets/upload.svg" alt='Upload file symbol' />
 						</div>
 					</label>
-						<input type="file" id="file" accept="application/json, application/csv" />
+						<input type="file" id="file" accept="application/json, .csv" />
 				</div>
 			</div>
 		);
@@ -42,8 +44,7 @@ function ManualEntry(props) {
 	// Generate HTML form from DS schema
 	return (
 		<div className="card">
-			<form>
-			</form>
+			<p>TODO: Generate form from schema</p>
 		</div>
 	)
 }
@@ -51,13 +52,22 @@ function ManualEntry(props) {
 class ContributePage extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {guidelines: ""};
+	}
+
+	async componentWillMount() {
+		const cont_guid
+		await fetch("http://127.0.0.1:3000/dataset/second_dataset/details?q=contribution_guidelines")
+		            .then( (response) => response.json())
+								.then( (data) => cont_guid = data['rows'][0]['contribution_guidelines'] );
+		this.setState({guidelines: cont_guid});
 	}
 
 	render() {
 		return(
 			<div className="page">
 				<Header />
-				<Guidelines />
+				<Guidelines gd={this.state.guidelines} />
 				<h3>Drag and drop</h3>
 				<DropCSV />
 				<h3>Manual entry</h3>

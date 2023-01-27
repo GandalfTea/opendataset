@@ -41,7 +41,6 @@ var db_1 = require("../db");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
-// TODO: Prevent injection attacks (current is vulnerable)
 router.get("/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var username, get;
     return __generator(this, function (_a) {

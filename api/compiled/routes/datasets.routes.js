@@ -82,7 +82,7 @@ router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void
                 ret = _a.sent();
                 dsid = ret["rows"][0]["ds_id"];
                 if (!(query != null)) return [3 /*break*/, 3];
-                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) return [3 /*break*/, 3];
+                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) return [3 /*break*/, 3];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT ".concat(query, " FROM ds_frontend WHERE ds_id=$1"), [dsid])];
             case 2:
                 ret = _a.sent();
@@ -138,7 +138,7 @@ router.patch("/:dsid/details", function (req, res) { return __awaiter(void 0, vo
                     console.log(e);
                 }
                 new_des = req.body['data'];
-                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) return [3 /*break*/, 3];
+                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) return [3 /*break*/, 3];
                 return [4 /*yield*/, (0, db_1.queryDB)("UPDATE ds_frontend SET ".concat(query, "=$1 WHERE ds_id=$2"), [new_des, dsid])];
             case 2:
                 ret = _a.sent();

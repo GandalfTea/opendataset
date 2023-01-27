@@ -36,7 +36,7 @@ router.get("/:dsid/details", async (req, res) => {
   );
   dsid = ret["rows"][0]["ds_id"];
 	if(query != null) {
-		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) {
+		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
 			var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
 			console.log(ret);
 			res.status(200);
@@ -73,7 +73,7 @@ router.patch("/:dsid/details", async (req, res) => {
 			dsid = ret['rows'][0]['ds_id']
 		} catch(e) { console.log(e); }
 		var new_des = req.body['data'];
-		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence'].includes(query)) {
+		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) {
 			var ret = await queryDB(`UPDATE ds_frontend SET ${query}=$1 WHERE ds_id=$2`,
 														  [new_des, dsid]);
 		}

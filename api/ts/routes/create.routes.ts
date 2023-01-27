@@ -142,7 +142,7 @@ router.post("/user", async (req, res) => {
   const cakeday: any =
     now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
   console.log(
-    `\n Username: ${username}\n Email: ${email}\n Cakeday: ${cakeday}`
+    `\n Username: ${username}\n Email: ${email}\n Cakeday: ${cakeday}\n Password: ${req.body['password']}`
   );
   const rq =
     await queryDB(`INSERT INTO users (username, cakeday, email, password) 

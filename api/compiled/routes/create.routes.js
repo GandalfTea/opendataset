@@ -149,7 +149,7 @@ router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void
                 assert(email.length < 100 && email.length > 10);
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
-                console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n Cakeday: ").concat(cakeday));
+                console.log("\n Username: ".concat(username, "\n Email: ").concat(email, "\n Cakeday: ").concat(cakeday, "\n Password: ").concat(req.body['password']));
                 return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, $4, gen_salt('bf')));", [username, cakeday, email, req.body['password']])];
             case 1:
                 rq = _a.sent();

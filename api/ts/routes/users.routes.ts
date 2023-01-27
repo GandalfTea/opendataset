@@ -3,7 +3,6 @@ import { queryDB } from "../db";
 const express = require("express");
 const router = express.Router();
 
-// TODO: Prevent injection attacks (current is vulnerable)
 router.get("/:user", async (req: any, res: any) => {
   var username: string = req.params.user;
   var get: any = await queryDB(
