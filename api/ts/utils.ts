@@ -3,7 +3,7 @@
 
 enum dtype {
 	DS_NAME,
-	USER_NAME,
+	USERNAME,
 	EMAIL,
 	INT,
 	UINT
@@ -14,7 +14,7 @@ function validate(input: string | number, data_type: any): boolean {
 		case dtype.DS_NAME:
 			return /^[A-Za-z][A-Za-z0-9_\-@,.'"$%^&*() ]{4,49}/.test(input);
 			break;
-		case dtype.DS_NAME:
+		case dtype.USERNAME:
 			return /^[a-za-z][a-za-z0-9_]{4,29}/.test(input);
 			break;
 		case dtype.EMAIL:

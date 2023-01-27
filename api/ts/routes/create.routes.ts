@@ -122,39 +122,46 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
   }
 
   /* TODO
-	 [ ] Search DB database to make sure name is unique
+	 [X] Search DB database to make sure name is unique
 	 [x] Search owner in User DB.
-	 [ ] protect against injection attacks
-	 [ ] parse schema into database creation command
-	 [ ] check data format and schema + safety check?
-	 [ ] error catching and sending
-	 [ ] respond with success */
+	 [X] protect against injection attacks
+	 [X] parse schema into database creation command
+	 [X] check data format and schema + safety check?
+	 [X] error catching and sending
+	 [X] respond with success */
 });
 
 router.post("/user", async (req, res) => {
+
   console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`);
 
-  assert(req.body['username'].length < 50 && req.body['username'].length > 1);
-  assert(req.body['email'].length < 100 && req.body['email'].length > 10);
-	assert(validate(req.body['email'], dtype.EMAIL));
+	try {
+  	assert(req.body['username'].length < 50 && req.body['username'].length > 1);
+		assert(validate(req.body['username'], dtype.USERNAME));
+		assert(validate(req.body['email'], dtype.EMAIL));
+	catch(err) {
+		assert(err instanceof assert.AssertionError);
+		res.status(422)
+		res.send("Incorrect information")
+	}
+
   var now = new Date();
   const cakeday: any = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+
   const rq =
     await queryDB(`INSERT INTO users (username, cakeday, email, password) 
 														VALUES($1, $2, $3, crypt($4, gen_salt('bf')))`,
 					        [req.body['username'], cakeday, req.body['email'], req.body['password']]);
-  console.log(rq);
-
-  res.status = 201;
+  //console.log(rq);
+  res.status(201);
   res.send(JSON.stringify(rq));
 
   /* TODO
-	 [ ] Require passward
-	 [ ] Check if username already exists
-	 [ ] Regex check username
+	 [ ] Check if rq is ERROR
+	 [X] Check if username already exists
+	 [X] Regex check username
 	 [ ] Link to a UserMetadata table for notifications and msg
 	 [ ] Verify email
-	 [ ] ? Hold pointer to databases created
 	 [ ] ? Karma / Rep points */
 });
 
