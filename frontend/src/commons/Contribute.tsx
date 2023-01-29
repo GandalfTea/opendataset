@@ -4,6 +4,7 @@ import * as ReactDOM from "react-dom/client";
 import Header from "@commons/Header";
 //import MarkdownRender from "@commons/Markdown";
 import ReactMarkdown from "react-markdown";
+import * as env from "@env";
 
 function Guidelines(props) {
   // LaTeX doesn't want to work
@@ -105,9 +106,8 @@ class ContributePage extends React.Component {
 
   async componentWillMount() {
     const cont_guid;
-    // TODO: Hard Coded dataset name and server host
     await fetch(
-      "http://127.0.0.1:3000/dataset/second_dataset/details?q=contribution_guidelines"
+      `${env.API_URL}/dataset/${this.props.name}/details?q=contribution_guidelines`
     )
       .then((response) => response.json())
       .then((data) => (cont_guid = data["rows"][0]["contribution_guidelines"]));
@@ -129,4 +129,5 @@ class ContributePage extends React.Component {
 }
 
 const root = ReactDOM.createRoot(document.getElementById("app"));
-root.render(<ContributePage />);
+// TODO: Hard Coded dataset name 
+root.render(<ContributePage name="second_dataset"/>);

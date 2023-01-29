@@ -34,6 +34,7 @@ module.exports = {
 			"@hooks"   : path.resolve(__dirname, "./src/hooks"),
 			"@assets"  : path.resolve(__dirname, "./src/assets"),
 			"@commons" : path.resolve(__dirname, './src/commons'),
+			"@env$"    : path.resolve(__dirname, './src/config.json'),
 		}
 	},
 	

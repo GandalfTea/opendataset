@@ -12,13 +12,21 @@
 			"ES2021.String"
 		],
 		"baseUrl": ".",
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+   	"allowSyntheticDefaultImports": true,
+
 		"paths": {
 			"@assets/*": [
 				"./src/assets/*"
 			],
 			"@hooks/*": [
 				"./src/hooks/*"
-			]
+			],
+			"@env":[
+				"./src/config.json"
+			] 
+
 		}
 	},
 	"include": ["./src/**/*"]

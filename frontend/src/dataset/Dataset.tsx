@@ -4,17 +4,18 @@ import * as ReactDOM from "react-dom/client";
 import useVote from "@hooks/useVote";
 import Header from "@commons/Header";
 import MarkdownRender from "@commons/Markdown";
+import * as env from "@env";
 
 function Vote(props) {
   const [vote, setVote] = useState(0);
   const [voted, setVoted] = useState(false); // Not sure if this needs to be in state
   useEffect(() => {
-    //var url = process.env.REACT_APP_BASE_URL;
-    var url = "http://localhost:3000";
+    var url = env.API_URL;
     if (vote > 0) {
       setVoted(true);
       vote === 1 ? `/upvote?ds=` : `/downvote?ds=`;
-      url += props.ds_name;
+      url += "/" + props.ds_name;
+			// TODO: CORS fail
       fetch(url, { method: "POST" });
     } else if (vote === 0 && voted) {
       fetch(url, { method: "DELETE" }); // Retract vote
@@ -65,9 +66,11 @@ function DatasetCard(props) {
             <img src="../assets/clipboard.svg" alt="copy to clipboard" />
           </button>
         </div>
-        <button type="button" className="button-empty-white">
-          <p>Contribute</p>
-        </button>
+				<a href={"http://127.0.0.1:" + env.PORT + "/contribute?ds=" + props.name}>
+        	<button type="button" className="button-empty-white">
+          	<p>Contribute</p>
+        	</button>
+				</a>
         <button type="button" className="button-full-white">
           <p>Get</p>
         </button>
@@ -91,13 +94,13 @@ class ContentCard extends React.Component {
   async componentWillMount() {
     (async () => {
       const sdata = await fetch(
-        `http://localhost:3000/dataset/${this.props.ds_name}/sample`
+        `${env.API_URL}/dataset/${this.props.ds_name}/sample`
       );
       this.sample_data = await sdata.json();
       this.sample_data = this.sample_data["rows"];
 
       const ddata = await fetch(
-        `http://localhost:3000/dataset/${this.props.ds_name}/details?field=readme`
+        `${env.API_URL}/dataset/${this.props.ds_name}/details?field=readme`
       );
       const jdata = await ddata.json();
       this.readme = jdata["rows"][0]["readme"];
@@ -264,7 +267,7 @@ class Dataset extends React.Component {
 
   async componentWillMount() {
     var details;
-    await fetch(`http://localhost:3000/dataset/${this.props.name}/details`)
+    await fetch(`${env.API_URL}/dataset/${this.props.name}/details`)
       .then((response) => response.json())
       .then((data) => (details = data));
     details = details["rows"][0];
