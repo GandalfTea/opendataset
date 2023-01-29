@@ -122,11 +122,13 @@ p {
 }
 
 .bottom-menu .button-empty-white {
-	margin-left: 14vw;
+	position: absolute;
+	right: calc(3% + 3% + 140px);
 }
 
 .bottom-menu .button-full-white {
-	margin-left: 2%;
+	position: absolute;
+	right: 3%;
 }
 
 .side-bar {
