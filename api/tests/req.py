@@ -101,12 +101,14 @@ def test_dataset():
     updated_description = {"data": "A demo description for a demo world. $$ e^^{i\\pi}=-1"}
     update_readme       = {"data": "A demo README."}
     update_licence      = {"data": 2}
+    update_guidelines   = {"data": "#### To contribute to this dataset, please confirm you are conscious."}
     update_num_contrib  = {"data": 42069}
     update_num_entries  = {"data": 4200000}
 
     test('test_database_update_decription', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=description", 200, updated_description)
     test('test_database_update_readme', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=readme", 200, update_readme)
     test('test_database_update_licence', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=licence", 200, update_licence)
+    test('test_database_update_guidelines', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=guidelines", 200, update_guidelines)
     test('test_database_update_contributors_number', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=num_contributors", 200, update_num_contrib)
     test('test_database_update_num_entries', 'PATCH', f"/dataset/{correct_payload['name']}/details?field=num_entries", 200, update_num_entries)
     print(" > test_database_edit_name                             SKIPPED")

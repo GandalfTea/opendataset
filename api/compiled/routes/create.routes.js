@@ -144,18 +144,30 @@ router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void
         switch (_a.label) {
             case 0:
                 console.log("CREATE user REQUEST from:  ".concat(req.socket.remoteAddress));
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, , 3, 4]);
                 assert(req.body['username'].length < 50 && req.body['username'].length > 1);
-                assert(req.body['email'].length < 100 && req.body['email'].length > 10);
+                assert((0, utils_1.validate)(req.body['username'], utils_1.dtype.USERNAME));
                 assert((0, utils_1.validate)(req.body['email'], utils_1.dtype.EMAIL));
+                try {
+                }
+                catch (err) {
+                    assert(err instanceof assert.AssertionError);
+                    res.status(422);
+                    res.send("Incorrect information");
+                }
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
                 return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, crypt($4, gen_salt('bf')))", [req.body['username'], cakeday, req.body['email'], req.body['password']])];
-            case 1:
+            case 2:
                 rq = _a.sent();
-                console.log(rq);
-                res.status = 201;
+                //console.log(rq);
+                res.status(201);
                 res.send(JSON.stringify(rq));
-                return [2 /*return*/];
+                return [3 /*break*/, 4];
+            case 3: return [7 /*endfinally*/];
+            case 4: return [2 /*return*/];
         }
     });
 }); });

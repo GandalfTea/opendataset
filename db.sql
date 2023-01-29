@@ -54,6 +54,8 @@ CREATE TABLE public.ds_frontend (
     num_entries integer DEFAULT 0,
     licence smallint NOT NULL,
     ds_id integer NOT NULL,
+    readme text,
+    contribution_guidelines text,
     CONSTRAINT ds_frontend_licence_check CHECK (((licence >= 0) AND (licence <= 5))),
     CONSTRAINT ds_frontend_num_entries_check CHECK ((num_entries >= 0))
 );
@@ -111,6 +113,40 @@ CREATE SEQUENCE public.ds_metadata_dataset_id_seq
 --
 
 ALTER SEQUENCE public.ds_metadata_dataset_id_seq OWNED BY public.ds_metadata.ds_id;
+
+
+--
+-- Name: issues; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.issues (
+    id integer NOT NULL,
+    ds_id integer,
+    description text,
+    bounty boolean,
+    bounty_amount integer,
+    from_user integer
+);
+
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.issues_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.issues_id_seq OWNED BY public.issues.id;
 
 
 --
@@ -180,6 +216,13 @@ ALTER TABLE ONLY public.ds_metadata ALTER COLUMN ds_id SET DEFAULT nextval('publ
 
 
 --
+-- Name: issues id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.issues ALTER COLUMN id SET DEFAULT nextval('public.issues_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -198,9 +241,8 @@ COPY public.contributors (user_id, ds_id) FROM stdin;
 -- Data for Name: ds_frontend; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.ds_frontend (num_contributors, description, num_entries, licence, ds_id) FROM stdin;
-0	This is a demo description to fill the white space and get a better idea of how an actual description would look like.	0	0	46
-0		0	0	52
+COPY public.ds_frontend (num_contributors, description, num_entries, licence, ds_id, readme, contribution_guidelines) FROM stdin;
+0	The Bee Movie script, but it's actually an anime title dataset	0	0	52	### Simple README.md example. \n This **should** be markdown formatted so that it is nice and crispy when reading. \n It can also technically render LaTeX, \n $ e^{i\\pi} = -1 $ \n $$ \n \\int\\limits_0^1 x^2 + y^2 \\ dx \n $$	# How to contribute to Datasets?  Datasets is an open source project, so all contributions and suggestions are welcome
 \.
 
 
@@ -209,8 +251,15 @@ COPY public.ds_frontend (num_contributors, description, num_entries, licence, ds
 --
 
 COPY public.ds_metadata (ds_id, ds_name, score, contribution, owner) FROM stdin;
-46	demo-dataset	0	1	0
 52	second_dataset	0	0	0
+\.
+
+
+--
+-- Data for Name: issues; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.issues (id, ds_id, description, bounty, bounty_amount, from_user) FROM stdin;
 \.
 
 
@@ -5242,14 +5291,21 @@ SELECT pg_catalog.setval('public.ds_frontend_ds_id_seq', 1, false);
 -- Name: ds_metadata_dataset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ds_metadata_dataset_id_seq', 52, true);
+SELECT pg_catalog.setval('public.ds_metadata_dataset_id_seq', 77, true);
+
+
+--
+-- Name: issues_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.issues_id_seq', 1, false);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 58, true);
+SELECT pg_catalog.setval('public.users_id_seq', 63, true);
 
 
 --

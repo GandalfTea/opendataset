@@ -3,40 +3,61 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
 import Header from "@commons/Header";
-import MarkdownRender from "@commons/Markdown";
+//import MarkdownRender from "@commons/Markdown";
+import ReactMarkdown from 'react-markdown';
 
 function Guidelines(props) {
-	// Markdown doesn't want to work
-	//return <div className="black card"><MarkdownRender children={props.gd}></MarkdownRender></div>
-	return <div className="guidelines black card"><p>{props.gd}</p></div>
+	// LaTeX doesn't want to work
+	return <div className="guidelines black card"><ReactMarkdown>{props.gd}</ReactMarkdown></div>
 }
 
-function DropCSV(props) {
-	const [file, setFile] = useState(false); 
-	
-	if(file) {
-		// Show CSV
-		return(
-			<div className="black card">
-				<pre>{ /* CSV DATA */}</pre>
-			</div>
-		);
-	} else {
-		return (
-			<div className="card" 
-			     id="drop"
-			     onDrop={/*do something*/}
-					 onDragOver={ /* do something */}>
-				<div className="circle">
-					<label for="file">
-						<div>
-							<img src="../assets/upload.svg" alt='Upload file symbol' />
-						</div>
-					</label>
-						<input type="file" id="file" accept="application/json, .csv" />
+class DropCSV extends React.Component {
+	constructor(props){
+		super(props);
+		this.state = { drop: false, loading: false };
+		this.drop_handler = this.drop_handler.bind(this);
+		this.drag_over_handler = this.drag_over_handler.bind(this);
+	}
+
+	drop_handler(e){
+		e.preventDefault();
+		this.setState({loading: true})
+		if(e.dataTransfer.items) {
+			[...e.dataTransfer.items].forEach( (f, i) => {
+				if(f.kind === 'file') {
+					const file = f.getAsFile();
+					// Get contents of file
+				}
+			});
+		}
+	}
+
+	drag_over_handler(e){
+		e.preventDefault();
+	}
+
+	render() {
+		if(this.state.drop) {
+			return(
+				<div className="card"> { /* CSV data */}</div>
+			);
+		} else {
+			return(
+				<div className="card" 
+			   	   id="drop"
+			   	   onDrop={ (e) => this.drop_handler(e)}
+						 onDragOver={ (e) => this.drag_over_handler(e)}>
+					<div className={ (this.state.loading) ? "circle-loading circle" : "circle" }>
+						<label for="file">
+							<div>
+								<img src="../assets/upload.svg" alt='Upload file symbol' />
+							</div>
+						</label>
+							<input type="file" id="file" accept="application/json, .csv" />
+			 		</div>
 				</div>
-			</div>
-		);
+			);
+		}
 	}
 }
 

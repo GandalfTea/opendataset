@@ -5,7 +5,7 @@ exports.validate = exports.dtype = void 0;
 var dtype;
 (function (dtype) {
     dtype[dtype["DS_NAME"] = 0] = "DS_NAME";
-    dtype[dtype["USER_NAME"] = 1] = "USER_NAME";
+    dtype[dtype["USERNAME"] = 1] = "USERNAME";
     dtype[dtype["EMAIL"] = 2] = "EMAIL";
     dtype[dtype["INT"] = 3] = "INT";
     dtype[dtype["UINT"] = 4] = "UINT";
@@ -17,7 +17,7 @@ function validate(input, data_type) {
         case dtype.DS_NAME:
             return /^[A-Za-z][A-Za-z0-9_\-@,.'"$%^&*() ]{4,49}/.test(input);
             break;
-        case dtype.DS_NAME:
+        case dtype.USERNAME:
             return /^[a-za-z][a-za-z0-9_]{4,29}/.test(input);
             break;
         case dtype.EMAIL:

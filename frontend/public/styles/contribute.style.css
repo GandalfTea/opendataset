@@ -62,3 +62,8 @@ h3 {
 	transition: all 0.2s ease;
 }
 
+
+.card .circle-loading {
+	background-color: #2f2f2f;
+	transition: all 0.4s ease;
+}
