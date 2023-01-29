@@ -15,6 +15,7 @@ class DropCSV extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = { drop: false, loading: false };
+		this.csv_data = "";
 		this.drop_handler = this.drop_handler.bind(this);
 		this.drag_over_handler = this.drag_over_handler.bind(this);
 	}
@@ -26,7 +27,16 @@ class DropCSV extends React.Component {
 			[...e.dataTransfer.items].forEach( (f, i) => {
 				if(f.kind === 'file') {
 					const file = f.getAsFile();
-					// Get contents of file
+					var reader = new FileReader();
+					reader.readAsText(file, "UTF-8");
+					reader.onload = (e) => {
+						this.csv_data = e.target.result.split('\n');	
+						this.setState({ loading: false, drop: true});
+					}
+					reader.onerror = (e) => {
+						this.csv_data = "Error Reading File."
+						this.setState({ loading: false, drop: true});
+					}
 				}
 			});
 		}
@@ -36,10 +46,19 @@ class DropCSV extends React.Component {
 		e.preventDefault();
 	}
 
+	csv_format_handler(f: string) {
+		if(f.length > 30) {
+			f = f.map( (s) => <p>{s}</p>)
+			return f.slice(0, 30);
+		} else {
+			return f.map( (s) => <p>{s}</p>);
+		}
+	}
+
 	render() {
 		if(this.state.drop) {
 			return(
-				<div className="card"> { /* CSV data */}</div>
+				<div className="file-contents card"> {this.csv_format_handler(this.csv_data)} </div>
 			);
 		} else {
 			return(

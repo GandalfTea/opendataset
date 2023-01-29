@@ -67,3 +67,11 @@ h3 {
 	background-color: #2f2f2f;
 	transition: all 0.4s ease;
 }
+
+.file-contents {
+	height: auto;
+	max-height: 500px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding: 50px;
+}
