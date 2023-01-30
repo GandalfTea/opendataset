@@ -71,9 +71,11 @@ function DatasetCard(props) {
           	<p>Contribute</p>
         	</button>
 				</a>
-        <button type="button" className="button-full-white">
-          <p>Get</p>
-        </button>
+				<a href={env.API_URL + "/dataset/" + props.name} download={props.name+".csv"}> 
+        	<button type="button" className="button-full-white">
+        	  <p>Get</p>
+        	</button>
+				</a>
       </div>
     </div>
   );

@@ -38,15 +38,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.router = void 0;
 var db_1 = require("../db");
+var path = require("path");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
 // GET
-router.get("/:dsid", function (req, res) {
-    var dsid = req.params.dsid;
-    res.status = 302;
-    res.send("GET Dataset with UUID ".concat(dsid));
-});
+router.get("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var dsid, rp, ret;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                dsid = req.params.dsid;
+                rp = path.resolve(__dirname, '../../cache/', "dw-" + Date.now() + ".csv");
+                return [4 /*yield*/, (0, db_1.queryDB)("COPY ".concat(dsid, " TO '").concat(rp, "' WITH DELIMITER ',' CSV HEADER;"))];
+            case 1:
+                ret = _a.sent();
+                console.log(ret);
+                rp = path.resolve(__dirname, '../../cache/', 'dw-1675037273325.csv');
+                res.set("Access-Control-Allow-Origin", "*");
+                res.download(rp);
+                return [2 /*return*/];
+        }
+    });
+}); });
 router.get("/:dsid/sample", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var dsid, ret;
     return __generator(this, function (_a) {

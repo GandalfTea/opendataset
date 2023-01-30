@@ -1,13 +1,23 @@
 import { queryDB } from "../db";
+const path = require("path");
 
 const express = require("express");
 const router = express.Router();
 
 // GET
-router.get("/:dsid", (req, res) => {
+router.get("/:dsid", async (req, res) => {
   var dsid: number | string = req.params.dsid;
-  res.status = 302;
-  res.send(`GET Dataset with UUID ${dsid}`);
+	var rp = path.resolve(__dirname, '../../cache/', "dw-" + Date.now() + ".csv");
+
+	// TODO: Vulnerable, and doesn't work. Great code.
+	let ret = await queryDB(`\COPY ${dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
+	console.log(ret)
+
+	rp = path.resolve(__dirname, '../../cache/', 'dw-1675037273325.csv');
+  res.set("Access-Control-Allow-Origin", "*");
+  res.download(rp);
+	
+	// TODO: Delete temp download file.
 });
 
 router.get("/:dsid/sample", async (req, res) => {
