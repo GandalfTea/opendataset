@@ -18,7 +18,7 @@ function Guidelines(props) {
 class DropCSV extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { drop: false, loading: false };
+    this.state = { drop: false, loading: false, testing: false };
     this.csv_data = "";
 		this.filename = "";
 		this.filesize = "";
@@ -75,7 +75,29 @@ class DropCSV extends React.Component {
 	}
 
   render() {
-    if (this.state.drop) {
+
+		if (this.state.testing) {
+			return(
+				<div className="testing card">
+					<h4>{this.filename}, {this.display_filesize(this.filesize)}, {this.filentries} entries</h4>
+					<div>
+						{ /* [ ] Find a way to store user tests
+						     [ ] Do tests even make sense?  */}
+						<h4>Automated Tests</h4>
+						<div>
+							<img src="../assets/ok.svg" alt='success' />
+							<p>Not illegal</p>
+						</div>
+						<div>
+							<img src="../assets/x.svg" alt='fail' />
+							<p>Custom test 1</p>
+						</div>
+					</div>
+
+				</div>
+			)
+
+		} else if (this.state.drop) {
       return (
         <div className="file-description card">
 					<h4>{this.filename}, {this.display_filesize(this.filesize)}, {this.filentries} entries</h4>
@@ -84,7 +106,8 @@ class DropCSV extends React.Component {
 					</div>
 					<div>
 						<button className="button-empty-black"><p>Next</p></button>
-						<button className="button-full-black"><p>Done</p></button>
+						<button className="button-full-black"
+						        onClick={ () => this.setState({drop: false, testing: true})}><p>Done</p></button>
 					</div>
         </div>
       );

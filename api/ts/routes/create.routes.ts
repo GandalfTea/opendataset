@@ -106,11 +106,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
       }
 
       /* TODO: Once the file is in local storage
-				[x] Automatic schema generation
-				[x] Create new table in DB using schema
 				[?] Migrate the data
-				[ ] ? Link table to a meta table of contributions
-				[ ] ? Register table in metatable of datasets */
+				[ ] Validate input    */
     } else {
       process.stdout.write(`RESOLVED, dataset '${name}' created.`);
       if (DEBUG)
@@ -136,7 +133,6 @@ router.post("/user", async (req, res) => {
   console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`);
 
 	try {
-		console.log(validate(req.body['username'], dtype.USERNAME));
 		assert(validate(req.body['username'], dtype.USERNAME));
 		assert(validate(req.body['email'], dtype.EMAIL));
 	catch(err) {
