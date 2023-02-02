@@ -14,7 +14,7 @@ GET  /dataset/:dsid/contributions?id=:id    Returns specific contribution
 POST /create/dataset                        Create new dataset
        data: {}
 PATCH /dataset/:dsid/details?field=:field   Update dataset frontend details 
-       data: {':field' : ' . . . '}
+       data: {'data' : ' . . . '}
 DELETE /dataset/:dsid                       Delete dataset
 ```
 

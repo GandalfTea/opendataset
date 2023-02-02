@@ -147,7 +147,7 @@ router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, , 3, 4]);
-                assert(req.body['username'].length < 50 && req.body['username'].length > 1);
+                console.log((0, utils_1.validate)(req.body['username'], utils_1.dtype.USERNAME));
                 assert((0, utils_1.validate)(req.body['username'], utils_1.dtype.USERNAME));
                 assert((0, utils_1.validate)(req.body['email'], utils_1.dtype.EMAIL));
                 try {

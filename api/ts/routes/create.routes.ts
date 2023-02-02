@@ -136,7 +136,7 @@ router.post("/user", async (req, res) => {
   console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`);
 
 	try {
-  	assert(req.body['username'].length < 50 && req.body['username'].length > 1);
+		console.log(validate(req.body['username'], dtype.USERNAME));
 		assert(validate(req.body['username'], dtype.USERNAME));
 		assert(validate(req.body['email'], dtype.EMAIL));
 	catch(err) {

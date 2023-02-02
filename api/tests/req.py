@@ -51,12 +51,12 @@ def test(test_name, req_type, req_url, expected_status_code, payload={}):
 def test_user():
 
     # CREATE
-    payload = {'username':'demo-user', 'email':'demo-email@example.com', 'password':'demopassword'}
-    test("test_user_creation", "POST", "/create/user", 200, payload)
+    payload = {'username':'demouser', 'email':'demo-email@example.com', 'password':'demopassword'}
+    test("test_user_creation", "POST", "/create/user", 201, payload)
 
     # LOGIN
-    correct_payload = {'username': 'demo-user', 'password': 'demopassword'}
-    wrong_payload   = {'username': 'demo-user', 'password': 'wrongpassword'}
+    correct_payload = {'username': 'demouser', 'password': 'demopassword'}
+    wrong_payload   = {'username': 'demouser', 'password': 'wrongpassword'}
     test("test_user_login_wrong_credentials", "POST", "/login", 400, wrong_payload)
     test("test_user_login_correct_credentials", "POST", "/login", 200, correct_payload)
 
@@ -124,8 +124,6 @@ def test_dataset():
     # DELETE 
     if NO_DELETE: print(" > test_database_deletion                              SKIPPED")
     else: test('test_database_deletion', 'DELETE', f"/dataset/{correct_payload['name']}", 204)
-
-
 
 
 if __name__ == '__main__':
