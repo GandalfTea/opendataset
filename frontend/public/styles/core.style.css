@@ -53,7 +53,9 @@ p {
 
 /* GENERAL BUTTONS */
 
+.button-full-black,
 .button-full-white,
+.button-empty-black,
 .button-empty-white {
 	height: 35px;
 	width: 140px;
@@ -61,13 +63,23 @@ p {
 	cursor: pointer;
 }
 
+.button-empty-black,
 .button-empty-white {
 	background-color: transparent;
+}
+
+.button-empty-white {
 	border: 2px solid white;
 	color: white;
 }
 
-.button-empty-white p{
+.button-empty-black {
+	border: 2px solid #2f2f2f;
+	color: black;
+}
+
+.button-empty-black p,
+.button-empty-white p {
 	font-size: 16px;
 	font-weight: bold;
 	width: auto;
@@ -87,13 +99,26 @@ p {
 	border: none;
 }
 
+.button-full-black {
+	background-color: #2f2f2f;
+	border: none;
+}
+
+.button-full-black p,
 .button-full-white p {
 	font-size: 16px;
 	font-weight: bold;
 	height: auto;
 	margin: auto;
-	color: #171717;
 	margin: auto;
 	background-color: transparent;
+}
+
+.button-full-white p {
+	color: #171717;
+}
+
+.button-full-black p {
+	color: white;
 }
 
