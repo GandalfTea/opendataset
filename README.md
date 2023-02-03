@@ -16,16 +16,16 @@ Python: `pandas`
 
 #### Run locally:
 
-`api` and `frontend` are different webservers that both run on express and node
+`api` and `frontend` are different webservers that both run in express.
 
 &nbsp;
 ##### API Server:
 
 Import `db.sql` into a PostgreSQL database.     
-Update `node-postgres` client information in `./api/ts/db.ts` with your login credentials.     
-Make sure your Postgres user has the `pg_read_server_files` role.   
-Default `PORT` is `3000` and `DEBUG` is `false`, change this in `./api/ts/app.ts`.      
-Compile the TS using `tsc` and start the webserver:
+Update information in `./api/ts/db.ts` with your login credentials.     
+NOTE: Make sure you have the `pg_read_server_files` role.   
+Default `PORT` is `3000`, change this in `./api/ts/app.ts`.      
+Compile the TS and start the webserver:
 ```bash
 $ sh compile.sh
 ```
@@ -36,16 +36,16 @@ $ node ./compiled/app.js
 ```
 Run the API tests:
 ```bash
-$ python ./tests/req.py
+$ python ./tests/api.py
 ```
-Use the demo forms in `./frontend` or make requests using cURL     
-In order to upload files to a HTML form, it needs `enctype="multipart/form-data"`.
+For demo cURLs see readme in api folder.
       
 &nbsp;
 
 ##### Frontend server:
+Update the details in `api/src/config.json`.    
 ```bash
-REACT_APP_API_BASE_DIR= { your api url }:PORT node app.js
+node app.js
 ```
 
 &nbsp;
