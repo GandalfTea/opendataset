@@ -1,24 +1,30 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
 import * as ReactDOM from "react-dom/client";
+import { useState, useEffect } from "react";
+
 import useVote from "@hooks/useVote";
 import Header from "@commons/Header";
 import MarkdownRender from "@commons/Markdown";
 import * as env from "@env";
 
+/*
+[ ] Include CORS Headers
+[ ] Include User ID token header 
+*/
 function Vote(props) {
+	/* 0 - none
+		 1 - upvote
+		 2 - downvote */
   const [vote, setVote] = useState(0);
-  const [voted, setVoted] = useState(false); // Not sure if this needs to be in state
+	var voted = false;
   useEffect(() => {
-    var url = env.API_URL;
+		const url = `${env.API_URL}${vote===1 ? '/upvote?ds=' : '/downvote?ds='}${props.ds_name}`;
+		console.log(url)
     if (vote > 0) {
-      setVoted(true);
-      vote === 1 ? `/upvote?ds=` : `/downvote?ds=`;
-      url += "/" + props.ds_name;
-			// TODO: CORS fail
-      fetch(url, { method: "POST" });
+			voted=true;
+      fetch(url, { method: "POST", mode: "cors", headers: { "Access-Control-Allow-Origin": "*"} });
     } else if (vote === 0 && voted) {
-      fetch(url, { method: "DELETE" }); // Retract vote
+      fetch(url, { method: "DELETE", mode: "cors", headers: {"Access-Control-Allow-Origin": "*"} });
       setVoted(false);
     }
   });
@@ -31,8 +37,7 @@ function Vote(props) {
         onClick={() => (vote === 1 ? setVote(0) : setVote(1))}>
         <img
           src={vote === 1 ? "../assets/vote_on.svg" : "../assets/vote_off.svg"}
-          style={{ transform: "rotate(180deg)" }}
-        />
+          style={{ transform: "rotate(180deg)" }} />
       </button>
       <p>
         {vote === 1
@@ -45,9 +50,7 @@ function Vote(props) {
         type="button"
         className="score_button"
         onClick={() => (vote === 2 ? setVote(0) : setVote(2))}>
-        <img
-          src={vote === 2 ? "../assets/vote_on.svg" : "../assets/vote_off.svg"}
-        />
+        <img src={vote === 2 ? "../assets/vote_on.svg" : "../assets/vote_off.svg"} />
       </button>
     </div>
   );
@@ -84,28 +87,25 @@ function DatasetCard(props) {
 class ContentCard extends React.Component {
   constructor(props) {
     super(props);
-    this.sample_data = null;
-    this.readme = null;
-    this.issues = null;
-    this.tabhtml = null;
-
     this.state = { tab: 0, loading: true };
+    this.tabhtml = null;
+		this.data = {
+			"readme" : "",
+			"sample_data": "",
+			"issues" : "",
+		}
     this.renderTab = this.renderTab.bind(this);
   }
 
   async componentWillMount() {
     (async () => {
-      const sdata = await fetch(
-        `${env.API_URL}/dataset/${this.props.ds_name}/sample`
-      );
-      this.sample_data = await sdata.json();
-      this.sample_data = this.sample_data["rows"];
+      const sdata = await fetch( `${env.API_URL}/dataset/${this.props.ds_name}/sample`);
+      this.data.sample_data = await sdata.json();
+      this.data.sample_data = this.data.sample_data["rows"];
 
-      const ddata = await fetch(
-        `${env.API_URL}/dataset/${this.props.ds_name}/details?field=readme`
-      );
+      const ddata = await fetch( `${env.API_URL}/dataset/${this.props.ds_name}/details?field=readme`);
       const jdata = await ddata.json();
-      this.readme = jdata["rows"][0]["readme"];
+      this.data.readme = jdata["rows"][0]["readme"];
     })().then(() => this.setState({ loading: false }));
   }
 
@@ -115,8 +115,7 @@ class ContentCard extends React.Component {
       case 0:
         return (
           <div className="readme">
-            {console.log(this.readme)}
-            <MarkdownRender children={this.readme}></MarkdownRender>
+            <MarkdownRender children={this.data.readme}></MarkdownRender>
           </div>
         );
         break;
@@ -124,21 +123,18 @@ class ContentCard extends React.Component {
       case 1:
         var data;
         try {
-          data = JSON.stringify(
-            this.sample_data[0]["row_to_json"],
-            undefined,
-            2
-          );
+          data = JSON.stringify( this.data.sample_data[0]["row_to_json"], undefined, 2);
         } catch (e) {
+					data = "Error reading sample data. Not valid JSON format.";
           console.error(e);
         }
         var tableheaders = [];
         var tabent = [];
-        tableheaders = Object.keys(this.sample_data[0]["row_to_json"]);
+        tableheaders = Object.keys(this.data.sample_data[0]["row_to_json"]);
         tableheaders = tableheaders.map((i) => <th>{i}</th>);
         tableheaders = <tr>{tableheaders}</tr>;
 
-        for (let i of this.sample_data) {
+        for (let i of this.data.sample_data) {
           let ent = [];
           let keys = Object.keys(i["row_to_json"]);
           for (let f of keys) {
@@ -149,7 +145,6 @@ class ContentCard extends React.Component {
         return (
           <div className="sample">
             <div className="snippet">
-              {" "}
               <pre>{data}</pre>
             </div>
             <div className="table">
