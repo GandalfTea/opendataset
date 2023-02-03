@@ -29,6 +29,7 @@ import { router as login_routes } from "./routes/login.routes";
 app.use("/create", create_routes);
 app.use("/user", users_routes);
 app.use("/dataset", datasets_routes);
+app.use("/ds", datasets_routes);
 app.use("/login", login_routes);
 
 app.listen(PORT, () => {
