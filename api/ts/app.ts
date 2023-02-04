@@ -16,8 +16,8 @@ const cors = require('cors');
 // Setup
 
 const app = express();
-const PORT: number = 3000;
-const DEBUG: boolean = false;
+const PORT: number = process.env.PORT;
+const DEBUG: boolean = process.env.DEBUG;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());

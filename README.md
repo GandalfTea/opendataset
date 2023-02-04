@@ -5,11 +5,6 @@ Like a very shitty GitHub, for now.
 &nbsp;
 
 #### Dependencies:      
-Backend: `typescript`, `express`, PostgreSQL, `multer`, `pg`       
-Frontend:      
-* `react`, `socket.io`, `pug`,      
-* `react-markdown`, `react-mathjax`, `remark-math`          
-
 Python: `pandas`  
 
 &nbsp;
@@ -22,9 +17,18 @@ Python: `pandas`
 ##### API Server:
 
 Import `db.sql` into a PostgreSQL database.     
-Update information in `./api/ts/db.ts` with your login credentials.     
-NOTE: Make sure you have the `pg_read_server_files` role.   
-Default `PORT` is `3000`, change this in `./api/ts/app.ts`.      
+Create `.env` file in `./api/` with db info:
+```bash
+PORT=3000
+DEBUG=0
+
+PGUSER=
+PGHOST=
+PGPASSWORD=
+PGDATABASE=
+PGPORT=
+```
+NOTE: Make sure your user has the `pg_read_server_files` role.   
 Compile the TS and start the webserver:
 ```bash
 $ sh compile.sh

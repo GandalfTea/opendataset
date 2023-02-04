@@ -8,8 +8,8 @@ var pgSession = require("connect-pg-simple")(session);
 var cors = require('cors');
 // Setup
 var app = express();
-var PORT = 3000;
-var DEBUG = false;
+var PORT = process.env.PORT;
+var DEBUG = process.env.DEBUG;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
