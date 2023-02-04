@@ -11,6 +11,7 @@ var assert = require("assert");
 const express = require("express");
 const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
+const cors = require('cors');
 
 // Setup
 
@@ -20,6 +21,7 @@ const DEBUG: boolean = false;
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
 
 const store = new pgSession({
   conString: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`,

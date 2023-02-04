@@ -1,16 +1,18 @@
 "use strict";
 exports.__esModule = true;
-require('dotenv').config();
+require("dotenv").config();
 var assert = require("assert");
 var express = require("express");
 var session = require("express-session");
 var pgSession = require("connect-pg-simple")(session);
+var cors = require('cors');
 // Setup
 var app = express();
 var PORT = 3000;
 var DEBUG = false;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(cors());
 var store = new pgSession({
     conString: "postgres://".concat(process.env.PGUSER, ":").concat(process.env.PGPASSWORD, "@").concat(process.env.PGHOST, ":").concat(process.env.PGPORT, "/").concat(process.env.PGDATABASE)
 });
