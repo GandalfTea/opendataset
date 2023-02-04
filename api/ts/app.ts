@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+require("dotenv").config();
 import {
   queryDB,
   generate_schema,
@@ -8,13 +9,34 @@ import {
 
 var assert = require("assert");
 const express = require("express");
+const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
+
+// Setup
+
 const app = express();
 const PORT: number = 3000;
 const DEBUG: boolean = false;
 
-// Setup
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+const store = new pgSession({
+  conString: `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`,
+});
+
+app.use(
+  session({
+    store: store,
+    secret: "catsridingbikesonspikeslikereichs",
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+      secure: false, // localhost no https
+      maxAge: 1000 * 60 * 60,
+    },
+  })
+);
 
 app.get("/", (req, res) => {
   res.status = 200;

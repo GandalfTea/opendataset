@@ -41,6 +41,7 @@ var db_1 = require("../db");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
+// [ ] JWT token that expire in 1h
 router.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var ret;
     return __generator(this, function (_a) {
@@ -49,7 +50,7 @@ router.post("/", function (req, res) { return __awaiter(void 0, void 0, void 0, 
             case 1:
                 ret = _a.sent();
                 if (parseInt(ret["rowCount"]) > 0) {
-                    console.log(ret);
+                    console.log("LOGIN SUCCESSFUL for user ".concat(req.body['username']));
                     res.status(200);
                     res.send("Successful Login");
                 }

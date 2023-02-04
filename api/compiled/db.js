@@ -39,47 +39,35 @@ exports.__esModule = true;
 exports.csv_mig_errors = exports.migrate_csv_to_db_new_table = exports.generate_schema = exports.create_ds_frontend = exports.create_ds_metadata = exports.queryDB = void 0;
 var Client = require("pg").Client;
 var path = require("path");
+require("dotenv").config();
 var utils_1 = require("./utils");
-// TODO: Maybe not close connection to db on every query?
+var client = new Client({
+    user: process.env.PGUSER,
+    host: process.env.PGHOST,
+    database: process.env.PGDATABASE,
+    password: process.env.PGPASSWORD,
+    port: process.env.PGPORT
+});
+client.connect();
 var queryDB = function (query, params) { return __awaiter(void 0, void 0, void 0, function () {
-    var client, res, error_1;
+    var res, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 4, , 5]);
-                client = new Client({
-                    user: "su",
-                    host: "127.0.0.1",
-                    database: "api",
-                    password: "lafiel",
-                    port: "5432"
-                });
-                return [4 /*yield*/, client.connect()];
-            case 1:
-                _a.sent();
+                _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, client.query(query, params)];
-            case 2:
+            case 1:
                 res = _a.sent();
-                return [4 /*yield*/, client.end()];
-            case 3:
-                _a.sent();
                 return [2 /*return*/, res];
-            case 4:
+            case 2:
                 error_1 = _a.sent();
                 return [2 /*return*/, error_1];
-            case 5: return [2 /*return*/];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
 exports.queryDB = queryDB;
-var prepareDB = function (sname, query) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        queryDB("PREPARE ".concat(sname, " "));
-        return [2 /*return*/];
-    });
-}); };
 // Add table metadata to ds_metadata
-// Note: Score is defaulted to 0;
 function create_ds_metadata(ds_name, ds_cont, ds_owner) {
     return __awaiter(this, void 0, void 0, function () {
         var ret;

@@ -1,35 +1,29 @@
 const { Client } = require("pg");
 const path = require("path");
-
+require("dotenv").config();
 import { dtype, validate } from './utils';
 
-// TODO: Maybe not close connection to db on every query?
+const client = new Client({
+	user: process.env.PGUSER,
+	host: process.env.PGHOST,
+	database: process.env.PGDATABASE,
+	password: process.env.PGPASSWORD,
+	port: process.env.PGPORT,
+});
+
+client.connect();
+
 const queryDB = async (query:string, params) => {
   try {
-    const client = new Client({
-      user: "su",
-      host: "127.0.0.1",
-      database: "api",
-      password: "lafiel",
-      port: "5432",
-    });
-    await client.connect();
     const res: any = await client.query(query, params);
-    await client.end();
     return res;
   } catch (error) {
     return error;
   }
 };
 
-const prepareDB = async(sname: string, query: string) => {
-	queryDB(`PREPARE ${sname} `)
-}
-
-
 // Add table metadata to ds_metadata
 
-// Note: Score is defaulted to 0;
 async function create_ds_metadata(
   ds_name: string,
   ds_cont: number,
