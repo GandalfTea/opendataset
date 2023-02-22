@@ -238,17 +238,24 @@ function SideBar(props) {
 
   return (
     <div className="side-bar">
-      <h3>About</h3>
-      <p>
-        {props.num_entries} entries . {props.file_type} .{" "}
-        <strong>{props.file_size}</strong>
-      </p>
+      <h3>Metadata</h3>
+      <p> <strong>{props.num_entries} entries</strong></p>
+			<p> <strong>{props.file_size}</strong> </p>
+			<p> {props.file_type}</p>
       <p>{props.num_contrib} contributors</p>
       <div>
-        <h3>Owner</h3>
+        <h3>Admins</h3>
         <div className="owner">
           <div className="owner-pfp"></div>
           <p>owner_name</p>
+        </div>
+        <div className="owner">
+          <div className="owner-pfp"></div>
+          <p>admin_name</p>
+        </div>
+        <div className="owner">
+          <div className="owner-pfp"></div>
+          <p>admin_name</p>
         </div>
       </div>
       {licence}
@@ -270,7 +277,8 @@ class Dataset extends React.Component {
     details = details["rows"][0];
     this.setState({
       desc: details["description"],
-      num_entries: details["num_entries"],
+      //num_entries: details["num_entries"],
+			num_entries: "56.451.430",
       num_cont: details["num_contributors"],
       licence: details["licence"],
     });
@@ -284,16 +292,16 @@ class Dataset extends React.Component {
           address="demo-user/"
           name={this.props.name}
           description={this.state.desc}
-          cli="127.0.0.1:3000/dataset/43"
+          cli="api.demoname.com/ds/43568"
           score="69"
         />
         <div className="content">
           <SideBar
             about={this.state.desc}
             num_entries={this.state.num_entries}
-            num_contrib="560"
+            num_contrib="56"
             file_type="CSV"
-            file_size="456 kB"
+            file_size="420 kB"
             licence={this.state.licence}
           />
           <ContentCard ds_name={this.props.name} />

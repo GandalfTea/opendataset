@@ -75,7 +75,6 @@ class DropCSV extends React.Component {
 	}
 
   render() {
-
 		if (this.state.testing) {
 			return(
 				<div className="testing card">
@@ -160,14 +159,14 @@ class ContributePage extends React.Component {
 
   render() {
     return (
-      <div className="page">
-        <Header />
-        <Guidelines gd={this.state.guidelines} />
-        <h3>Drag and drop</h3>
-        <DropCSV />
-        <h3>Manual entry</h3>
-        <ManualEntry />
-      </div>
+			<div className="page">
+				<Header />
+				<Guidelines gd={this.state.guidelines} />
+				<h3>Drag and drop</h3>
+				<DropCSV />
+				<h3>Manual entry</h3>
+				<ManualEntry />
+			</div>
     );
   }
 }
