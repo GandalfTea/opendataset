@@ -1,34 +1,51 @@
 import { queryDB } from "../db";
 const path = require("path");
+const fs = require('fs');
 
+require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 
 // GET
 router.get("/:dsid", async (req, res) => {
-  var dsid: number | string = req.params.dsid;
-	var rp = path.resolve(__dirname, '../../cache/', "dw-" + Date.now() + ".csv");
+	if(process.env.DEBUG) console.log(`GET ${req.params.dsid}`);
+	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
+	if(ret.rows.length == 0) {
+		if(process.env.DEBUG) console.log('\tERROR: Dataset does not exist');
+		return;
+	}
 
-	// TODO: Vulnerable, and doesn't work. Great code.
-	let ret = await queryDB(`\COPY ${dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
-	console.log(ret)
-
-	rp = path.resolve(__dirname, '../../cache/', 'dw-1675037273325.csv');
-  res.set("Access-Control-Allow-Origin", "*");
-  res.download(rp);
+	var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
+	let ret = await queryDB(`\COPY ${req.params.dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
 	
-	// TODO: Delete temp download file.
+	// TODO: \COPY doesn't work, this is an empty file
+	try {
+		await fs.promises.writeFile(rp, "").then(console.log("\ttemp file created"))
+	} catch(e) { console.log(e) }
+
+  await res.download(rp, async (e) => { 
+		if(e) console.log(e);
+		else {
+			if(process.env.DEBUG) console.log(`\ttemp file sent`);
+			try { if(fs.existsSync(rp)) await fs.promises.unlink(rp);
+			} catch(e) { console.log(e)}
+			if(process.env.DEBUG) console.log(`\ttemp file deleted`);
+		}
+	});
 });
 
 router.get("/:dsid/sample", async (req, res) => {
-  var dsid: number | string = req.params.dsid;
-	// TODO:  Verify dsid is a ream dataset name
-	let ret = await queryDB(`SELECT row_to_json(${dsid}) FROM ${dsid} LIMIT 50;`);
-	console.log(ret);
+	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
+	if(ret.rows.length == 0) {
+		if(process.env.DEBUG) console.log(`ERROR: Dataset does not exist`);
+		return;
+	}
+	let ret = await queryDB(`SELECT row_to_json(${req.params.dsid}) FROM ${req.params.dsid} LIMIT 50;`);
 	res.status(200);
-  res.set("Access-Control-Allow-Origin", "*");
 	res.send(ret);
 })
+
+
 
 router.get("/:dsid/contributions/:hash", (req, res) => {
   var ds = req.params.dsid["uuid"];
@@ -37,40 +54,39 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
   res.send(`GET contribution ${hash} for dataset ${ds}.`);
 });
 
+
+/*
+	GET metadata about dataset
+*/
+
 router.get("/:dsid/details", async (req, res) => {
   var dsid: number | string = req.params.dsid;
 	var query: string = req.query.q;
-  var ret = await queryDB(
-    `SELECT ds_id FROM ds_metadata WHERE ds_name=$1;`,
-		[dsid]
-  );
-  dsid = ret["rows"][0]["ds_id"];
+	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [dsid]);
+	if(ret.rows.length == 0) {
+		if(process.env.DEBUG) console.log(`ERROR: Dataset does not exist: ${dsid}.`);
+		return;
+	}
+
+	if(!Number.isInteger(dsid)) {
+  	var ret = await queryDB( `SELECT ds_id FROM ds_metadata WHERE ds_name=$1;`, [dsid]);
+  	dsid = ret.rows[0].ds_id;
+	}
+
 	if(query != null) {
 		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
 			var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
-			console.log(ret);
 			res.status(200);
-			res.set("Access-Control-Allow-Origin", "*");
 			res.send(JSON.stringify(ret));
 			return;
 		}
 	}
   var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
-  console.log(ret);
   res.status(200);
-  res.set("Access-Control-Allow-Origin", "*");
   res.send(JSON.stringify(ret));
 });
 
-router.get('/:dsid/demo', async (req, res) => {
-	var dsid: number | string = req.params.dsid;
-  var ret = await queryDB(
-    `SELECT ds_id FROM ds_metadata WHERE ds_name=$1;`,
-		[dsid]
-  );
-  dsid = ret["rows"][0]["ds_id"];
-  var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
-})
+
 
 // UPDATE FRONTEND
 router.patch("/:dsid/details", async (req, res) => {
