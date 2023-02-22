@@ -8,10 +8,13 @@ const router = express.Router();
 
 // GET
 router.get("/:dsid", async (req, res) => {
-	if(process.env.DEBUG) console.log(`GET ${req.params.dsid}`);
+	if(process.env.DEBUG) {
+		process.stdout.write(`\nGET * ${req.params.dsid}`);
+		const _start = process.hrtime.bigint();
+	}
 	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
 	if(ret.rows.length == 0) {
-		if(process.env.DEBUG) console.log('\tERROR: Dataset does not exist');
+		console.log('\tERROR: Dataset does not exist');
 		return;
 	}
 
@@ -20,29 +23,39 @@ router.get("/:dsid", async (req, res) => {
 	
 	// TODO: \COPY doesn't work, this is an empty file
 	try {
-		await fs.promises.writeFile(rp, "").then(console.log("\ttemp file created"))
+		await fs.promises.writeFile(rp, "")
 	} catch(e) { console.log(e) }
 
   await res.download(rp, async (e) => { 
 		if(e) console.log(e);
 		else {
-			if(process.env.DEBUG) console.log(`\ttemp file sent`);
 			try { if(fs.existsSync(rp)) await fs.promises.unlink(rp);
 			} catch(e) { console.log(e)}
-			if(process.env.DEBUG) console.log(`\ttemp file deleted`);
+			if(process.env.DEBUG) {
+				const _end = process.hrtime.bigint();
+				process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+			}
 		}
 	});
 });
 
 router.get("/:dsid/sample", async (req, res) => {
+	if(process.env.DEBUG) {
+		process.stdout.write(`\nGET SAMPLE ${req.params.dsid}`);
+		const _start = process.hrtime.bigint();
+	}
 	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
 	if(ret.rows.length == 0) {
-		if(process.env.DEBUG) console.log(`ERROR: Dataset does not exist`);
+		console.log(`ERROR: Dataset does not exist`);
 		return;
 	}
 	let ret = await queryDB(`SELECT row_to_json(${req.params.dsid}) FROM ${req.params.dsid} LIMIT 50;`);
 	res.status(200);
 	res.send(ret);
+	if(process.env.DEBUG) {
+		const _end = process.hrtime.bigint();
+		process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+	}
 })
 
 
