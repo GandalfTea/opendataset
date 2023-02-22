@@ -161,6 +161,7 @@ p {
 .side-bar .owner {
 	display: flex;
 	flex-direction: row;
+	margin-top: 0px;
 }
 
 .owner div {
