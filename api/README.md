@@ -5,7 +5,7 @@ Datasets
 
 ```
 GET  /dataset/:dsid                         Returns the whole dataset
-GET  /dataset/:dsid/:int                    Return a random subset equal to [ int ] % of dataset. Int is between 1-100
+GET  /dataset/:dsid/:flat                   Return a random subset equal to [ int/float ] % of dataset. Number is between 1-100
 GET  /dataset/:dsid/sample                  Returns a random subset of 50 entries
 GET  /dataset/:dsid/details                 Returns the dataset metadata
 GET  /dataset/:dsid/details?q=:field        Return specific contributions

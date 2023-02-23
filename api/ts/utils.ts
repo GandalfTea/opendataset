@@ -1,3 +1,4 @@
+import { queryDB } from "./db";
 
 // Data Sanitation
 
@@ -32,4 +33,9 @@ function validate(input: string | number, data_type: any): boolean {
 	}
 }
 
-export { dtype, validate };
+async function ds_exists(dsid: string | number): boolean {
+	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(Number(dsid))) ? "ds_id=$1" : "ds_name=$1"}`, [dsid]);
+	return (ret.rows.length == 0) ? false : true;
+}
+
+export { dtype, validate, ds_exists };

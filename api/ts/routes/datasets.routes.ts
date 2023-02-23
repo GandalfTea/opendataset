@@ -1,4 +1,5 @@
 import { queryDB } from "../db";
+import {ds_exists} from "../utils";
 const path = require("path");
 const fs = require('fs');
 
@@ -6,55 +7,105 @@ require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 
-// GET
+
+
+// TODO: Cache recent downloads
 router.get("/:dsid", async (req, res) => {
 	if(process.env.DEBUG) {
 		process.stdout.write(`\nGET * ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
 	}
-	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
-	if(ret.rows.length == 0) {
-		console.log('\tERROR: Dataset does not exist');
-		return;
-	}
 
-	var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
-	let ret = await queryDB(`\COPY ${req.params.dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
+	if(await ds_exists(req.params.dsid)) {
+		var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
+		let ret = await queryDB(`\COPY ${req.params.dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
 	
-	// TODO: \COPY doesn't work, this is an empty file
-	try {
-		await fs.promises.writeFile(rp, "")
-	} catch(e) { console.log(e) }
+		// TODO: \COPY doesn't work, this is an empty file
+		try { await fs.promises.writeFile(rp, "") } 
+		catch(e) { console.log(e) }
 
-  await res.download(rp, async (e) => { 
-		if(e) console.log(e);
-		else {
-			try { if(fs.existsSync(rp)) await fs.promises.unlink(rp);
-			} catch(e) { console.log(e)}
-			if(process.env.DEBUG) {
-				const _end = process.hrtime.bigint();
-				process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+ 		res.download(rp, async (e) => { 
+			if(e) console.log(e);
+			else {
+				try { if(fs.existsSync(rp)) await fs.promises.unlink(rp); } 
+				catch(e) { console.log(e); }
+				if(process.env.DEBUG) {
+					const _end = process.hrtime.bigint();
+					process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+				}
 			}
-		}
-	});
+		});
+	} else {
+		if(process.env.DEBUG) process.stdout.write("\tERROR \t dataset does not exits.");
+		res.status(404);
+		res.send("Dataset not found.");
+	}
 });
 
+// Get random percentage from dataset
+router.get("/:dsid/:percentage", async (req, res) => {
+	if(process.env.DEBUG) {
+		process.stdout.write(`\nGET ${req.params.percentage}% ${req.params.dsid}`);
+		const _start = process.hrtime.bigint();
+	}
+
+	if(await ds_exists(req.params.dsid)) {
+		var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
+		const req_num = req.params.percentage / 100;
+		let ret = await queryDB(`SELECT num_entries FROM ds_frontend WHERE ds_id=$1;`
+																			, [req.params.dsid]);
+		var num_entries = ret.rows[0].num_entries; 
+		num_entries = 5000; // not yet in db
+		var used_idx = new Set();
+		while(used_idx.size < num_entries*req_num) {
+			let randidx = Math.floor(Math.random() * num_entries);
+			used_idx.add(randidx);
+		}
+
+		let ret = await queryDB(`\COPY (SELECT * FROM ${req.params.dsid} WHERE ds_id in (${Array.from(used_idx)})) TO ${rp} WITH DELIMITER ',' CSV HEADER;`);
+		// TODO: still dummy file
+		try { await fs.promises.writeFile(rp, "") } 
+		catch(e) { console.log(e) }
+ 		res.download(rp, async (e) => { 
+			if(e) console.log(e);
+			else {
+				try { if(fs.existsSync(rp)) await fs.promises.unlink(rp); } 
+				catch(e) { console.log(e); }
+				if(process.env.DEBUG) {
+					const _end = process.hrtime.bigint();
+					process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+				}
+			}
+		});
+
+	} else {
+		if(process.env.DEBUG) process.stdout.write("\tERROR \t dataset does not exits.");
+		res.status(404);
+		res.send("Dataset not found.");
+	}
+
+})
+
+
+// Get a sample of first 50 entries
 router.get("/:dsid/sample", async (req, res) => {
 	if(process.env.DEBUG) {
 		process.stdout.write(`\nGET SAMPLE ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
 	}
-	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [req.params.dsid]);
-	if(ret.rows.length == 0) {
-		console.log(`ERROR: Dataset does not exist`);
-		return;
-	}
-	let ret = await queryDB(`SELECT row_to_json(${req.params.dsid}) FROM ${req.params.dsid} LIMIT 50;`);
-	res.status(200);
-	res.send(ret);
-	if(process.env.DEBUG) {
-		const _end = process.hrtime.bigint();
-		process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+
+	if(ds_exists(req.params.dsid)) {
+		let ret = await queryDB(`SELECT row_to_json(${req.params.dsid}) FROM ${req.params.dsid} LIMIT 50;`);
+		res.status(200);
+		res.send(ret);
+		if(process.env.DEBUG) {
+			const _end = process.hrtime.bigint();
+			process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+		}
+	} else {
+		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		res.status(404);
+		res.send("Dataset not found.");
 	}
 })
 
