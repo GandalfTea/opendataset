@@ -42,8 +42,9 @@ router.get("/:dsid", async (req, res) => {
 	}
 });
 
+
 // Get random percentage from dataset
-router.get("/:dsid/:percentage", async (req, res) => {
+router.get("/:dsid/p/:percentage", async (req, res) => {
 	if(process.env.DEBUG) {
 		process.stdout.write(`\nGET ${req.params.percentage}% ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
@@ -54,7 +55,7 @@ router.get("/:dsid/:percentage", async (req, res) => {
 		const req_num = req.params.percentage / 100;
 		let ret = await queryDB(`SELECT num_entries FROM ds_frontend WHERE ds_id=$1;`
 																			, [req.params.dsid]);
-		var num_entries = ret.rows[0].num_entries; 
+		var num_entries = 0; //ret.rows[0].num_entries; 
 		num_entries = 5000; // not yet in db
 		var used_idx = new Set();
 		while(used_idx.size < num_entries*req_num) {
@@ -62,7 +63,8 @@ router.get("/:dsid/:percentage", async (req, res) => {
 			used_idx.add(randidx);
 		}
 
-		let ret = await queryDB(`\COPY (SELECT * FROM ${req.params.dsid} WHERE ds_id in (${Array.from(used_idx)})) TO ${rp} WITH DELIMITER ',' CSV HEADER;`);
+		let ret = await queryDB(`\COPY (SELECT * FROM ${req.params.dsid} WHERE ds_id in 
+													  (${Array.from(used_idx)})) TO ${rp} WITH DELIMITER ',' CSV HEADER;`);
 		// TODO: still dummy file
 		try { await fs.promises.writeFile(rp, "") } 
 		catch(e) { console.log(e) }
@@ -83,25 +85,29 @@ router.get("/:dsid/:percentage", async (req, res) => {
 		res.status(404);
 		res.send("Dataset not found.");
 	}
-
 })
 
 
 // Get a sample of first 50 entries
+
 router.get("/:dsid/sample", async (req, res) => {
 	if(process.env.DEBUG) {
 		process.stdout.write(`\nGET SAMPLE ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
 	}
-
 	if(ds_exists(req.params.dsid)) {
+		if(Number.isInteger(Number(req.params.dsid))) {
+ 		 	var ret = await queryDB( `select ds_name from ds_metadata where ds_id=$1;`, [req.params.dsid]);
+ 		 	req.params.dsid = ret.rows[0].ds_name;
+		}
+
 		let ret = await queryDB(`SELECT row_to_json(${req.params.dsid}) FROM ${req.params.dsid} LIMIT 50;`);
 		res.status(200);
 		res.send(ret);
-		if(process.env.DEBUG) {
-			const _end = process.hrtime.bigint();
-			process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
-		}
+			if(process.env.DEBUG) {
+				const _end = process.hrtime.bigint();
+				process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+			}
 	} else {
 		process.stdout.write(`\t ERROR \t Dataset does not exist`);
 		res.status(404);
@@ -119,35 +125,30 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
 });
 
 
-/*
-	GET metadata about dataset
-*/
+
+/* GET metadata about dataset */
 
 router.get("/:dsid/details", async (req, res) => {
   var dsid: number | string = req.params.dsid;
 	var query: string = req.query.q;
-	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(dsid)) ? "ds_id=$1" : "ds_name=$1"}`, [dsid]);
-	if(ret.rows.length == 0) {
-		if(process.env.DEBUG) console.log(`ERROR: Dataset does not exist: ${dsid}.`);
-		return;
-	}
-
-	if(!Number.isInteger(dsid)) {
-  	var ret = await queryDB( `SELECT ds_id FROM ds_metadata WHERE ds_name=$1;`, [dsid]);
-  	dsid = ret.rows[0].ds_id;
-	}
-
-	if(query != null) {
-		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
-			var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
-			res.status(200);
-			res.send(JSON.stringify(ret));
-			return;
+	if(ds_exists(req.params.dsid)) {
+		if(!Number.isInteger(Number(dsid))) {
+ 		 	var ret = await queryDB( `select ds_id from ds_metadata where ds_name=$1;`, [dsid]);
+ 		 	dsid = ret.rows[0].ds_id;
 		}
+	
+		if(query != null) {
+			if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
+				var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
+				res.status(200);
+				res.send(JSON.stringify(ret));
+				return;
+			}
+		}
+ 	 var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
+ 	 res.status(200);
+  	res.send(JSON.stringify(ret));
 	}
-  var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
-  res.status(200);
-  res.send(JSON.stringify(ret));
 });
 
 

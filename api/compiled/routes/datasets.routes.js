@@ -38,29 +38,26 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.router = void 0;
 var db_1 = require("../db");
+var utils_1 = require("../utils");
 var path = require("path");
 var fs = require('fs');
 require("dotenv").config();
 var express = require("express");
 var router = express.Router();
 exports.router = router;
-// GET
+// TODO: Cache recent downloads
 router.get("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _start, ret, rp, ret, e_1;
+    var _start, rp, ret, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (process.env.DEBUG) {
-                    process.stdout.write("\nGET \t*".concat(req.params.dsid));
+                    process.stdout.write("\nGET * ".concat(req.params.dsid));
                     _start = process.hrtime.bigint();
                 }
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT score FROM ds_metadata WHERE ".concat((Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"), [req.params.dsid])];
+                return [4 /*yield*/, (0, utils_1.ds_exists)(req.params.dsid)];
             case 1:
-                ret = _a.sent();
-                if (ret.rows.length == 0) {
-                    console.log('\tERROR: Dataset does not exist');
-                    return [2 /*return*/];
-                }
+                if (!_a.sent()) return [3 /*break*/, 7];
                 rp = path.resolve(__dirname, '../../tmp/', "".concat(req.params.dsid, "-") + Date.now() + ".csv");
                 return [4 /*yield*/, (0, db_1.queryDB)("COPY ".concat(req.params.dsid, " TO '").concat(rp, "' WITH DELIMITER ',' CSV HEADER;"))
                     // TODO: \COPY doesn't work, this is an empty file
@@ -78,7 +75,8 @@ router.get("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void
                 e_1 = _a.sent();
                 console.log(e_1);
                 return [3 /*break*/, 6];
-            case 6: return [4 /*yield*/, res.download(rp, function (e) { return __awaiter(void 0, void 0, void 0, function () {
+            case 6:
+                res.download(rp, function (e) { return __awaiter(void 0, void 0, void 0, function () {
                     var e_2, _end;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -107,39 +105,133 @@ router.get("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void
                             case 6: return [2 /*return*/];
                         }
                     });
-                }); })];
+                }); });
+                return [3 /*break*/, 8];
             case 7:
-                _a.sent();
-                return [2 /*return*/];
+                if (process.env.DEBUG)
+                    process.stdout.write("\tERROR \t dataset does not exits.");
+                res.status(404);
+                res.send("Dataset not found.");
+                _a.label = 8;
+            case 8: return [2 /*return*/];
         }
     });
 }); });
-router.get("/:dsid/sample", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _start, ret, ret, _end;
+// Get random percentage from dataset
+router.get("/:dsid/p/:percentage", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _start, rp, req_num, ret, num_entries, used_idx, randidx, ret, e_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 if (process.env.DEBUG) {
-                    process.stdout.write("\nGET \tSAMPLE ".concat(req.params.dsid));
+                    process.stdout.write("\nGET ".concat(req.params.percentage, "% ").concat(req.params.dsid));
                     _start = process.hrtime.bigint();
                 }
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT score FROM ds_metadata WHERE ".concat((Number.isInteger(req.params.dsid)) ? "ds_id=$1" : "ds_name=$1"), [req.params.dsid])];
+                return [4 /*yield*/, (0, utils_1.ds_exists)(req.params.dsid)];
             case 1:
-                ret = _a.sent();
-                if (ret.rows.length == 0) {
-                    console.log("ERROR: Dataset does not exist");
-                    return [2 /*return*/];
-                }
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT row_to_json(".concat(req.params.dsid, ") FROM ").concat(req.params.dsid, " LIMIT 50;"))];
+                if (!_a.sent()) return [3 /*break*/, 8];
+                rp = path.resolve(__dirname, '../../tmp/', "".concat(req.params.dsid, "-") + Date.now() + ".csv");
+                req_num = req.params.percentage / 100;
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT num_entries FROM ds_frontend WHERE ds_id=$1;", [req.params.dsid])];
             case 2:
                 ret = _a.sent();
+                num_entries = 0;
+                num_entries = 5000; // not yet in db
+                used_idx = new Set();
+                while (used_idx.size < num_entries * req_num) {
+                    randidx = Math.floor(Math.random() * num_entries);
+                    used_idx.add(randidx);
+                }
+                return [4 /*yield*/, (0, db_1.queryDB)("COPY (SELECT * FROM ".concat(req.params.dsid, " WHERE ds_id in \n\t\t\t\t\t\t\t\t\t\t\t\t\t  (").concat(Array.from(used_idx), ")) TO ").concat(rp, " WITH DELIMITER ',' CSV HEADER;"))];
+            case 3:
+                ret = _a.sent();
+                _a.label = 4;
+            case 4:
+                _a.trys.push([4, 6, , 7]);
+                return [4 /*yield*/, fs.promises.writeFile(rp, "")];
+            case 5:
+                _a.sent();
+                return [3 /*break*/, 7];
+            case 6:
+                e_3 = _a.sent();
+                console.log(e_3);
+                return [3 /*break*/, 7];
+            case 7:
+                res.download(rp, function (e) { return __awaiter(void 0, void 0, void 0, function () {
+                    var e_4, _end;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                if (!e) return [3 /*break*/, 1];
+                                console.log(e);
+                                return [3 /*break*/, 6];
+                            case 1:
+                                _a.trys.push([1, 4, , 5]);
+                                if (!fs.existsSync(rp)) return [3 /*break*/, 3];
+                                return [4 /*yield*/, fs.promises.unlink(rp)];
+                            case 2:
+                                _a.sent();
+                                _a.label = 3;
+                            case 3: return [3 /*break*/, 5];
+                            case 4:
+                                e_4 = _a.sent();
+                                console.log(e_4);
+                                return [3 /*break*/, 5];
+                            case 5:
+                                if (process.env.DEBUG) {
+                                    _end = process.hrtime.bigint();
+                                    process.stdout.write("\t success \t ".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                                }
+                                _a.label = 6;
+                            case 6: return [2 /*return*/];
+                        }
+                    });
+                }); });
+                return [3 /*break*/, 9];
+            case 8:
+                if (process.env.DEBUG)
+                    process.stdout.write("\tERROR \t dataset does not exits.");
+                res.status(404);
+                res.send("Dataset not found.");
+                _a.label = 9;
+            case 9: return [2 /*return*/];
+        }
+    });
+}); });
+// Get a sample of first 50 entries
+router.get("/:dsid/sample", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _start, ret, ret_1, _end;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (process.env.DEBUG) {
+                    process.stdout.write("\nGET SAMPLE ".concat(req.params.dsid));
+                    _start = process.hrtime.bigint();
+                }
+                if (!(0, utils_1.ds_exists)(req.params.dsid)) return [3 /*break*/, 4];
+                if (!Number.isInteger(Number(req.params.dsid))) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, db_1.queryDB)("select ds_name from ds_metadata where ds_id=$1;", [req.params.dsid])];
+            case 1:
+                ret_1 = _a.sent();
+                req.params.dsid = ret_1.rows[0].ds_name;
+                _a.label = 2;
+            case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT row_to_json(".concat(req.params.dsid, ") FROM ").concat(req.params.dsid, " LIMIT 50;"))];
+            case 3:
+                ret_1 = _a.sent();
+                console.log("SELECT row_to_json(".concat(req.params.dsid, ") FROM ").concat(req.params.dsid, " LIMIT 50;"));
                 res.status(200);
-                res.send(ret);
+                res.send(ret_1);
                 if (process.env.DEBUG) {
                     _end = process.hrtime.bigint();
                     process.stdout.write("\t success \t ".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
                 }
-                return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 4:
+                process.stdout.write("\t ERROR \t Dataset does not exist");
+                res.status(404);
+                res.send("Dataset not found.");
+                _a.label = 5;
+            case 5: return [2 /*return*/];
         }
     });
 }); });
@@ -149,45 +241,37 @@ router.get("/:dsid/contributions/:hash", function (req, res) {
     res.status = 302;
     res.send("GET contribution ".concat(hash, " for dataset ").concat(ds, "."));
 });
-/*
-    GET metadata about dataset
-*/
+/* GET metadata about dataset */
 router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, query, ret, ret, ret, ret;
+    var dsid, query, ret, ret, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
                 query = req.query.q;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT score FROM ds_metadata WHERE ".concat((Number.isInteger(dsid)) ? "ds_id=$1" : "ds_name=$1"), [dsid])];
+                if (!(0, utils_1.ds_exists)(req.params.dsid)) return [3 /*break*/, 6];
+                if (!!Number.isInteger(Number(dsid))) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, db_1.queryDB)("select ds_id from ds_metadata where ds_name=$1;", [dsid])];
             case 1:
                 ret = _a.sent();
-                if (ret.rows.length == 0) {
-                    if (process.env.DEBUG)
-                        console.log("ERROR: Dataset does not exist: ".concat(dsid, "."));
-                    return [2 /*return*/];
-                }
-                if (!!Number.isInteger(dsid)) return [3 /*break*/, 3];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
-            case 2:
-                ret = _a.sent();
                 dsid = ret.rows[0].ds_id;
-                _a.label = 3;
-            case 3:
-                if (!(query != null)) return [3 /*break*/, 5];
-                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) return [3 /*break*/, 5];
+                _a.label = 2;
+            case 2:
+                if (!(query != null)) return [3 /*break*/, 4];
+                if (!['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT ".concat(query, " FROM ds_frontend WHERE ds_id=$1"), [dsid])];
-            case 4:
+            case 3:
                 ret = _a.sent();
                 res.status(200);
                 res.send(JSON.stringify(ret));
                 return [2 /*return*/];
-            case 5: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
-            case 6:
+            case 4: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
+            case 5:
                 ret = _a.sent();
                 res.status(200);
                 res.send(JSON.stringify(ret));
-                return [2 /*return*/];
+                _a.label = 6;
+            case 6: return [2 /*return*/];
         }
     });
 }); });
