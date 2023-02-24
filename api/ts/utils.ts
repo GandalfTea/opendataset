@@ -39,7 +39,7 @@ async function ds_exists(dsid: string | number): boolean {
 }
 
 async function user_exists(identifier: string | number) : boolean {
-  let user: string = await queryDB(`SELECT * FROM users WHERE ${ (Number.isInteger(Number(identifier)) ? "username=$1;" : "is=$1") }`, [identifier]);
+  let user: string = await queryDB(`SELECT * FROM users WHERE ${ (Number.isInteger(Number(identifier)) ? "id=$1;" : "username=$1") }`, [identifier]);
   return (user.rowCount == 0) ? false : true;
 }
 

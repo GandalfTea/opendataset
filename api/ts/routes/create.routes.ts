@@ -1,21 +1,22 @@
+
 import { dtype, validate, ds_exists, user_exists} from '../utils'
 const express = require("express");
 const router = express.Router();
-var assert = require("assert");
+const assert = require("assert");
 
-const DEBUG: boolean = false;
+require("dotenv").config();
 
 const multer = require("multer");
-var cache = multer.diskStorage({
+var temp = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./cache");
+    cb(null, "./tmp");
   },
   filename: (req, file, cb) => {
     const dsname = file.originalname.split(".")[0];
     cb(null, dsname + "-" + Date.now() + ".csv");
   },
 });
-var upload = multer({ storage: cache });
+var upload = multer({ storage: temp });
 
 import {
   queryDB,
@@ -27,28 +28,29 @@ import {
 
 
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
-  process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
+  process.stdout.write(`\n\tCREATE ds : ${req.socket.remoteAddress} : `);
 
 	// Required info
 	try {
-		assert(req.body.owner !== null, "");
-		assert(req.body.name !== null);
+		assert(req.body.owner !== null, "Owner Required.");
+		assert(req.body.name !== null, "Name Required.");
 	} catch(e) {
 		assert(e instanceof assert.AssertionError);
-		process.stdout.write("ERROR: Missing required information.");
+		process.stdout.write(`ERROR: Missing required information. ${e}`);
 		res.status(400);
 		res.send("Missing required information.");
 		return;
 	}
 
 	// already exists ?
-	if(ds_exists(req.body.name)) {
+	if( await ds_exists(req.body.name)) {
+		process.stdout.write(` ERROR: Dataset already exists. ${req.body.name}`)
 		res.status(409); // Conflict	
     res.send(`A dataset with the name ${req.body.name} already exists.`);
     return;
 	}
 
-	if(user_exists(req.body.owner)) {
+	if( await user_exists(req.body.owner)) {
 		if(!Number.isInteger(Number(req.body.owner))) {
   		let owner_entry: string = await queryDB(`SELECT * FROM users WHERE username=$1`, [req.body.owner]);
     	const owner: number = owner_entry.rows[0].id;
@@ -59,7 +61,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     var cont: number = parseInt(req.body.contributions);
 		if(![0, 1, 2].includes(cont)) cont=0; // Invalid contribution option
 
-		const contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribuition_guidelines;
+		const contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribution_guidelines;
 		const description = (req.body.description == null) ? "" : req.body.description;
 		const licence = (req.body.licence == null) ? 5 : parseInt(req.body.licence); // Default is All Rights Reserved
 		const readme = (req.body.readme == null) ? "" : req.body.readme;
@@ -82,9 +84,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
           process.stdout.write(
             ` Successful data migration, dataset '${name}' created.`
           );
-          if (DEBUG)
-            console.log(`\n${name}\n\towner: ${owner}\n
-												 \tcontributions: ${cont}\n\tschema: ${schema}\n\tfile: ${file.filename}`);
+          if (process.env.DEBUG)
+						process.stdout.write("Successful migration.")
           res.status(201); // Created
           res.send(`Recieved data : ${JSON.stringify(req.body)}`);
           break;
@@ -112,15 +113,14 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
         // TODO: ADD default
 			}
     } else {
-      process.stdout.write(`RESOLVED, dataset '${name}' created.`);
-      if (DEBUG)
-        console.log(`\n${name}\n\towner: ${owner}\n
-														 \tcontributions: ${cont}\n\tschema: ${schema}`);
+      process.stdout.write(`RESOLVED, dataset '${req.body.name}' created.`);
+      if (process.env.DEBUG)
+				process.stdout.write("Created.")
       res.status(201); // Created
       res.send(`Recieved data : ${JSON.stringify(req.body)}`);
     }
   } else {
-    process.stdout.write(`REJECTED, user ${req.body.owner} not found.`);
+    process.stdout.write(` ERROR, user ${req.body.owner} not found.`);
     res.status(404);
     res.send(`User not found: ${req.body.owner}`);
     return;
