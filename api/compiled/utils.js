@@ -92,7 +92,7 @@ function user_exists(identifier) {
         var user;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE ".concat((Number.isInteger(Number(identifier)) ? "username=$1;" : "is=$1")), [identifier])];
+                case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE ".concat((Number.isInteger(Number(identifier)) ? "id=$1;" : "username=$1")), [identifier])];
                 case 1:
                     user = _a.sent();
                     return [2 /*return*/, (user.rowCount == 0) ? false : true];

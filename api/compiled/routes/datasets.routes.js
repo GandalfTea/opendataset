@@ -310,31 +310,30 @@ router.patch("/:dsid/details", function (req, res) { return __awaiter(void 0, vo
 // EDIT
 // DELETE
 router["delete"]("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var dsid, dsname, ret, ret, ret, ret;
+    var dsid, ret, ret, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 dsid = req.params.dsid;
-                if (!(dsid instanceof String || typeof dsid === "string")) return [3 /*break*/, 2];
-                dsname = dsid;
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1;", [dsid])];
+                if (!!Number.isInteger(Number(dsid))) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, db_1.queryDB)('SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid])];
             case 1:
                 ret = _a.sent();
-                dsid = ret["rows"][0]["ds_id"];
-                return [3 /*break*/, 4];
-            case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_name FROM ds_metadata WHERE ds_id=$1;", [dsid])];
+                if (ret.rowCount === 0) {
+                    res.status(404);
+                    res.send("Dataset not found.");
+                    return [2 /*return*/];
+                }
+                dsid = ret.rows[0].ds_id;
+                _a.label = 2;
+            case 2: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id=$1;", [dsid])];
             case 3:
                 ret = _a.sent();
-                _a.label = 4;
-            case 4: return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_metadata WHERE ds_id=$1;", [dsid])];
-            case 5:
-                ret = _a.sent();
                 return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM ds_frontend WHERE ds_id=$1;", [dsid])];
-            case 6:
+            case 4:
                 ret = _a.sent();
-                console.log("\n\n\n", ret);
                 res.status(204);
-                res.send("Hello");
+                res.send("Deleted.");
                 return [2 /*return*/];
         }
     });

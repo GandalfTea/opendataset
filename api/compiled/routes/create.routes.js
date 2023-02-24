@@ -42,58 +42,63 @@ var express = require("express");
 var router = express.Router();
 exports.router = router;
 var assert = require("assert");
-var DEBUG = false;
+require("dotenv").config();
 var multer = require("multer");
-var cache = multer.diskStorage({
+var temp = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, "./cache");
+        cb(null, "./tmp");
     },
     filename: function (req, file, cb) {
         var dsname = file.originalname.split(".")[0];
         cb(null, dsname + "-" + Date.now() + ".csv");
     }
 });
-var upload = multer({ storage: cache });
+var upload = multer({ storage: temp });
 var db_1 = require("../db");
 router.post("/dataset", upload.single("init"), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
     var owner_entry, owner, owner, cont, contguide, description, licence, readme, file, FILE_UPLOAD, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
+                process.stdout.write("\n\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
                 // Required info
                 try {
-                    assert(req.body.owner !== null, "");
-                    assert(req.body.name !== null);
+                    assert(req.body.owner !== null, "Owner Required.");
+                    assert(req.body.name !== null, "Name Required.");
                 }
                 catch (e) {
                     assert(e instanceof assert.AssertionError);
-                    process.stdout.write("ERROR: Missing required information.");
+                    process.stdout.write("ERROR: Missing required information. ".concat(e));
                     res.status(400);
                     res.send("Missing required information.");
                     return [2 /*return*/];
                 }
+                return [4 /*yield*/, (0, utils_1.ds_exists)(req.body.name)];
+            case 1:
                 // already exists ?
-                if ((0, utils_1.ds_exists)(req.body.name)) {
+                if (_a.sent()) {
+                    process.stdout.write(" ERROR: Dataset already exists. ".concat(req.body.name));
                     res.status(409); // Conflict	
                     res.send("A dataset with the name ".concat(req.body.name, " already exists."));
                     return [2 /*return*/];
                 }
-                if (!(0, utils_1.user_exists)(req.body.owner)) return [3 /*break*/, 9];
-                if (!!Number.isInteger(Number(req.body.owner))) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, utils_1.user_exists)(req.body.owner)];
+            case 2:
+                if (!_a.sent()) return [3 /*break*/, 11];
+                if (!!Number.isInteger(Number(req.body.owner))) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1", [req.body.owner])];
-            case 1:
+            case 3:
                 owner_entry = _a.sent();
                 owner = owner_entry.rows[0].id;
-                return [3 /*break*/, 3];
-            case 2:
+                return [3 /*break*/, 5];
+            case 4:
                 owner = req.body.owner;
-                _a.label = 3;
-            case 3:
+                _a.label = 5;
+            case 5:
                 cont = parseInt(req.body.contributions);
                 if (![0, 1, 2].includes(cont))
                     cont = 0; // Invalid contribution option
-                contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribuition_guidelines;
+                contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribution_guidelines;
                 description = (req.body.description == null) ? "" : req.body.description;
                 licence = (req.body.licence == null) ? 5 : parseInt(req.body.licence);
                 readme = (req.body.readme == null) ? "" : req.body.readme;
@@ -101,21 +106,21 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 FILE_UPLOAD = !file ? false : true;
                 // metadata tables 
                 return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body.name, cont, 0)];
-            case 4:
+            case 6:
                 // metadata tables 
                 _a.sent();
                 return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body.name, description, 0, 0, licence, contguide, readme)];
-            case 5:
+            case 7:
                 _a.sent();
-                if (!FILE_UPLOAD) return [3 /*break*/, 7];
+                if (!FILE_UPLOAD) return [3 /*break*/, 9];
                 return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body.name)];
-            case 6:
+            case 8:
                 ret = _a.sent();
                 switch (ret) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
                         process.stdout.write(" Successful data migration, dataset '".concat(name, "' created."));
-                        if (DEBUG)
-                            console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                        if (process.env.DEBUG)
+                            process.stdout.write("Successful migration.");
                         res.status(201); // Created
                         res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                         break;
@@ -138,21 +143,21 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                         break;
                     // TODO: ADD default
                 }
-                return [3 /*break*/, 8];
-            case 7:
-                process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
-                if (DEBUG)
-                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
+                return [3 /*break*/, 10];
+            case 9:
+                process.stdout.write("RESOLVED, dataset '".concat(req.body.name, "' created."));
+                if (process.env.DEBUG)
+                    process.stdout.write("Created.");
                 res.status(201); // Created
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
-                _a.label = 8;
-            case 8: return [3 /*break*/, 10];
-            case 9:
-                process.stdout.write("REJECTED, user ".concat(req.body.owner, " not found."));
+                _a.label = 10;
+            case 10: return [3 /*break*/, 12];
+            case 11:
+                process.stdout.write(" ERROR, user ".concat(req.body.owner, " not found."));
                 res.status(404);
                 res.send("User not found: ".concat(req.body.owner));
                 return [2 /*return*/];
-            case 10: return [2 /*return*/];
+            case 12: return [2 /*return*/];
         }
     });
 }); });
