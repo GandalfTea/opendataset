@@ -10,13 +10,14 @@ router.get("/:user", async (req: any, res: any) => {
 		[username]
   );
   res.status = 302;
-  res.send(`User ${JSON.stringify(get["rows"])}`);
+  res.send(JSON.stringify(get["rows"]));
 });
 
 // DELETE
 router.delete("/:user", async (req, res) => {
   var username: string = req.params.user;
-	console.log(username)
+
+	// Check if user exists or 404
   var query: any = await queryDB(
     `DELETE FROM users WHERE username=$1;`,
 		[username]

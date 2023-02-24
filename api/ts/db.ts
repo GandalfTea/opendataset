@@ -45,10 +45,13 @@ async function create_ds_frontend(
   ds_num_cont: number = 0,
   ds_num_entries: number = 0,
   ds_licence: number = 0
+	ds_contguide: string = "",
+	ds_readme: string = ""
 ) {
   var ret = await queryDB(
     `SELECT ds_id FROM ds_metadata WHERE ds_name='${ds_name}';`
   );
+	// TODO: Verify ID
   const dsid = ret["rows"][0]["ds_id"];
   var ret = await queryDB(
     `INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id) VALUES($1, $2, $3, $4, $5);`,

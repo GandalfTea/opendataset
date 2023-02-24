@@ -67,7 +67,7 @@ router.get("/:dsid", function (req, res) { return __awaiter(void 0, void 0, void
                 _a.label = 3;
             case 3:
                 _a.trys.push([3, 5, , 6]);
-                return [4 /*yield*/, fs.promises.writeFile(rp, "")];
+                return [4 /*yield*/, fs.promises.writeFile(rp, "demo data for a demo world")];
             case 4:
                 _a.sent();
                 return [3 /*break*/, 6];
@@ -218,7 +218,6 @@ router.get("/:dsid/sample", function (req, res) { return __awaiter(void 0, void 
             case 2: return [4 /*yield*/, (0, db_1.queryDB)("SELECT row_to_json(".concat(req.params.dsid, ") FROM ").concat(req.params.dsid, " LIMIT 50;"))];
             case 3:
                 ret_1 = _a.sent();
-                console.log("SELECT row_to_json(".concat(req.params.dsid, ") FROM ").concat(req.params.dsid, " LIMIT 50;"));
                 res.status(200);
                 res.send(ret_1);
                 if (process.env.DEBUG) {
@@ -263,13 +262,13 @@ router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void
             case 3:
                 ret = _a.sent();
                 res.status(200);
-                res.send(JSON.stringify(ret));
+                res.send(JSON.stringify(ret.rows[0]));
                 return [2 /*return*/];
             case 4: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM ds_frontend WHERE ds_id=$1", [dsid])];
             case 5:
                 ret = _a.sent();
                 res.status(200);
-                res.send(JSON.stringify(ret));
+                res.send(JSON.stringify(ret.rows[0]));
                 _a.label = 6;
             case 6: return [2 /*return*/];
         }

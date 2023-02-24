@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.ds_exists = exports.validate = exports.dtype = void 0;
+exports.user_exists = exports.ds_exists = exports.validate = exports.dtype = void 0;
 var db_1 = require("./db");
 // Data Sanitation
 var dtype;
@@ -81,9 +81,23 @@ function ds_exists(dsid) {
                 case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT score FROM ds_metadata WHERE ".concat((Number.isInteger(Number(dsid))) ? "ds_id=$1" : "ds_name=$1"), [dsid])];
                 case 1:
                     ret = _a.sent();
-                    return [2 /*return*/, (ret.rows.length == 0) ? false : true];
+                    return [2 /*return*/, (ret.rowCount == 0) ? false : true];
             }
         });
     });
 }
 exports.ds_exists = ds_exists;
+function user_exists(identifier) {
+    return __awaiter(this, void 0, void 0, function () {
+        var user;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE ".concat((Number.isInteger(Number(identifier)) ? "username=$1;" : "is=$1")), [identifier])];
+                case 1:
+                    user = _a.sent();
+                    return [2 /*return*/, (user.rowCount == 0) ? false : true];
+            }
+        });
+    });
+}
+exports.user_exists = user_exists;

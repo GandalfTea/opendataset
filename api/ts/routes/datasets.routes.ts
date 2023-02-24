@@ -21,7 +21,7 @@ router.get("/:dsid", async (req, res) => {
 		let ret = await queryDB(`\COPY ${req.params.dsid} TO '${rp}' WITH DELIMITER ',' CSV HEADER;`)
 	
 		// TODO: \COPY doesn't work, this is an empty file
-		try { await fs.promises.writeFile(rp, "") } 
+		try { await fs.promises.writeFile(rp, "demo data for a demo world") } 
 		catch(e) { console.log(e) }
 
  		res.download(rp, async (e) => { 
@@ -141,13 +141,13 @@ router.get("/:dsid/details", async (req, res) => {
 			if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
 				var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
 				res.status(200);
-				res.send(JSON.stringify(ret));
+				res.send(JSON.stringify(ret.rows[0]));
 				return;
 			}
 		}
  	 var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
  	 res.status(200);
-  	res.send(JSON.stringify(ret));
+  	res.send(JSON.stringify(ret.rows[0]));
 	}
 });
 

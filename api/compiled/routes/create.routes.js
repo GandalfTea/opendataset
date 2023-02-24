@@ -41,8 +41,8 @@ var utils_1 = require("../utils");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
-var DEBUG = false;
 var assert = require("assert");
+var DEBUG = false;
 var multer = require("multer");
 var cache = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -56,54 +56,66 @@ var cache = multer.diskStorage({
 var upload = multer({ storage: cache });
 var db_1 = require("../db");
 router.post("/dataset", upload.single("init"), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var owner_entry, name_1, ret, owner, cont, schema, file, FILE_UPLOAD, ret_1;
+    var owner_entry, owner, owner, cont, contguide, description, licence, readme, file, FILE_UPLOAD, ret;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 process.stdout.write("\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1;", [req.body["owner"]])];
-            case 1:
-                owner_entry = _a.sent();
-                if (!(owner_entry["rowCount"] <= 0)) return [3 /*break*/, 2];
-                process.stdout.write("REJECTED, user ".concat(req.body["owner"], " not found."));
-                res.status(404);
-                res.send("User not found: ".concat(req.body["owner"]));
-                return [2 /*return*/];
-            case 2:
-                name_1 = req.body["name"];
-                return [4 /*yield*/, (0, db_1.queryDB)("SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name=$1);", [name_1])];
-            case 3:
-                ret = _a.sent();
-                if (ret["rows"][0]["exists"] == true) {
-                    process.stdout.write("REJECTED, dataset ".concat(name_1, " already exists."));
-                    res.status(409); // Conflict
-                    res.send("A dataset with the name ".concat(name_1, " already exists."));
+                // Required info
+                try {
+                    assert(req.body.owner !== null, "");
+                    assert(req.body.name !== null);
+                }
+                catch (e) {
+                    assert(e instanceof assert.AssertionError);
+                    process.stdout.write("ERROR: Missing required information.");
+                    res.status(400);
+                    res.send("Missing required information.");
                     return [2 /*return*/];
                 }
-                owner = owner_entry["rows"][0]["id"];
-                cont = parseInt(req.body["contributions"]);
-                schema = req.body["schema"];
+                // already exists ?
+                if ((0, utils_1.ds_exists)(req.body.name)) {
+                    res.status(409); // Conflict	
+                    res.send("A dataset with the name ".concat(req.body.name, " already exists."));
+                    return [2 /*return*/];
+                }
+                if (!(0, utils_1.user_exists)(req.body.owner)) return [3 /*break*/, 9];
+                if (!!Number.isInteger(Number(req.body.owner))) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, db_1.queryDB)("SELECT * FROM users WHERE username=$1", [req.body.owner])];
+            case 1:
+                owner_entry = _a.sent();
+                owner = owner_entry.rows[0].id;
+                return [3 /*break*/, 3];
+            case 2:
+                owner = req.body.owner;
+                _a.label = 3;
+            case 3:
+                cont = parseInt(req.body.contributions);
+                if (![0, 1, 2].includes(cont))
+                    cont = 0; // Invalid contribution option
+                contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribuition_guidelines;
+                description = (req.body.description == null) ? "" : req.body.description;
+                licence = (req.body.licence == null) ? 5 : parseInt(req.body.licence);
+                readme = (req.body.readme == null) ? "" : req.body.readme;
                 file = req.file;
                 FILE_UPLOAD = !file ? false : true;
-                // ADD TABLE METADATA TO ds_metadata in DB
-                // TODO: Get owner id
-                return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body["name"], cont, 0)];
+                // metadata tables 
+                return [4 /*yield*/, (0, db_1.create_ds_metadata)(req.body.name, cont, 0)];
             case 4:
-                // ADD TABLE METADATA TO ds_metadata in DB
-                // TODO: Get owner id
+                // metadata tables 
                 _a.sent();
-                return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body["name"])];
+                return [4 /*yield*/, (0, db_1.create_ds_frontend)(req.body.name, description, 0, 0, licence, contguide, readme)];
             case 5:
                 _a.sent();
                 if (!FILE_UPLOAD) return [3 /*break*/, 7];
-                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body["name"])];
+                return [4 /*yield*/, (0, db_1.migrate_csv_to_db_new_table)(file.filename, req.body.name)];
             case 6:
-                ret_1 = _a.sent();
-                switch (ret_1) {
+                ret = _a.sent();
+                switch (ret) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
-                        process.stdout.write(" Successful data migration, dataset '".concat(name_1, "' created."));
+                        process.stdout.write(" Successful data migration, dataset '".concat(name, "' created."));
                         if (DEBUG)
-                            console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
+                            console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema, "\n\tfile: ").concat(file.filename));
                         res.status(201); // Created
                         res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                         break;
@@ -128,13 +140,19 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 }
                 return [3 /*break*/, 8];
             case 7:
-                process.stdout.write("RESOLVED, dataset '".concat(name_1, "' created."));
+                process.stdout.write("RESOLVED, dataset '".concat(name, "' created."));
                 if (DEBUG)
-                    console.log("\n".concat(name_1, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
+                    console.log("\n".concat(name, "\n\towner: ").concat(owner, "\n\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t \tcontributions: ").concat(cont, "\n\tschema: ").concat(schema));
                 res.status(201); // Created
                 res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                 _a.label = 8;
-            case 8: return [2 /*return*/];
+            case 8: return [3 /*break*/, 10];
+            case 9:
+                process.stdout.write("REJECTED, user ".concat(req.body.owner, " not found."));
+                res.status(404);
+                res.send("User not found: ".concat(req.body.owner));
+                return [2 /*return*/];
+            case 10: return [2 /*return*/];
         }
     });
 }); });

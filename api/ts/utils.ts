@@ -35,7 +35,12 @@ function validate(input: string | number, data_type: any): boolean {
 
 async function ds_exists(dsid: string | number): boolean {
 	let ret = await queryDB(`SELECT score FROM ds_metadata WHERE ${ (Number.isInteger(Number(dsid))) ? "ds_id=$1" : "ds_name=$1"}`, [dsid]);
-	return (ret.rows.length == 0) ? false : true;
+	return (ret.rowCount == 0) ? false : true;
 }
 
-export { dtype, validate, ds_exists };
+async function user_exists(identifier: string | number) : boolean {
+  let user: string = await queryDB(`SELECT * FROM users WHERE ${ (Number.isInteger(Number(identifier)) ? "username=$1;" : "is=$1") }`, [identifier]);
+  return (user.rowCount == 0) ? false : true;
+}
+
+export { dtype, validate, ds_exists, user_exists };

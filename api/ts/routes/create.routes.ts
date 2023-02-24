@@ -1,9 +1,9 @@
-import { dtype, validate} from '../utils'
+import { dtype, validate, ds_exists, user_exists} from '../utils'
 const express = require("express");
 const router = express.Router();
+var assert = require("assert");
 
 const DEBUG: boolean = false;
-var assert = require("assert");
 
 const multer = require("multer");
 var cache = multer.diskStorage({
@@ -28,47 +28,54 @@ import {
 
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
   process.stdout.write(`\tCREATE ds : ${req.socket.remoteAddress} : `);
-  let owner_entry: string = await queryDB(
-    `SELECT * FROM users WHERE username=$1;`,
-		[req.body["owner"]]
-  );
 
-  // Check if owner account exists
-  if (owner_entry["rowCount"] <= 0) {
-    process.stdout.write(`REJECTED, user ${req.body["owner"]} not found.`);
-    res.status(404);
-    res.send(`User not found: ${req.body["owner"]}`);
+	// Required info
+	try {
+		assert(req.body.owner !== null, "");
+		assert(req.body.name !== null);
+	} catch(e) {
+		assert(e instanceof assert.AssertionError);
+		process.stdout.write("ERROR: Missing required information.");
+		res.status(400);
+		res.send("Missing required information.");
+		return;
+	}
+
+	// already exists ?
+	if(ds_exists(req.body.name)) {
+		res.status(409); // Conflict	
+    res.send(`A dataset with the name ${req.body.name} already exists.`);
     return;
-  } else {
-    // Check if dataset name already exists
-    const name: string = req.body["name"];
-    let ret = await queryDB(
-      `SELECT EXISTS ( SELECT FROM information_schema.tables WHERE table_name=$1);`,
-			[name]
-    );
-    if (ret["rows"][0]["exists"] == true) {
-      process.stdout.write(`REJECTED, dataset ${name} already exists.`);
-      res.status(409); // Conflict
-      res.send(`A dataset with the name ${name} already exists.`);
-      return;
-    }
+	}
 
-    const owner: string = owner_entry["rows"][0]["id"];
-    const cont: number = parseInt(req.body["contributions"]); // TODO: Maybe test if [0-2]
-    const schema: string = req.body["schema"]; // TODO: REDUNDANT
+	if(user_exists(req.body.owner)) {
+		if(!Number.isInteger(Number(req.body.owner))) {
+  		let owner_entry: string = await queryDB(`SELECT * FROM users WHERE username=$1`, [req.body.owner]);
+    	const owner: number = owner_entry.rows[0].id;
+		} else {
+			const owner: number = req.body.owner
+		}
+
+    var cont: number = parseInt(req.body.contributions);
+		if(![0, 1, 2].includes(cont)) cont=0; // Invalid contribution option
+
+		const contguide = (req.body.contribution_guidelines == null) ? "" : req.body.contribuition_guidelines;
+		const description = (req.body.description == null) ? "" : req.body.description;
+		const licence = (req.body.licence == null) ? 5 : parseInt(req.body.licence); // Default is All Rights Reserved
+		const readme = (req.body.readme == null) ? "" : req.body.readme;
 
     const file: any = req.file;
     const FILE_UPLOAD: boolean = !file ? false : true;
 
-    // ADD TABLE METADATA TO ds_metadata in DB
-    // TODO: Get owner id
-    await create_ds_metadata(req.body["name"], cont, 0);
-    await create_ds_frontend(req.body["name"]);
+    // metadata tables 
+    await create_ds_metadata(req.body.name, cont, 0);
+    await create_ds_frontend(req.body.name, description, 0, 0, licence, contguide, readme);
 
+		// initial data
     if (FILE_UPLOAD) {
       const ret = await migrate_csv_to_db_new_table(
         file.filename,
-        req.body["name"]
+        req.body.name
       );
       switch (ret) {
         case csv_mig_errors.SUCCESSFUL_MIGRATION:
@@ -103,11 +110,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
           res.send(`Internal Server Error. Sorry.`);
           break;
         // TODO: ADD default
-      }
-
-      /* TODO: Once the file is in local storage
-				[?] Migrate the data
-				[ ] Validate input    */
+			}
     } else {
       process.stdout.write(`RESOLVED, dataset '${name}' created.`);
       if (DEBUG)
@@ -116,16 +119,12 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
       res.status(201); // Created
       res.send(`Recieved data : ${JSON.stringify(req.body)}`);
     }
-  }
-
-  /* TODO
-	 [X] Search DB database to make sure name is unique
-	 [x] Search owner in User DB.
-	 [X] protect against injection attacks
-	 [X] parse schema into database creation command
-	 [X] check data format and schema + safety check?
-	 [X] error catching and sending
-	 [X] respond with success */
+  } else {
+    process.stdout.write(`REJECTED, user ${req.body.owner} not found.`);
+    res.status(404);
+    res.send(`User not found: ${req.body.owner}`);
+    return;
+	}
 });
 
 router.post("/user", async (req, res) => {

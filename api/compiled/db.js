@@ -87,11 +87,13 @@ function create_ds_metadata(ds_name, ds_cont, ds_owner) {
     });
 }
 exports.create_ds_metadata = create_ds_metadata;
-function create_ds_frontend(ds_name, ds_description, ds_num_cont, ds_num_entries, ds_licence) {
+function create_ds_frontend(ds_name, ds_description, ds_num_cont, ds_num_entries, ds_licence, ds_contguide, ds_readme) {
     if (ds_description === void 0) { ds_description = ""; }
     if (ds_num_cont === void 0) { ds_num_cont = 0; }
     if (ds_num_entries === void 0) { ds_num_entries = 0; }
     if (ds_licence === void 0) { ds_licence = 0; }
+    if (ds_contguide === void 0) { ds_contguide = ""; }
+    if (ds_readme === void 0) { ds_readme = ""; }
     return __awaiter(this, void 0, void 0, function () {
         var ret, dsid, ret;
         return __generator(this, function (_a) {
