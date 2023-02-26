@@ -248,7 +248,7 @@ router.get("/:dsid/details", function (req, res) { return __awaiter(void 0, void
             case 0:
                 dsid = req.params.dsid;
                 query = req.query.q;
-                if (!(0, utils_1.ds_exists)(req.params.dsid)) return [3 /*break*/, 6];
+                if (!(0, utils_1.ds_exists)(dsid)) return [3 /*break*/, 6];
                 if (!!Number.isInteger(Number(dsid))) return [3 /*break*/, 2];
                 return [4 /*yield*/, (0, db_1.queryDB)("select ds_id from ds_metadata where ds_name=$1;", [dsid])];
             case 1:
@@ -280,14 +280,14 @@ router.patch("/:dsid/details", function (req, res) { return __awaiter(void 0, vo
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                query = req.query.field;
+                query = req.query.q;
                 dsid = req.params.dsid;
                 if (!(query != null && dsid != null)) return [3 /*break*/, 4];
                 return [4 /*yield*/, (0, db_1.queryDB)("SELECT ds_id FROM ds_metadata WHERE ds_name=$1", [dsid])];
             case 1:
                 ret = _a.sent();
                 try {
-                    dsid = ret['rows'][0]['ds_id'];
+                    dsid = ret.rows[0].ds_id;
                 }
                 catch (e) {
                     console.log(e);
@@ -299,7 +299,6 @@ router.patch("/:dsid/details", function (req, res) { return __awaiter(void 0, vo
                 ret = _a.sent();
                 _a.label = 3;
             case 3:
-                console.log(ret);
                 res.status(200);
                 res.send("Done.");
                 _a.label = 4;

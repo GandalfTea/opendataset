@@ -131,7 +131,7 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
 router.get("/:dsid/details", async (req, res) => {
   var dsid: number | string = req.params.dsid;
 	var query: string = req.query.q;
-	if(ds_exists(req.params.dsid)) {
+	if(ds_exists(dsid)) {
 		if(!Number.isInteger(Number(dsid))) {
  		 	var ret = await queryDB( `select ds_id from ds_metadata where ds_name=$1;`, [dsid]);
  		 	dsid = ret.rows[0].ds_id;
@@ -155,20 +155,19 @@ router.get("/:dsid/details", async (req, res) => {
 
 // UPDATE FRONTEND
 router.patch("/:dsid/details", async (req, res) => {
-	var query: string = req.query.field;
+	var query: string = req.query.q;
 	var dsid: number | string = req.params.dsid;
 	if(query != null && dsid != null) {
 		var ret = await queryDB(`SELECT ds_id FROM ds_metadata WHERE ds_name=$1`,
 													 [dsid]);
 		try{
-			dsid = ret['rows'][0]['ds_id']
+			dsid = ret.rows[0].ds_id;
 		} catch(e) { console.log(e); }
 		var new_des = req.body['data'];
 		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) {
 			var ret = await queryDB(`UPDATE ds_frontend SET ${query}=$1 WHERE ds_id=$2`,
 														  [new_des, dsid]);
 		}
-		console.log(ret)
 		res.status(200);
 		res.send("Done.")
 	}
