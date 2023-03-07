@@ -28,7 +28,10 @@ import {
 
 
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
-  process.stdout.write(`\n\tCREATE ds : ${req.socket.remoteAddress} : `);
+	if(process.env.DEBUG >= 1) {
+  	process.stdout.write(`\nCREATE dataset : ${req.socket.remoteAddress} : `);
+		const _start = process.hrtime.bigint();
+	}
 
 	// Required info
 	try {
@@ -36,7 +39,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 		assert(req.body.name !== null, "Name Required.");
 	} catch(e) {
 		assert(e instanceof assert.AssertionError);
-		process.stdout.write(`ERROR: Missing required information. ${e}`);
+		if(process.env.DEBUG > 1)
+			process.stdout.write(`ERROR : Missing required information. ${e}`);
 		res.status(400);
 		res.send("Missing required information.");
 		return;
@@ -44,7 +48,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 
 	// already exists ?
 	if( await ds_exists(req.body.name)) {
-		process.stdout.write(` ERROR: Dataset already exists. ${req.body.name}`)
+		if(process.env.DEBUG >= 1)
+			process.stdout.write(`ERROR : Dataset already exists. ${req.body.name}`)
 		res.status(409); // Conflict	
     res.send(`A dataset with the name ${req.body.name} already exists.`);
     return;
@@ -81,11 +86,10 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
       );
       switch (ret) {
         case csv_mig_errors.SUCCESSFUL_MIGRATION:
-          process.stdout.write(
-            ` Successful data migration, dataset '${name}' created.`
-          );
-          if (process.env.DEBUG)
-						process.stdout.write("Successful migration.")
+          if(process.env.DEBUG >= 1) {
+						const _end = process.hrtime.bigint();
+						process.stdout.write(`Successful migration. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+					}
           res.status(201); // Created
           res.send(`Recieved data : ${JSON.stringify(req.body)}`);
           break;
@@ -93,12 +97,19 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
         case csv_mig_errors.ERROR_GENERATING_SCHEMA:
         case csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
           process.stdout.write(`ERROR, Schema or Commands generation failure`);
+          if(process.env.DEBUG >= 1) {
+						const _end = process.hrtime.bigint();
+          	process.stdout.write(`ERROR, Schema or Commands generation failure \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+					}
           res.status(421); // Unprocessable Entity
           res.send(`Error parsing input on out end. Sorry`);
           break;
 
         case csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
-          process.stdout.write(`ERROR, Illegal column names`);
+          if(process.env.DEBUG >= 1) {
+						const _end = process.hrtime.bigint();
+          	process.stdout.write(`ERROR, Illegal column names \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+					}
           res.status(400); // Bad request
           res.send(`Your file contains illegal column names. Please make sure to
 										have your first row be in accordance with SQL naming conventions.`);
@@ -106,38 +117,49 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 
         case csv_mig_errors.FAILURE_TO_GENERATE_TABLE:
         case csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
-          process.stdout.write(`ERROR, Database error`);
+          if(process.env.DEBUG >= 1) {
+						const _end = process.hrtime.bigint();
+          	process.stdout.write(`ERROR, Database error \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+					}
           res.status(500); // Internal server error
           res.send(`Internal Server Error. Sorry.`);
           break;
         // TODO: ADD default
 			}
     } else {
-      process.stdout.write(`RESOLVED, dataset '${req.body.name}' created.`);
-      if (process.env.DEBUG)
-				process.stdout.write("Created.")
+      if(process.env.DEBUG >= 1) {
+					const _end = process.hrtime.bigint();
+          process.stdout.write(`SUCCESS, ds ${req.body.name} created. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+			}
       res.status(201); // Created
-      res.send(`Recieved data : ${JSON.stringify(req.body)}`);
+      res.send(`Created`);
     }
   } else {
-    process.stdout.write(` ERROR, user ${req.body.owner} not found.`);
+    if(process.env.DEBUG >= 1) {
+			const _end = process.hrtime.bigint();
+    	process.stdout.write(`ERROR, user ${req.body.owner} not found. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+		}
     res.status(404);
     res.send(`User not found: ${req.body.owner}`);
     return;
 	}
 });
 
+
+
 router.post("/user", async (req, res) => {
 
-  console.log(`CREATE user REQUEST from:  ${req.socket.remoteAddress}`);
+	if(process.env.DEBUG >=1) {
+  	process.stdout.write(`\nCREATE user    : ${req.socket.remoteAddress} : `);
+		const _start = process.hrtime.bigint();
+	}
 
-	try {
-		assert(validate(req.body['username'], dtype.USERNAME));
-		assert(validate(req.body['email'], dtype.EMAIL));
-	catch(err) {
-		assert(err instanceof assert.AssertionError);
+	// TODO: Shit code 
+	if(!validate(req.body.username, dtype.USERNAME) || !validate(req.body.email, dtype.EMAIL)) {
+		process.stdout.write("ERROR, Incorrect Information.")
 		res.status(422)
 		res.send("Incorrect information")
+		return;
 	}
 
   var now = new Date();
@@ -147,7 +169,10 @@ router.post("/user", async (req, res) => {
     await queryDB(`INSERT INTO users (username, cakeday, email, password) 
 														VALUES($1, $2, $3, crypt($4, gen_salt('bf')))`,
 					        [req.body['username'], cakeday, req.body['email'], req.body['password']]);
-  //console.log(rq);
+	if(process.env.DEBUG >= 1) {
+		const _end = process.hrtime.bigint()
+		process.stdout.write(`SUCCESS, user ${req.body.username} created. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+	}
   res.status(201);
   res.send(JSON.stringify(rq));
 

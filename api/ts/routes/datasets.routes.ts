@@ -8,11 +8,10 @@ const express = require("express");
 const router = express.Router();
 
 
-
 // TODO: Cache recent downloads
 router.get("/:dsid", async (req, res) => {
 	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET * ${req.params.dsid}`);
+		process.stdout.write(`\nGET ${req.params.dsid} : `);
 		const _start = process.hrtime.bigint();
 	}
 
@@ -36,7 +35,7 @@ router.get("/:dsid", async (req, res) => {
 			}
 		});
 	} else {
-		if(process.env.DEBUG) process.stdout.write("\tERROR \t dataset does not exits.");
+		process.stdout.write(`ERROR \t Dataset does not exist`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -90,6 +89,7 @@ router.get("/:dsid/p/:percentage", async (req, res) => {
 
 // Get a sample of first 50 entries
 
+// TODO: Switch to int dsid
 router.get("/:dsid/sample", async (req, res) => {
 	if(process.env.DEBUG) {
 		process.stdout.write(`\nGET SAMPLE ${req.params.dsid}`);
@@ -131,23 +131,42 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
 router.get("/:dsid/details", async (req, res) => {
   var dsid: number | string = req.params.dsid;
 	var query: string = req.query.q;
+	if(process.env.DEBUG >=1)
+		const _start = process.hrtime.bigint();
 	if(ds_exists(dsid)) {
 		if(!Number.isInteger(Number(dsid))) {
  		 	var ret = await queryDB( `select ds_id from ds_metadata where ds_name=$1;`, [dsid]);
+			if(ret.rowCount === 0) {
+				res.status(404);
+				res.send("Dataset not found.")
+				return;
+			}
  		 	dsid = ret.rows[0].ds_id;
 		}
 	
 		if(query != null) {
 			if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines' ].includes(query)) {
 				var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
+				if(process.env.DEBUG >= 1) {
+					const _end = process.hrtime.bigint();
+					process.stdout.write(`\nSELECT ${query} from ${dsid} : SUCCESS \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+				}
 				res.status(200);
 				res.send(JSON.stringify(ret.rows[0]));
 				return;
 			}
 		}
- 	 var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
- 	 res.status(200);
+		if(process.env.DEBUG >= 1) {
+			const _end = process.hrtime.bigint();
+			process.stdout.write(`\nSELECT * from ${dsid} : SUCCESS \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+		}
+ 	 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
+ 	 	res.status(200);
   	res.send(JSON.stringify(ret.rows[0]));
+	} else {
+		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		res.status(404);
+		res.send("Dataset not found.");
 	}
 });
 
@@ -157,19 +176,29 @@ router.get("/:dsid/details", async (req, res) => {
 router.patch("/:dsid/details", async (req, res) => {
 	var query: string = req.query.q;
 	var dsid: number | string = req.params.dsid;
-	if(query != null && dsid != null) {
-		var ret = await queryDB(`SELECT ds_id FROM ds_metadata WHERE ds_name=$1`,
-													 [dsid]);
-		try{
-			dsid = ret.rows[0].ds_id;
-		} catch(e) { console.log(e); }
-		var new_des = req.body['data'];
-		if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) {
-			var ret = await queryDB(`UPDATE ds_frontend SET ${query}=$1 WHERE ds_id=$2`,
-														  [new_des, dsid]);
+	if(ds_exists(dsid)) {
+		if(!Number.isInteger(Number(dsid))) {
+   		var ret = await queryDB( 'SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid]);
+			if(ret.rowCount === 0) {
+				res.status(404);
+				res.send("Dataset not found.")
+				return;
+			}
+   		dsid = ret.rows[0].ds_id;
 		}
-		res.status(200);
-		res.send("Done.")
+		if(query != null) {
+			var new_data = req.body['data'];
+			if( ['description', 'readme', 'num_contributors', 'num_entries', 'licence', 'contribution_guidelines'].includes(query)) {
+				var ret = await queryDB(`UPDATE ds_frontend SET ${query}=$1 WHERE ds_id=$2`,
+															  [new_data, dsid]);
+			}
+			res.status(200);
+			res.send("Done.")
+		}
+	} else {
+		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		res.status(404);
+		res.send("Dataset not found.");
 	}
 });
 
@@ -178,19 +207,28 @@ router.patch("/:dsid/details", async (req, res) => {
 // DELETE
 router.delete("/:dsid", async (req, res) => {
   var dsid: number | string = req.params.dsid;
-	if(!Number.isInteger(Number(dsid))) {
-    var ret = await queryDB( 'SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid]);
-		if(ret.rowCount === 0) {
-			res.status(404);
-			res.send("Dataset not found.")
-			return;
+	if(ds_exists(dsid)) {
+		if(!Number.isInteger(Number(dsid))) {
+   		var ret = await queryDB( 'SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid]);
+			if(ret.rowCount === 0) {
+				res.status(404);
+				res.send("Dataset not found.")
+				return;
+			}
+   		dsid = ret.rows[0].ds_id;
 		}
-    dsid = ret.rows[0].ds_id;
+  	var ret = await queryDB(`DELETE FROM ds_metadata WHERE ds_id=$1;`, [dsid]);
+  	var ret = await queryDB(`DELETE FROM ds_frontend WHERE ds_id=$1;`, [dsid]);
+
+		// TODO: Verify delete by rowCount 1
+		
+  	res.status(204);
+  	res.send("Deleted.");
+	} else {
+		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		res.status(404);
+		res.send("Dataset not found.");
 	}
-  var ret = await queryDB(`DELETE FROM ds_metadata WHERE ds_id=$1;`, [dsid]);
-  var ret = await queryDB(`DELETE FROM ds_frontend WHERE ds_id=$1;`, [dsid]);
-  res.status(204);
-  res.send("Deleted.");
 });
 
 export { router };

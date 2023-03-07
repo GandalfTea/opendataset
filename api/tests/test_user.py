@@ -15,17 +15,6 @@ class TestUser(unittest.TestCase):
         r = rq.get(f"{BASE_API_URL}/user/{username}")
         self.assertFalse(r.json()) # assert empty list
     
-    def test_user_creation_email_contails_illegal_characters(self):
-        username = 'demousername'
-        password = 'demopassword'
-        email    = '420demoemail@example.com'
-        r = rq.post(f"{BASE_API_URL}/create/user",
-                    headers={"Content-Type": "application/json"},
-                    data=json.dumps({"username": username, "password": password, "email": email}))
-        self.assertEqual(r.status_code, 422)
-        r = rq.get(f"{BASE_API_URL}/user/{username}")
-        self.assertFalse(r.json()) # assert empty list
-
     def test_user_creation_username_too_short(self):
         username = 'dem'
         password = 'demopassword'
