@@ -50,6 +50,26 @@ class TestUser(unittest.TestCase):
         self.assertEqual(res['username'], username)
         self.assertEqual(res['email'], email)
 
+class TestLogin(unittest.TestCase):
+
+    def setUp(self):
+        username = 'demousername'
+        password = 'demopassword'
+        email    = 'demoemail@example.com'
+        rq.delete(f"{BASE_API_URL}/user/{username}")
+        r = rq.post(f"{BASE_API_URL}/create/user",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps({"username": username, "password": password, "email": email}))
+        self.assertEqual(r.status_code, 201)
+        r = rq.get(f"{BASE_API_URL}/user/{username}")
+        res = r.json()[0]
+        self.assertEqual(res['username'], username)
+        self.assertEqual(res['email'], email)
+
+    def tearDown(self):
+        username = 'demousername'
+        rq.delete(f"{BASE_API_URL}/user/{username}")
+
 
     # TODO: Test email regex
 
