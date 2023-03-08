@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.router = void 0;
 var db_1 = require("../db");
+var utils_1 = require("../utils");
 var express = require("express");
 var router = express.Router();
 exports.router = router;
@@ -58,17 +59,36 @@ router.get("/:user", function (req, res) { return __awaiter(void 0, void 0, void
 }); });
 // DELETE
 router["delete"]("/:user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var username, query;
+    var username, _start, query, _end, _end;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 username = req.params.user;
+                if (process.env.DEBUG >= 1) {
+                    process.stdout.write("\nDELETE user    : ".concat(req.socket.remoteAddress, " : "));
+                    _start = process.hrtime.bigint();
+                }
+                if (!(0, utils_1.user_exists)(username)) return [3 /*break*/, 2];
                 return [4 /*yield*/, (0, db_1.queryDB)("DELETE FROM users WHERE username=$1;", [username])];
             case 1:
                 query = _a.sent();
-                res.status = 200;
-                res.send(query);
-                return [2 /*return*/];
+                if (process.env.DEBUG >= 1) {
+                    _end = process.hrtime.bigint();
+                    process.stdout.write("".concat("".padStart(10), "SUCCESS : User ").concat(username, " deleted.").padEnd(60));
+                    process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                }
+                res.status(200);
+                res.send("Deleted");
+                return [3 /*break*/, 3];
+            case 2:
+                if (process.env.DEBUG >= 1) {
+                    _end = process.hrtime.bigint();
+                    process.stdout.write("ERROR, user not found \t ".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                }
+                res.status(404);
+                res.send("User not found.");
+                _a.label = 3;
+            case 3: return [2 /*return*/];
         }
     });
 }); });

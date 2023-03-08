@@ -56,11 +56,14 @@ var temp = multer.diskStorage({
 var upload = multer({ storage: temp });
 var db_1 = require("../db");
 router.post("/dataset", upload.single("init"), function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var owner_entry, owner, owner, cont, contguide, description, licence, readme, file, FILE_UPLOAD, ret;
+    var _start, owner_entry, owner, owner, cont, contguide, description, licence, readme, file, FILE_UPLOAD, ret, _end, _end, _end, _end, _end, _end;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                process.stdout.write("\n\tCREATE ds : ".concat(req.socket.remoteAddress, " : "));
+                if (process.env.DEBUG >= 1) {
+                    process.stdout.write("\nCREATE dataset : ".concat(req.socket.remoteAddress, " : "));
+                    _start = process.hrtime.bigint();
+                }
                 // Required info
                 try {
                     assert(req.body.owner !== null, "Owner Required.");
@@ -68,7 +71,8 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 }
                 catch (e) {
                     assert(e instanceof assert.AssertionError);
-                    process.stdout.write("ERROR: Missing required information. ".concat(e));
+                    if (process.env.DEBUG > 1)
+                        process.stdout.write("".concat("".padStart(10), "ERROR: Missing required information ").concat(e).padEnd(60));
                     res.status(400);
                     res.send("Missing required information.");
                     return [2 /*return*/];
@@ -77,7 +81,8 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
             case 1:
                 // already exists ?
                 if (_a.sent()) {
-                    process.stdout.write(" ERROR: Dataset already exists. ".concat(req.body.name));
+                    if (process.env.DEBUG >= 1)
+                        process.stdout.write("".concat("".padStart(10), "ERROR   : Dataset already exists, ").concat(req.body.name, ".").padEnd(60));
                     res.status(409); // Conflict	
                     res.send("A dataset with the name ".concat(req.body.name, " already exists."));
                     return [2 /*return*/];
@@ -118,26 +123,41 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 ret = _a.sent();
                 switch (ret) {
                     case db_1.csv_mig_errors.SUCCESSFUL_MIGRATION:
-                        process.stdout.write(" Successful data migration, dataset '".concat(name, "' created."));
-                        if (process.env.DEBUG)
-                            process.stdout.write("Successful migration.");
+                        if (process.env.DEBUG >= 1) {
+                            _end = process.hrtime.bigint();
+                            process.stdout.write("".concat("".padStart(10), "SUCCESS : Successful Migration.").padEnd(60));
+                            process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                        }
                         res.status(201); // Created
                         res.send("Recieved data : ".concat(JSON.stringify(req.body)));
                         break;
                     case db_1.csv_mig_errors.ERROR_GENERATING_SCHEMA:
                     case db_1.csv_mig_errors.ERROR_GENERATING_DB_COMMANDS:
                         process.stdout.write("ERROR, Schema or Commands generation failure");
+                        if (process.env.DEBUG >= 1) {
+                            _end = process.hrtime.bigint();
+                            process.stdout.write("".concat("".padStart(10), "ERROR : Schema or Command Generation Failure.").padEnd(60));
+                            process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                        }
                         res.status(421); // Unprocessable Entity
                         res.send("Error parsing input on out end. Sorry");
                         break;
                     case db_1.csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
-                        process.stdout.write("ERROR, Illegal column names");
+                        if (process.env.DEBUG >= 1) {
+                            _end = process.hrtime.bigint();
+                            process.stdout.write("".concat("".padStart(10), "ERROR : Illegal column names.").padEnd(60));
+                            process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                        }
                         res.status(400); // Bad request
                         res.send("Your file contains illegal column names. Please make sure to\n\t\t\t\t\t\t\t\t\t\thave your first row be in accordance with SQL naming conventions.");
                         break;
                     case db_1.csv_mig_errors.FAILURE_TO_GENERATE_TABLE:
                     case db_1.csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
-                        process.stdout.write("ERROR, Database error");
+                        if (process.env.DEBUG >= 1) {
+                            _end = process.hrtime.bigint();
+                            process.stdout.write("".concat("".padStart(10), "ERROR : Failure to generate table and migrate data.").padEnd(60));
+                            process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                        }
                         res.status(500); // Internal server error
                         res.send("Internal Server Error. Sorry.");
                         break;
@@ -145,15 +165,20 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
                 }
                 return [3 /*break*/, 10];
             case 9:
-                process.stdout.write("RESOLVED, dataset '".concat(req.body.name, "' created."));
-                if (process.env.DEBUG)
-                    process.stdout.write("Created.");
+                if (process.env.DEBUG >= 1) {
+                    _end = process.hrtime.bigint();
+                    process.stdout.write("".concat("".padStart(10), "SUCCESS : DS ").concat(req.body.name, " created").padEnd(60));
+                    process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                }
                 res.status(201); // Created
-                res.send("Recieved data : ".concat(JSON.stringify(req.body)));
+                res.send("Created");
                 _a.label = 10;
             case 10: return [3 /*break*/, 12];
             case 11:
-                process.stdout.write(" ERROR, user ".concat(req.body.owner, " not found."));
+                if (process.env.DEBUG >= 1) {
+                    _end = process.hrtime.bigint();
+                    process.stdout.write("ERROR, user ".concat(req.body.owner, " not found. \t ").concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                }
                 res.status(404);
                 res.send("User not found: ".concat(req.body.owner));
                 return [2 /*return*/];
@@ -162,34 +187,34 @@ router.post("/dataset", upload.single("init"), function (req, res, next) { retur
     });
 }); });
 router.post("/user", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var now, cakeday, rq;
+    var _start, now, cakeday, rq, _end;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("CREATE user REQUEST from:  ".concat(req.socket.remoteAddress));
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, , 3, 4]);
-                assert((0, utils_1.validate)(req.body['username'], utils_1.dtype.USERNAME));
-                assert((0, utils_1.validate)(req.body['email'], utils_1.dtype.EMAIL));
-                try {
+                if (process.env.DEBUG >= 1) {
+                    process.stdout.write("\nCREATE user    : ".concat(req.socket.remoteAddress, " : "));
+                    _start = process.hrtime.bigint();
                 }
-                catch (err) {
-                    assert(err instanceof assert.AssertionError);
+                // TODO: Shit code 
+                if (!(0, utils_1.validate)(req.body.username, utils_1.dtype.USERNAME) || !(0, utils_1.validate)(req.body.email, utils_1.dtype.EMAIL)) {
+                    process.stdout.write("ERROR, Incorrect Information.");
                     res.status(422);
                     res.send("Incorrect information");
+                    return [2 /*return*/];
                 }
                 now = new Date();
                 cakeday = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
                 return [4 /*yield*/, (0, db_1.queryDB)("INSERT INTO users (username, cakeday, email, password) \n\t\t\t\t\t\t\t\t\t\t\t\t\t\tVALUES($1, $2, $3, crypt($4, gen_salt('bf')))", [req.body['username'], cakeday, req.body['email'], req.body['password']])];
-            case 2:
+            case 1:
                 rq = _a.sent();
-                //console.log(rq);
+                if (process.env.DEBUG >= 1) {
+                    _end = process.hrtime.bigint();
+                    process.stdout.write("".concat("".padStart(10), "SUCCESS : User ").concat(req.body.username, " created.").padEnd(60));
+                    process.stdout.write("".concat((Number(_end - _start) * 1e-6).toFixed(2), "ms"));
+                }
                 res.status(201);
                 res.send(JSON.stringify(rq));
-                return [3 /*break*/, 4];
-            case 3: return [7 /*endfinally*/];
-            case 4: return [2 /*return*/];
+                return [2 /*return*/];
         }
     });
 }); });

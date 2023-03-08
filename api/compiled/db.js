@@ -80,7 +80,6 @@ function create_ds_metadata(ds_name, ds_cont, ds_owner) {
                     return [4 /*yield*/, queryDB("INSERT INTO ds_metadata (ds_name, contribution, owner) VALUES ( $1, $2, $3);", [ds_name, ds_cont.toString(), ds_owner.toString()])];
                 case 1:
                     ret = _a.sent();
-                    console.log(ret);
                     return [2 /*return*/];
             }
         });
@@ -105,7 +104,6 @@ function create_ds_frontend(ds_name, ds_description, ds_num_cont, ds_num_entries
                     return [4 /*yield*/, queryDB("INSERT INTO ds_frontend (num_contributors, description, num_entries, licence, ds_id, contribution_guidelines, readme) VALUES($1, $2, $3, $4, $5, $6, $7);", [ds_num_cont, ds_description, ds_num_entries, ds_licence, dsid, ds_contguide, ds_readme])];
                 case 2:
                     ret = _a.sent();
-                    console.log(ret);
                     return [2 /*return*/];
             }
         });
