@@ -30,7 +30,8 @@ router.get("/:dsid", async (req, res) => {
 				catch(e) { console.log(e); }
 				if(process.env.DEBUG) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+					process.stdout.write(`${"".padStart(20)}SUCCESS`.padEnd(77)) 
+					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 				}
 			}
 		});
@@ -106,7 +107,8 @@ router.get("/:dsid/sample", async (req, res) => {
 		res.send(ret);
 			if(process.env.DEBUG) {
 				const _end = process.hrtime.bigint();
-				process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+				process.stdout.write(`${"".padStart(10)}SUCCESS`.padEnd(73)) 
+				process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 			}
 	} else {
 		process.stdout.write(`\t ERROR \t Dataset does not exist`);
@@ -149,7 +151,8 @@ router.get("/:dsid/details", async (req, res) => {
 				var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
 				if(process.env.DEBUG >= 1) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`\nSELECT ${query} from ${dsid} : SUCCESS \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+					process.stdout.write(`\nSELECT ${query} from ${dsid} : ${req.socket.remoteAddress} : ${"".padStart(6)}SUCCESS`.padEnd(97)) 
+					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 				}
 				res.status(200);
 				res.send(JSON.stringify(ret.rows[0]));
@@ -158,7 +161,8 @@ router.get("/:dsid/details", async (req, res) => {
 		}
 		if(process.env.DEBUG >= 1) {
 			const _end = process.hrtime.bigint();
-			process.stdout.write(`\nSELECT * from ${dsid} : SUCCESS \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+			process.stdout.write(`\nSELECT * from ${dsid} : ${req.socket.remoteAddress} : ${"".padStart(6)}SUCCESS`.padEnd(97)) 
+			process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 		}
  	 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
  	 	res.status(200);

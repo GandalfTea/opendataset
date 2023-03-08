@@ -94,6 +94,7 @@ class TestDatasetCreation(unittest.TestCase):
     def test_dataset_creation_defaulted_licence(self):
         name = 'demo-dataset_defaulted'
         owner = 'demousername'
+        rq.delete(f"{BASE_API_URL}/ds/{name}")
         r = rq.post(f"{BASE_API_URL}/create/dataset",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"name": name, "owner": owner}))
@@ -264,8 +265,8 @@ class TestDatasetMethods(unittest.TestCase):
                      data = json.dumps({"data": new_guidelines}))
         self.assertEqual(r.status_code, 200)
         r = rq.get(f"{BASE_API_URL}/ds/{self.name}/details?q=contribution_guidelines")
-        r = r.json()
-        self.assertEqual(r['contribution_guidelines'], new_guidelines)
+        r = r.json()['contribution_guidelines']
+        self.assertEqual(r, new_guidelines)
 
     def test_update_contibutors_number(self):
         new_cont = 42069 
@@ -273,10 +274,9 @@ class TestDatasetMethods(unittest.TestCase):
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_cont}))
         self.assertEqual(r.status_code, 200)
-        r = rq.get(f"{BASE_API_URL}/ds/{self.name}/details?q=contribution_guidelines")
+        r = rq.get(f"{BASE_API_URL}/ds/{self.name}/details?q=num_contributors")
         r = r.json()
-        print(r)
-        self.assertEqual(r['contribution_guidelines'], new_cont)
+        self.assertEqual(r['num_contributors'], new_cont)
     
     def test_update_num_entries(self):
         new_nument = 42069 
@@ -286,7 +286,7 @@ class TestDatasetMethods(unittest.TestCase):
         self.assertEqual(r.status_code, 200)
         r = rq.get(f"{BASE_API_URL}/ds/{self.name}/details?q=num_entries")
         r = r.json()
-        self.assertEqual(r['contribution_guidelines'], new_nument)
+        self.assertEqual(r['num_entries'], new_nument)
 
 
     # DELETE 

@@ -30,7 +30,8 @@ router.delete("/:user", async (req, res) => {
   	);
 		if(process.env.DEBUG >=1) {
 			const _end = process.hrtime.bigint();
-			process.stdout.write(`SUCCESS, user ${username} deleted. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+			process.stdout.write(`${"".padStart(10)}SUCCESS : User ${username} deleted.`.padEnd(60)) 
+			process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 		}
   	res.status(200);
   	res.send("Deleted");

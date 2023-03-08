@@ -40,7 +40,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 	} catch(e) {
 		assert(e instanceof assert.AssertionError);
 		if(process.env.DEBUG > 1)
-			process.stdout.write(`ERROR : Missing required information. ${e}`);
+			process.stdout.write(`${"".padStart(10)}ERROR: Missing required information ${e}`.padEnd(60)) 
 		res.status(400);
 		res.send("Missing required information.");
 		return;
@@ -49,7 +49,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 	// already exists ?
 	if( await ds_exists(req.body.name)) {
 		if(process.env.DEBUG >= 1)
-			process.stdout.write(`ERROR : Dataset already exists. ${req.body.name}`)
+			process.stdout.write(`${"".padStart(10)}ERROR   : Dataset already exists, ${req.body.name}.`.padEnd(60)) 
 		res.status(409); // Conflict	
     res.send(`A dataset with the name ${req.body.name} already exists.`);
     return;
@@ -88,7 +88,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
         case csv_mig_errors.SUCCESSFUL_MIGRATION:
           if(process.env.DEBUG >= 1) {
 						const _end = process.hrtime.bigint();
-						process.stdout.write(`Successful migration. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+						process.stdout.write(`${"".padStart(10)}SUCCESS : Successful Migration.`.padEnd(60)) 
+						process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 					}
           res.status(201); // Created
           res.send(`Recieved data : ${JSON.stringify(req.body)}`);
@@ -99,7 +100,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
           process.stdout.write(`ERROR, Schema or Commands generation failure`);
           if(process.env.DEBUG >= 1) {
 						const _end = process.hrtime.bigint();
-          	process.stdout.write(`ERROR, Schema or Commands generation failure \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+						process.stdout.write(`${"".padStart(10)}ERROR : Schema or Command Generation Failure.`.padEnd(60)) 
+						process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 					}
           res.status(421); // Unprocessable Entity
           res.send(`Error parsing input on out end. Sorry`);
@@ -108,7 +110,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
         case csv_mig_errors.ERROR_ILLEGAL_COLUMN_NAMES:
           if(process.env.DEBUG >= 1) {
 						const _end = process.hrtime.bigint();
-          	process.stdout.write(`ERROR, Illegal column names \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+						process.stdout.write(`${"".padStart(10)}ERROR : Illegal column names.`.padEnd(60)) 
+						process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 					}
           res.status(400); // Bad request
           res.send(`Your file contains illegal column names. Please make sure to
@@ -119,7 +122,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
         case csv_mig_errors.FAILURE_TO_MIGRATE_CSV_INTO_TABLE:
           if(process.env.DEBUG >= 1) {
 						const _end = process.hrtime.bigint();
-          	process.stdout.write(`ERROR, Database error \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+						process.stdout.write(`${"".padStart(10)}ERROR : Failure to generate table and migrate data.`.padEnd(60)) 
+						process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 					}
           res.status(500); // Internal server error
           res.send(`Internal Server Error. Sorry.`);
@@ -129,7 +133,8 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     } else {
       if(process.env.DEBUG >= 1) {
 					const _end = process.hrtime.bigint();
-          process.stdout.write(`SUCCESS, ds ${req.body.name} created. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`);
+					process.stdout.write(`${"".padStart(10)}SUCCESS : DS ${req.body.name} created`.padEnd(60)) 
+					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 			}
       res.status(201); // Created
       res.send(`Created`);
@@ -171,7 +176,8 @@ router.post("/user", async (req, res) => {
 					        [req.body['username'], cakeday, req.body['email'], req.body['password']]);
 	if(process.env.DEBUG >= 1) {
 		const _end = process.hrtime.bigint()
-		process.stdout.write(`SUCCESS, user ${req.body.username} created. \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+		process.stdout.write(`${"".padStart(10)}SUCCESS : User ${req.body.username} created.`.padEnd(60)) 
+		process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 	}
   res.status(201);
   res.send(JSON.stringify(rq));
