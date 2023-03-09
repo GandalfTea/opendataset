@@ -11,7 +11,7 @@ const router = express.Router();
 // TODO: Cache recent downloads
 router.get("/:dsid", async (req, res) => {
 	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET ${req.params.dsid} : `);
+		process.stdout.write(`\nGET    ${req.params.dsid} : `);
 		const _start = process.hrtime.bigint();
 	}
 
@@ -30,7 +30,7 @@ router.get("/:dsid", async (req, res) => {
 				catch(e) { console.log(e); }
 				if(process.env.DEBUG) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`${"".padStart(20)}SUCCESS`.padEnd(77)) 
+					process.stdout.write(`${"".padStart(20)}SUCCESS`.padEnd(74)) 
 					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 				}
 			}
@@ -46,7 +46,7 @@ router.get("/:dsid", async (req, res) => {
 // Get random percentage from dataset
 router.get("/:dsid/p/:percentage", async (req, res) => {
 	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET ${req.params.percentage}% ${req.params.dsid}`);
+		process.stdout.write(`\nGET    ${req.params.percentage}% ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
 	}
 
@@ -93,7 +93,7 @@ router.get("/:dsid/p/:percentage", async (req, res) => {
 // TODO: Switch to int dsid
 router.get("/:dsid/sample", async (req, res) => {
 	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET SAMPLE ${req.params.dsid}`);
+		process.stdout.write(`\nGET    SAMPLE ${req.params.dsid}`);
 		const _start = process.hrtime.bigint();
 	}
 	if(ds_exists(req.params.dsid)) {
@@ -107,7 +107,7 @@ router.get("/:dsid/sample", async (req, res) => {
 		res.send(ret);
 			if(process.env.DEBUG) {
 				const _end = process.hrtime.bigint();
-				process.stdout.write(`${"".padStart(10)}SUCCESS`.padEnd(73)) 
+				process.stdout.write(`${"".padStart(10)}SUCCESS`.padEnd(70)) 
 				process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
 			}
 	} else {
