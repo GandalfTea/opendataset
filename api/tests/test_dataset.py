@@ -1,6 +1,5 @@
 
 import unittest
-import time
 from setup import *
 unittest.TestLoader.sortTestMethodsUsing = None
 
