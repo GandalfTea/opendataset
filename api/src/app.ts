@@ -42,7 +42,10 @@ app.use(
 
 app.get("/", (req, res) => {
   res.status = 200;
-  res.send("Hello");
+	if(req.session.user)
+		res.send(`Hello, ${req.session.user}.`)
+		return;
+  res.send("Hello, stranger");
 });
 
 // Routes
