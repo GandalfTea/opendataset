@@ -3,7 +3,8 @@ dump.sh
 node_modules
 *.swp
 package-lock.json
-
+compiled
+simplehtml
 
 # Swap
 [._]*.s[a-v][a-z]

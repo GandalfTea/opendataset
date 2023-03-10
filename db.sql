@@ -169,6 +169,17 @@ CREATE TABLE public.second_dataset (
 
 
 --
+-- Name: session; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.session (
+    sid character varying NOT NULL,
+    sess json NOT NULL,
+    expire timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -242,7 +253,7 @@ COPY public.contributors (user_id, ds_id) FROM stdin;
 --
 
 COPY public.ds_frontend (num_contributors, description, num_entries, licence, ds_id, readme, contribution_guidelines) FROM stdin;
-0	The Bee Movie script, but it's actually an anime title dataset	0	0	52	### Simple README.md example. \n This **should** be markdown formatted so that it is nice and crispy when reading. \n It can also technically render LaTeX, \n $ e^{i\\pi} = -1 $ \n $$ \n \\int\\limits_0^1 x^2 + y^2 \\ dx \n $$	# How to contribute to Datasets?  Datasets is an open source project, so all contributions and suggestions are welcome
+0	The Bee Movie script, but it's actually an anime title dataset	0	0	52	### Simple README.md example. \n This **should** be markdown formatted so that it is nice and crispy when reading. \n It can also technically render LaTeX, \n $ e^{i\\pi} = -1 $ \n $$ \n \\int\\limits_0^1 x^2 + y^2 \\ dx \n $$	#### General contribution guidelines:  \\n    * Nothing illegal (follow common sense). \\n      * Another requirement that I  cannot think about now. \\n     * Yet another requirement, this time more detailed because it will probably be something important.  \\n\\n  &nbsp;  \\n\\n     For more information, please read the full  *general contributions guidelines*.
 \.
 
 
@@ -5272,11 +5283,21 @@ COPY public.second_dataset (index, id, name, owner, rank, score, price, tax, pro
 
 
 --
+-- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.session (sid, sess, expire) FROM stdin;
+\.
+
+
+--
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
 COPY public.users (username, email, cakeday, password, id) FROM stdin;
 GandalfTea	contact@octavian.work	2023-01-04	$2a$06$1XcvglP07B8yBybn1if9pufihVWnElinBOH10z7UlkjzPzyufKtwG	1
+demousername	demoemail@example.com	2023-02-23	$2a$06$kMhGrVTqI65afloJ2gJJeOQFBFi.AtVXcKcO5sL8sjYOYcfnXjWNm	83
+demousername	420demoemail@example.com	2023-02-23	$2a$06$SUwZwEpu1vC.Cbz2Zf1T/utB10vrEut6qmyoLeYT2Qb5h9kJrzZDW	84
 \.
 
 
@@ -5291,7 +5312,7 @@ SELECT pg_catalog.setval('public.ds_frontend_ds_id_seq', 1, false);
 -- Name: ds_metadata_dataset_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.ds_metadata_dataset_id_seq', 77, true);
+SELECT pg_catalog.setval('public.ds_metadata_dataset_id_seq', 89, true);
 
 
 --
@@ -5305,7 +5326,7 @@ SELECT pg_catalog.setval('public.issues_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 63, true);
+SELECT pg_catalog.setval('public.users_id_seq', 90, true);
 
 
 --
@@ -5341,6 +5362,14 @@ ALTER TABLE ONLY public.ds_metadata
 
 
 --
+-- Name: session session_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5354,6 +5383,13 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: IDX_session_expire; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX "IDX_session_expire" ON public.session USING btree (expire);
 
 
 --
