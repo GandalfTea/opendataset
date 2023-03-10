@@ -1,5 +1,6 @@
 import { queryDB } from "../db";
 import {user_exists} from "../utils";
+import log from "../logging";
 
 const express = require("express");
 const router = express.Router();
@@ -15,11 +16,22 @@ router.get("/:user", async (req: any, res: any) => {
 });
 
 // DELETE
+// Note: Requires session.
+
 router.delete("/:user", async (req, res) => {
+
   var username: string = req.params.user;
 
+	/*
+	if(req.session.user === undefined || req.session.user !== username) {
+		res.status(401) // Unauthorised
+		res.send("Unauthorised.")
+		return;
+	}
+	*/
+
 	if(process.env.DEBUG >= 1) {
-		process.stdout.write(`\nDELETE user    : ${req.socket.remoteAddress} : `)
+		//process.stdout.write(`\nDELETE user    : ${req.socket.remoteAddress} : `)
 		const _start = process.hrtime.bigint()
 	}
 
@@ -30,8 +42,9 @@ router.delete("/:user", async (req, res) => {
   	);
 		if(process.env.DEBUG >=1) {
 			const _end = process.hrtime.bigint();
-			process.stdout.write(`${"".padStart(10)}SUCCESS : User ${username} deleted.`.padEnd(60)) 
-			process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+			//process.stdout.write(`${"".padStart(10)}SUCCESS : User ${username} deleted.`.padEnd(60)) 
+			//process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+			log("DELETE", req.socket.remoteAddress, Number(_end - _start), 200, `User ${req.body.username} delete.`);
 		}
   	res.status(200);
   	res.send("Deleted");

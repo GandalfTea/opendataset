@@ -177,7 +177,18 @@ router.get("/:dsid/details", async (req, res) => {
 
 
 // UPDATE FRONTEND
+// NOTE: Requires session.
+
 router.patch("/:dsid/details", async (req, res) => {
+
+	if(req.session.user === undefined) {
+		res.status(401) // Unauthorized
+		res.send("Login required.")
+		return;
+	}
+
+	// TODO: Check if user has edit provileges on this ds
+	
 	var query: string = req.query.q;
 	var dsid: number | string = req.params.dsid;
 	if(ds_exists(dsid)) {
@@ -206,10 +217,19 @@ router.patch("/:dsid/details", async (req, res) => {
 	}
 });
 
-// EDIT
-
 // DELETE
+// NOTE: Requires session.
+
 router.delete("/:dsid", async (req, res) => {
+
+	if(req.session.user === undefined) {
+		res.status(401) // Unauthorized
+		res.send("Login required.")
+		return;
+	}
+
+	// TODO: Verify user has privilages
+
   var dsid: number | string = req.params.dsid;
 	if(ds_exists(dsid)) {
 		if(!Number.isInteger(Number(dsid))) {

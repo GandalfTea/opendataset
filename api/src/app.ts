@@ -41,11 +41,13 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.status = 200;
-	if(req.session.user)
-		res.send(`Hello, ${req.session.user}.`)
+  res.status(200);
+	if(req.session.user === undefined) {
+  	res.send("Hello, stranger");
 		return;
-  res.send("Hello, stranger");
+	} else {
+		res.send(`Hello, ${req.session.user}.`)
+	}
 });
 
 // Routes

@@ -1,5 +1,6 @@
 
 import { dtype, validate, ds_exists, user_exists} from '../utils'
+import log from "../logging";
 const express = require("express");
 const router = express.Router();
 const assert = require("assert");
@@ -29,7 +30,7 @@ import {
 
 router.post("/dataset", upload.single("init"), async (req, res, next) => {
 	if(process.env.DEBUG >= 1) {
-  	process.stdout.write(`\nCREATE dataset : ${req.socket.remoteAddress} : `);
+  	//process.stdout.write(`\nCREATE dataset : ${req.socket.remoteAddress} : `);
 		const _start = process.hrtime.bigint();
 	}
 
@@ -40,7 +41,7 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 	} catch(e) {
 		assert(e instanceof assert.AssertionError);
 		if(process.env.DEBUG > 1)
-			process.stdout.write(`${"".padStart(10)}ERROR: Missing required information ${e}`.padEnd(60)) 
+			//process.stdout.write(`${"".padStart(10)}ERROR: Missing required information ${e}`.padEnd(60)) 
 		res.status(400);
 		res.send("Missing required information.");
 		return;
@@ -48,8 +49,11 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 
 	// already exists ?
 	if( await ds_exists(req.body.name)) {
-		if(process.env.DEBUG >= 1)
-			process.stdout.write(`${"".padStart(10)}ERROR   : Dataset already exists, ${req.body.name}.`.padEnd(60)) 
+		if(process.env.DEBUG >= 1) {
+			const _end = process.hrtime.bigint();
+			//process.stdout.write(`${"".padStart(10)}ERROR   : Dataset already exists, ${req.body.name}.`.padEnd(60)) 
+			log("!!!", req.socket.remoteAddress, Number(_end - _start), 409, `Dataset "${req.body.name}" already exists.`);
+		}
 		res.status(409); // Conflict	
     res.send(`A dataset with the name ${req.body.name} already exists.`);
     return;
@@ -133,8 +137,9 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
     } else {
       if(process.env.DEBUG >= 1) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`${"".padStart(10)}SUCCESS : DS ${req.body.name} created`.padEnd(60)) 
-					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+					//process.stdout.write(`${"".padStart(10)}SUCCESS : DS ${req.body.name} created`.padEnd(60)) 
+					//process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+					log("POST", req.socket.remoteAddress, Number(_end - _start), 201, `Dataset ${req.body.name} created.`);
 			}
       res.status(201); // Created
       res.send(`Created`);
@@ -155,13 +160,13 @@ router.post("/dataset", upload.single("init"), async (req, res, next) => {
 router.post("/user", async (req, res) => {
 
 	if(process.env.DEBUG >=1) {
-  	process.stdout.write(`\nCREATE user    : ${req.socket.remoteAddress} : `);
+  	//process.stdout.write(`\nCREATE user    : ${req.socket.remoteAddress} : `);
 		const _start = process.hrtime.bigint();
 	}
 
 	// TODO: Shit code 
 	if(!validate(req.body.username, dtype.USERNAME) || !validate(req.body.email, dtype.EMAIL)) {
-		process.stdout.write("ERROR, Incorrect Information.")
+		//process.stdout.write("ERROR, Incorrect Information.")
 		res.status(422)
 		res.send("Incorrect information")
 		return;
@@ -176,8 +181,9 @@ router.post("/user", async (req, res) => {
 					        [req.body['username'], cakeday, req.body['email'], req.body['password']]);
 	if(process.env.DEBUG >= 1) {
 		const _end = process.hrtime.bigint()
-		process.stdout.write(`${"".padStart(10)}SUCCESS : User ${req.body.username} created.`.padEnd(60)) 
-		process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+		//process.stdout.write(`${"".padStart(10)}SUCCESS : User ${req.body.username} created.`.padEnd(60)) 
+		//process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+		log("POST", req.socket.remoteAddress, Number(_end - _start), 201, `User ${req.body.username} created.`);
 	}
   res.status(201);
   res.send(JSON.stringify(rq));
