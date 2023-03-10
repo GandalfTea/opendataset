@@ -1,5 +1,6 @@
 import { queryDB } from "../db";
 import {ds_exists} from "../utils";
+import log from "../logging";
 const path = require("path");
 const fs = require('fs');
 
@@ -10,10 +11,8 @@ const router = express.Router();
 
 // TODO: Cache recent downloads
 router.get("/:dsid", async (req, res) => {
-	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET    ${req.params.dsid} : `);
-		const _start = process.hrtime.bigint();
-	}
+
+	if(process.env.DEBUG) const _start = process.hrtime.bigint();
 
 	if(await ds_exists(req.params.dsid)) {
 		var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
@@ -30,13 +29,12 @@ router.get("/:dsid", async (req, res) => {
 				catch(e) { console.log(e); }
 				if(process.env.DEBUG) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`${"".padStart(20)}SUCCESS`.padEnd(74)) 
-					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+					log("GET", req.socket.remoteAddress, Number(_end - _start), 200, `Download ${req.params.dsid} as CSV.`);
 				}
 			}
 		});
 	} else {
-		process.stdout.write(`ERROR \t Dataset does not exist`);
+		if(process.env.DEBUG >= 1) log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -45,10 +43,8 @@ router.get("/:dsid", async (req, res) => {
 
 // Get random percentage from dataset
 router.get("/:dsid/p/:percentage", async (req, res) => {
-	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET    ${req.params.percentage}% ${req.params.dsid}`);
-		const _start = process.hrtime.bigint();
-	}
+
+	if(process.env.DEBUG) const _start = process.hrtime.bigint();
 
 	if(await ds_exists(req.params.dsid)) {
 		var rp = path.resolve(__dirname, '../../tmp/', `${req.params.dsid}-` + Date.now() + ".csv");
@@ -75,13 +71,13 @@ router.get("/:dsid/p/:percentage", async (req, res) => {
 				catch(e) { console.log(e); }
 				if(process.env.DEBUG) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`\t success \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+					log("GET", req.socket.remoteAddress, Number(_end - _start), 200, `Download ${req.params.percentage}% of ${req.params.dsid}.`);
 				}
 			}
 		});
 
 	} else {
-		if(process.env.DEBUG) process.stdout.write("\tERROR \t dataset does not exits.");
+		if(process.env.DEBUG >= 1) log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -92,10 +88,9 @@ router.get("/:dsid/p/:percentage", async (req, res) => {
 
 // TODO: Switch to int dsid
 router.get("/:dsid/sample", async (req, res) => {
-	if(process.env.DEBUG) {
-		process.stdout.write(`\nGET    SAMPLE ${req.params.dsid}`);
-		const _start = process.hrtime.bigint();
-	}
+
+	if(process.env.DEBUG) const _start = process.hrtime.bigint();
+
 	if(ds_exists(req.params.dsid)) {
 		if(Number.isInteger(Number(req.params.dsid))) {
  		 	var ret = await queryDB( `select ds_name from ds_metadata where ds_id=$1;`, [req.params.dsid]);
@@ -107,11 +102,10 @@ router.get("/:dsid/sample", async (req, res) => {
 		res.send(ret);
 			if(process.env.DEBUG) {
 				const _end = process.hrtime.bigint();
-				process.stdout.write(`${"".padStart(10)}SUCCESS`.padEnd(70)) 
-				process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+				log("GET", req.socket.remoteAddress, Number(_end - _start), 200, `Sample for ${req.params.dsid}.`);
 			}
 	} else {
-		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		if(process.env.DEBUG >= 1) log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -119,6 +113,7 @@ router.get("/:dsid/sample", async (req, res) => {
 
 
 
+// TODO: Write
 router.get("/:dsid/contributions/:hash", (req, res) => {
   var ds = req.params.dsid["uuid"];
   var hash = req.params.hash;
@@ -131,14 +126,17 @@ router.get("/:dsid/contributions/:hash", (req, res) => {
 /* GET metadata about dataset */
 
 router.get("/:dsid/details", async (req, res) => {
+
+	if(process.env.DEBUG >=1) const _start = process.hrtime.bigint();
+
   var dsid: number | string = req.params.dsid;
 	var query: string = req.query.q;
-	if(process.env.DEBUG >=1)
-		const _start = process.hrtime.bigint();
+
 	if(ds_exists(dsid)) {
 		if(!Number.isInteger(Number(dsid))) {
  		 	var ret = await queryDB( `select ds_id from ds_metadata where ds_name=$1;`, [dsid]);
 			if(ret.rowCount === 0) {
+				if(process.env.DEBUG >= 1) log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 				res.status(404);
 				res.send("Dataset not found.")
 				return;
@@ -151,24 +149,22 @@ router.get("/:dsid/details", async (req, res) => {
 				var ret = await queryDB(`SELECT ${query} FROM ds_frontend WHERE ds_id=$1`, [dsid]);
 				if(process.env.DEBUG >= 1) {
 					const _end = process.hrtime.bigint();
-					process.stdout.write(`\nSELECT ${query} from ${dsid} : ${req.socket.remoteAddress} : ${"".padStart(6)}SUCCESS`.padEnd(97)) 
-					process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+					log("GET", req.socket.remoteAddress, Number(_end - _start), 200, `Select ${query} from ${dsid}.`);
 				}
 				res.status(200);
 				res.send(JSON.stringify(ret.rows[0]));
 				return;
 			}
 		}
+ 	 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
 		if(process.env.DEBUG >= 1) {
 			const _end = process.hrtime.bigint();
-			process.stdout.write(`\nSELECT * from ${dsid} : ${req.socket.remoteAddress} : ${"".padStart(6)}SUCCESS`.padEnd(97)) 
-			process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
+			log("GET", req.socket.remoteAddress, Number(_end - _start), 200, `Select * from ${dsid}.`);
 		}
- 	 	var ret = await queryDB(`SELECT * FROM ds_frontend WHERE ds_id=$1`, [dsid]);
  	 	res.status(200);
   	res.send(JSON.stringify(ret.rows[0]));
 	} else {
-		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		if(process.env.DEBUG >= 1) log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -181,7 +177,10 @@ router.get("/:dsid/details", async (req, res) => {
 
 router.patch("/:dsid/details", async (req, res) => {
 
+	if(process.env.DEBUG >= 1) const _start = process.hrtime.bigint();
+
 	if(req.session.user === undefined) {
+		if(process.env.DEBUG >= 1) log("PATCH", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 401, `Unauthorised.`);
 		res.status(401) // Unauthorized
 		res.send("Login required.")
 		return;
@@ -195,6 +194,7 @@ router.patch("/:dsid/details", async (req, res) => {
 		if(!Number.isInteger(Number(dsid))) {
    		var ret = await queryDB( 'SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid]);
 			if(ret.rowCount === 0) {
+				if(process.env.DEBUG >= 1) log("PATCH", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 				res.status(404);
 				res.send("Dataset not found.")
 				return;
@@ -207,11 +207,12 @@ router.patch("/:dsid/details", async (req, res) => {
 				var ret = await queryDB(`UPDATE ds_frontend SET ${query}=$1 WHERE ds_id=$2`,
 															  [new_data, dsid]);
 			}
+			if(process.env.DEBUG >= 1) log("PATCH", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 200, `Updated ${query} for ${dsid}.`);
 			res.status(200);
 			res.send("Done.")
 		}
 	} else {
-		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		if(process.env.DEBUG >= 1) log("PATCH", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}
@@ -222,11 +223,16 @@ router.patch("/:dsid/details", async (req, res) => {
 
 router.delete("/:dsid", async (req, res) => {
 
+	if(process.env.DEBUG >= 1) const _start = process.hrtime.bigint();
+
+	/*
 	if(req.session.user === undefined) {
+		if(process.env.DEBUG >= 1) log("DELETE", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 401, `Unauthorised.`);
 		res.status(401) // Unauthorized
 		res.send("Login required.")
 		return;
 	}
+	*/
 
 	// TODO: Verify user has privilages
 
@@ -235,6 +241,7 @@ router.delete("/:dsid", async (req, res) => {
 		if(!Number.isInteger(Number(dsid))) {
    		var ret = await queryDB( 'SELECT ds_id FROM ds_metadata WHERE ds_name=$1;', [dsid]);
 			if(ret.rowCount === 0) {
+				if(process.env.DEBUG >= 1) log("DELETE", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 				res.status(404);
 				res.send("Dataset not found.")
 				return;
@@ -246,10 +253,11 @@ router.delete("/:dsid", async (req, res) => {
 
 		// TODO: Verify delete by rowCount 1
 		
+		if(process.env.DEBUG >= 1) log("DELETE", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 204, `Dataset ${dsid} deleted.`);
   	res.status(204);
   	res.send("Deleted.");
 	} else {
-		process.stdout.write(`\t ERROR \t Dataset does not exist`);
+		if(process.env.DEBUG >= 1) log("DELETE", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 404, `Dataset ${req.params.dsid} not found.`);
 		res.status(404);
 		res.send("Dataset not found.");
 	}

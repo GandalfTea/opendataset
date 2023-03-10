@@ -6,33 +6,31 @@ const express = require("express");
 const router = express.Router();
 
 router.get("/:user", async (req: any, res: any) => {
+	if(process.env.DEBUG >= 1) const _start = process.hrtime.bigint();
   var username: string = req.params.user;
   var get: any = await queryDB(
     `SELECT * FROM users WHERE username=$1;`,
 		[username]
   );
+	log("GET", req.socket.remoteAddress, Number(process.hrtime.bigint() - _start), 200, `Get user ${username}.`);
   res.status = 302;
   res.send(JSON.stringify(get["rows"]));
 });
+
 
 // DELETE
 // Note: Requires session.
 
 router.delete("/:user", async (req, res) => {
 
+	if(process.env.DEBUG >= 1) const _start = process.hrtime.bigint()
+
   var username: string = req.params.user;
 
-	/*
 	if(req.session.user === undefined || req.session.user !== username) {
 		res.status(401) // Unauthorised
 		res.send("Unauthorised.")
 		return;
-	}
-	*/
-
-	if(process.env.DEBUG >= 1) {
-		//process.stdout.write(`\nDELETE user    : ${req.socket.remoteAddress} : `)
-		const _start = process.hrtime.bigint()
 	}
 
 	if(user_exists(username)) {
@@ -42,22 +40,18 @@ router.delete("/:user", async (req, res) => {
   	);
 		if(process.env.DEBUG >=1) {
 			const _end = process.hrtime.bigint();
-			//process.stdout.write(`${"".padStart(10)}SUCCESS : User ${username} deleted.`.padEnd(60)) 
-			//process.stdout.write(`${(Number(_end - _start)*1e-6).toFixed(2)}ms`)
-			log("DELETE", req.socket.remoteAddress, Number(_end - _start), 200, `User ${req.body.username} delete.`);
+			log("DELETE", req.socket.remoteAddress, Number(_end - _start), 200, `User ${req.body.username} deleted.`);
 		}
   	res.status(200);
   	res.send("Deleted");
 	} else {
 		if(process.env.DEBUG >= 1) {
 			const _end = process.hrtime.bigint();
-			process.stdout.write(`ERROR, user not found \t ${ (Number(_end - _start)*1e-6).toFixed(2) }ms`)
+			log("DELETE", req.socket.remoteAddress, Number(_end - _start), 404, `User ${req.body.username} not found.`);
 		}
 		res.status(404)
 		res.send("User not found.")
 	}
-  /* TODO
-		[ ] ? Require some confirmation beforehand (to prevent accidental deletion) */
 });
 
 export { router };
