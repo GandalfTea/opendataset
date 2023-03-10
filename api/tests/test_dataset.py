@@ -155,6 +155,13 @@ class TestDatasetMethods(unittest.TestCase):
 
         rq.delete(f"{BASE_API_URL}/ds/demo-dataset")
 
+        # Login
+        self.session = rq.Session()
+        r = self.session.post(f"{BASE_API_URL}/login",
+                              headers={"Content-Type": "application/json"},
+                              data=json.dumps({"username": username, "password": password}))
+        self.assertEqual(r.status_code, 200)
+
         # DS 
         self.name = 'demo-dataset'
         owner = 'demousername'
@@ -163,14 +170,14 @@ class TestDatasetMethods(unittest.TestCase):
         description = "What is my purpose? Testing."
         readme = "DEMO"
         contribution_guidelines = "DON'T"
-        r = rq.post(f"{BASE_API_URL}/create/dataset",
+        r = self.session.post(f"{BASE_API_URL}/create/dataset",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps({"name": self.name, "owner": owner, "contributions": contributions,
                                      "contribution_guidelines": contribution_guidelines,
                                      "description": description, "licence": licence, "readme": readme}))
         self.assertEqual(r.status_code, 201)
 
-        r = rq.get(f"{BASE_API_URL}/ds/{self.name}/details")
+        r = self.session.get(f"{BASE_API_URL}/ds/{self.name}/details")
         r = r.json()
         self.assertEqual(r['contribution_guidelines'], contribution_guidelines)
         self.assertEqual(r['description'], description)
@@ -229,7 +236,7 @@ class TestDatasetMethods(unittest.TestCase):
 
     def test_update_description(self):
         new_description = "Updated Description"
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=description",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=description",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_description}))
         self.assertEqual(r.status_code, 200)
@@ -239,7 +246,7 @@ class TestDatasetMethods(unittest.TestCase):
 
     def test_update_readme(self):
         new_readme = "Updated Readme"
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=readme",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=readme",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_readme}))
         self.assertEqual(r.status_code, 200)
@@ -249,7 +256,7 @@ class TestDatasetMethods(unittest.TestCase):
 
     def test_update_licence(self):
         new_licence = 0 
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=licence",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=licence",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_licence}))
         self.assertEqual(r.status_code, 200)
@@ -259,7 +266,7 @@ class TestDatasetMethods(unittest.TestCase):
 
     def test_update_guidelines(self):
         new_guidelines = "Updated Guidelines"
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=contribution_guidelines",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=contribution_guidelines",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_guidelines}))
         self.assertEqual(r.status_code, 200)
@@ -269,7 +276,7 @@ class TestDatasetMethods(unittest.TestCase):
 
     def test_update_contibutors_number(self):
         new_cont = 42069 
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=num_contributors",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=num_contributors",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_cont}))
         self.assertEqual(r.status_code, 200)
@@ -279,7 +286,7 @@ class TestDatasetMethods(unittest.TestCase):
     
     def test_update_num_entries(self):
         new_nument = 42069 
-        r = rq.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=num_entries",
+        r = self.session.patch(f"{BASE_API_URL}/ds/{self.name}/details?q=num_entries",
                      headers={"Content-Type": "application/json"},
                      data = json.dumps({"data": new_nument}))
         self.assertEqual(r.status_code, 200)
@@ -291,7 +298,7 @@ class TestDatasetMethods(unittest.TestCase):
     # DELETE 
 
     def test_dataset_deletion(self):
-        r = rq.delete(f"{BASE_API_URL}/ds/{self.name}")
+        r = self.session.delete(f"{BASE_API_URL}/ds/{self.name}")
         self.assertEqual(r.status_code, 204)
 
 
